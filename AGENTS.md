@@ -84,8 +84,14 @@ Stage the symlink itself, not the file inside it.
 
 `CLAUDE.md` is a symlink to this file. Edit `AGENTS.md`.
 
-`to-tickets`, `triage`, and `to-spec` expect a per-repo issue tracker config
-under `docs/agents/`, which does not exist yet.
+### Issue tracker
 
-TODO: run `setup-matt-pocock-skills` to choose an issue tracker (GitHub Issues
-on `yahyabedirhan/steal`, or local markdown) and write `docs/agents/`.
+Issues live in this repo's GitHub issues (`yahyabedirhan/steal`), through the `gh` CLI. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+The five default triage labels, each named after its role (`needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`). See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context: one `GLOSSARY.md` at the root and ADRs in `docs/adr/`, both created when a term or decision is first settled. See `docs/agents/domain.md`.
