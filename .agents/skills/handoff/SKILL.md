@@ -1,11 +1,10 @@
 ---
 name: handoff
-description: Compact the current conversation into a handoff document for another agent to pick up.
+description: Compact the current conversation into a handoff document for another agent to pick up. Use when asked for a handoff, or when another skill says to write one.
 argument-hint: "What will the next session be used for?"
-disable-model-invocation: true
 ---
 
-Write a handoff document summarising the current conversation so a fresh agent can continue the work. Save to the temporary directory of the user's OS - not the current workspace.
+Write a handoff document summarising the current conversation so a fresh agent can continue the work. Save it in the repository, in the project's handoff folder, else as `.handoff/<date>-<topic>.md`, and leave it uncommitted: the session that hands over commits it with the rest of its work.
 
 Include a "suggested skills" section in the document, naming which skills the next agent should call the Skill tool for.
 

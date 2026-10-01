@@ -1,12 +1,11 @@
 ---
 name: to-spec
-description: "Turn the current conversation into a spec and publish it to the project issue tracker: no interview, just synthesis of what you've already discussed."
-disable-model-invocation: true
+description: "Turn the current conversation into a spec and publish it to the project issue tracker: no interview, just synthesis of what you've already discussed. Use when asked to write a spec, or when a thinking session reaches its spec step."
 ---
 
 This skill takes the current conversation context and codebase understanding and produces a spec. Do NOT interview the user; just synthesize what you already know.
 
-The issue tracker and triage label vocabulary should have been provided to you. If not, tell the user to run `/setup-matt-pocock-skills`.
+The issue tracker and triage label vocabulary should have been provided to you. If not, run the **set-up-project** skill first.
 
 ## Process
 
@@ -17,6 +16,8 @@ The issue tracker and triage label vocabulary should have been provided to you. 
 Check with the user that these seams match their expectations.
 
 3. Write the spec using the template below, then publish it to the project issue tracker. Apply the `ready-for-agent` triage label - no need for additional triage.
+
+On a local-files tracker, write the spec to `.efforts/<effort>/spec.md`, where `<effort>` is the effort's name (or a short slug for the feature when there is no effort). Its tickets go beside it, in `.efforts/<effort>/issues/`.
 
 <spec-template>
 
