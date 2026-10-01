@@ -90,7 +90,7 @@ The extension stays installed across restarts as long as the folder stays put.
 | `npm run dev` | The same build in watch mode. |
 | `npm run typecheck` | `tsc --noEmit` in strict mode. |
 | `npm test` | Run the test suite with Vitest (jsdom). |
-| `npm run gen-icons` | Regenerate the placeholder crosshair icons (`tools/gen-icons.py`, standard library only). |
+| `npm run gen-icons` | Regenerate the ice-cream-scoop icons at 16, 32, 48 and 128 px (`tools/gen-icons.py`, standard library only). |
 
 The source is TypeScript under `src/`, built by Vite. `dist/` is generated and
 gitignored. `demo.html` is a manual test page with nested lists, links, and
