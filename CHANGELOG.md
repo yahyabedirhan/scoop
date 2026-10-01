@@ -10,10 +10,25 @@ milestones. `0.1.0` will be the first version considered ready to use.
 
 ## [Unreleased]
 
-- Added `docs/scoop-v01.md`, a standalone description of the final project
-  state (behavior and low-level design). JSDoc comments scrubbed of
-  session-scoped phrasing ("shipped this pass", "from the design session") so
-  they describe the code as it stands.
+## [0.0.6] - 2026-10-01
+
+### Added
+- `docs/scoop-v01.md`, a standalone description of the final project state
+  (behavior and low-level design). JSDoc comments scrubbed of session-scoped
+  phrasing ("shipped this pass", "from the design session") so they describe
+  the code as it stands.
+- A 32 px icon, for toolbars on high-density screens.
+
+### Changed
+- Renamed from **Steal** to **Scoop**, because the old name read as aggressive
+  from the outside. The repository moved to `yahyabedirhan/scoop`.
+- A new ice-cream-scoop icon replaces the cursor-snatch logo. It shows a
+  smiling scoop of strawberry ice cream from 48 px up.
+- The keyboard command id is now `toggle-scoop`. A custom shortcut set for the
+  old `toggle-steal` id is dropped, so set it again in
+  `chrome://extensions/shortcuts` if you changed it. The default stays
+  `Cmd+Shift+S` / `Ctrl+Shift+S`.
+- The orchestrator class `Robber` is now `Scooper`, in `src/lib/scooper.ts`.
 
 ## [0.0.5] - 2026-09-05
 
