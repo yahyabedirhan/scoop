@@ -543,7 +543,7 @@ src/
 | `npm run dev` | the same two passes in `--watch` mode |
 | `npm run typecheck` | `tsc --noEmit`, `strict` |
 | `npm test` | `vitest run` (jsdom) |
-| `npm run gen-icons` | regenerate the placeholder icons (`tools/gen-icons.py`, standard library only) |
+| `npm run gen-icons` | regenerate the ice-cream-scoop icons at 16, 32, 48 and 128 px (`tools/gen-icons.py`, standard library only) |
 
 Install: `chrome://extensions` -> Developer mode -> Load unpacked -> pick
 `dist/`. After changing code, rebuild (or run the watch), click reload on the
