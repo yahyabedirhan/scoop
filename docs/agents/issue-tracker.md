@@ -1,6 +1,6 @@
 # Issue tracker: GitHub
 
-Issues and specs for this repo live as GitHub issues in `yahyabedirhan/steal`, so the repo has no `.efforts/` folder. Use the `gh` CLI for all operations.
+Issues and specs for this repo live as GitHub issues in `yahyabedirhan/scoop`, so the repo has no `.efforts/` folder. Use the `gh` CLI for all operations.
 
 ## Conventions
 

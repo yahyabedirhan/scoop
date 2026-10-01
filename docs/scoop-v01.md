@@ -1,8 +1,8 @@
-# Steal
+# Scoop
 
 Last updated: 2026-09-05
 
-This document describes the final state of Steal: how the extension behaves and
+This document describes the final state of Scoop: how the extension behaves and
 how it is built, as it stands now. It is written to be read on its own, without
 tracing the path that got here.
 
@@ -65,7 +65,7 @@ nothing anywhere.
 15. As a user, I want Down to move to the next element sibling, or, when there is none, to the nearest following element of an ancestor, so that a lone child still steps forward instead of dead-ending.
 16. As a user, I want Left to move to the parent element, so that I can widen to a container.
 17. As a user, I want Right to move to the first element child, so that I can narrow into a container.
-18. As a user, I want traversal to land only on element nodes and to skip document-metadata elements (`head`, `meta`, `title`, `script`, `link`, `style`, `base`, `noscript`) and Steal's own overlay, so that Right on `<html>` lands on `<body>` and I never end up inside `<head>`.
+18. As a user, I want traversal to land only on element nodes and to skip document-metadata elements (`head`, `meta`, `title`, `script`, `link`, `style`, `base`, `noscript`) and Scoop's own overlay, so that Right on `<html>` lands on `<body>` and I never end up inside `<head>`.
 19. As a user, I want arrow presses at the edges of the tree to do nothing (no wrap-around), so that I do not lose my place.
 20. As a user, I want an arrow-selected target scrolled into view when it lands offscreen, aligned to whichever edge it passed with a small margin, so that the page keeps its natural scroll direction and the highlight stays visible.
 21. As a user, I want the arrow keys and Space not to scroll the page while inspecting, so that navigation and scrolling do not fight.
@@ -79,8 +79,8 @@ nothing anywhere.
 26. As a user, I want a small toast at my cursor confirming the copy and naming what was copied, fading on its own after about a second, so that I get feedback without it getting in the way.
 27. As a user, I want a failed copy to show an error toast and leave inspect mode running, so that I can retry.
 28. As a user, I want each copy to belong to the inspection that started it, so that a slow clipboard write from an inspection I already cancelled cannot show feedback or end a new inspection.
-29. As a user, I want the copied element to exclude Steal's own overlay, label, and lingering toast, and to have any temporary class or style change Steal made restored first, so that I get page content only, even when the target is `<body>` or `<html>`.
-30. As a user, I want a page element that happens to share Steal's id or class to stay selectable and copyable, so that ownership is by identity, not by name.
+29. As a user, I want the copied element to exclude Scoop's own overlay, label, and lingering toast, and to have any temporary class or style change Scoop made restored first, so that I get page content only, even when the target is `<body>` or `<html>`.
+30. As a user, I want a page element that happens to share Scoop's id or class to stay selectable and copyable, so that ownership is by identity, not by name.
 
 ### Copy modes
 
@@ -128,7 +128,7 @@ Requirements:
    successful copy. Never restore inspect mode across a navigation.
 2. While inspecting: hover selects document.elementFromPoint; arrow keys walk the
    element tree (sibling / parent / child, lone-child gap-jump on Down), skipping
-   document-metadata tags and Steal's own nodes, with no wrap-around; the mouse
+   document-metadata tags and Scoop's own nodes, with no wrap-around; the mouse
    moving always overrides keyboard selection.
 3. Draw a fixed-position overlay on the target's bounding box and a label that
    names the target and previews the active mode. Neither intercepts pointer
@@ -141,14 +141,14 @@ Requirements:
    The active mode id persists in chrome.storage.local as one global value and is
    restored when a new inspection starts.
 6. Click or Enter copies the target in the active mode: capture a clone with
-   Steal's own nodes and temporary changes undone, run the mode's transform,
+   Scoop's own nodes and temporary changes undone, run the mode's transform,
    turn the result into text, write it with navigator.clipboard.writeText.
    Suppress the page's mousedown/mouseup/click entirely. Show a confirm or error
    toast. On success, exit; on failure, keep inspecting.
 7. Each copy belongs to its originating inspection; a completion that arrives
    after that inspection ended does nothing.
-8. Capture is page content only: exclude Steal's overlay/label/toast by node
-   identity, restore any class/style Steal applied, never mutate the live page.
+8. Capture is page content only: exclude Scoop's overlay/label/toast by node
+   identity, restore any class/style Scoop applied, never mutate the live page.
 
 Out of Scope:
 - Iframes and cross-origin frames (top document only).
@@ -170,7 +170,7 @@ Entities:
                     boundary; constructs one Scooper and guards double-injection
 - Scooper         (src/lib/scooper.ts)        - orchestrator: session, target,
                     UI, active mode, event listeners, copy sequencing
-- Inspector       (src/lib/inspector.ts)      - Steal's DOM footprint: injected
+- Inspector       (src/lib/inspector.ts)      - Scoop's DOM footprint: injected
                     roots, the temporary inspect-cursor class, clean capture
 - Scroller        (src/lib/scroll/scroller.ts, interface) - bring a target into view
 - MarginScroller  (src/lib/scroll/margin-scroller.ts) - the implementation in use
@@ -223,7 +223,7 @@ graph TD
 
 Top-down, orchestrator first.
 
-**`Scooper`** - the orchestrator (the name is a pun on "Steal"). Registers the
+**`Scooper`** - the orchestrator, named after the extension ("Scoop"). Registers the
 capture-phase pointer and keyboard listeners, owns which mode is active, and
 sequences `Inspector` and `Scroller`. Everything `chrome.*` is injected at the
 constructor boundary (`getStoredModeId`, `setStoredModeId`, `notify`), so neither
@@ -263,7 +263,7 @@ Every completion belongs to the session that started it. `stop()` nulls
 `this.session !== owner` and does nothing. A write already handed to the
 clipboard cannot be undone.
 
-**`Inspector`** - the DOM-facing interface for everything Steal adds to or
+**`Inspector`** - the DOM-facing interface for everything Scoop adds to or
 changes on the page. No knowledge of scrolling.
 
 | State | Behavior |
@@ -271,7 +271,7 @@ changes on the page. No knowledge of scrolling.
 | `roots: WeakSet<Node>` (mounted UI roots, membership by identity) | `mount(root)` - register and append to `body` or `documentElement` |
 | `inspectClass: {el, original, applied} \| null` | `isExtensionNode(el)` - is `el` inside a mounted root? |
 | | `setInspecting(on)` - add/remove the `ic-active` class on `<html>` |
-| | `capture(el)` - a clone with Steal's nodes removed and the class undone |
+| | `capture(el)` - a clone with Scoop's nodes removed and the class undone |
 
 ```text
 capture(el)
@@ -284,8 +284,8 @@ capture(el)
 ```
 
 `restoreInspectClass` restores the `class` attribute verbatim (including whether
-it existed) when it still equals what Steal produced; otherwise the page has
-edited it, so only Steal's own `ic-active` token is removed. The same rule
+it existed) when it still equals what Scoop produced; otherwise the page has
+edited it, so only Scoop's own `ic-active` token is removed. The same rule
 governs live cleanup and the captured clone.
 
 **`Scroller`** (interface) - the swap point for "how do we bring a target into
@@ -318,7 +318,7 @@ The property-diffing math is two pure functions in the same file:
 `applyScrollMargin(el, marginPx)` writes both properties and returns a record of
 exactly what changed; `restoreScrollMargin(el, change)` restores the `style`
 attribute byte-for-byte when it is untouched, else reverts only the properties
-Steal still owns (value unchanged, priority not raised to `!important`).
+Scoop still owns (value unchanged, priority not raised to `!important`).
 
 **`DomNavigator`** - side-effect-free traversal.
 
@@ -366,7 +366,7 @@ type makes a typo a compile error.
 
 **Activation.** The manifest declares `activeTab`, `scripting`, `storage`, no
 host permissions, and no content scripts. The toolbar action and the
-`toggle-steal` command (default `Ctrl+Shift+S`, `Cmd+Shift+S` on macOS) both call
+`toggle-scoop` command (default `Ctrl+Shift+S`, `Cmd+Shift+S` on macOS) both call
 `toggleOnTab(tab)`:
 
 ```text
@@ -377,7 +377,7 @@ toggleOnTab(tab)
   on failure (restricted page): console.warn, do nothing
 ```
 
-`content.ts` runs once per injection; if `window.__stealScooper` is already set it
+`content.ts` runs once per injection; if `window.__scoopScooper` is already set it
 bails, so the background's `Toggle` message is the single source of truth.
 `background.ts` keeps a `Set` of active tab ids, sets the `#1a73e8` `ON` badge on
 `Started`, clears it on `Ended`, on `tabs.onUpdated` `status === "loading"`, and
@@ -598,5 +598,5 @@ placement. `demo.html` is the manual test page.
   and the `../.handoff/` documents. `../CHANGELOG.md` is the version-level
   summary.
 - Naming in this codebase is literal and descriptive over short or clever, with
-  one sanctioned exception: `Scooper`, a pun on "Steal".
+  one sanctioned exception: `Scooper`, named after the extension.
 - No em dashes anywhere, including code comments and commit messages.

@@ -1,9 +1,9 @@
-# Steal
+# Scoop
 
 Point at any element on a web page and copy it straight to your clipboard, in
 whatever shape you need it: the full HTML, a cleaned-up version, plain text, or
-Markdown. The name is a joke. Steal only ever writes to your clipboard and sends
-nothing anywhere.
+Markdown. Like an ice-cream scoop, it lifts out just the part you want. Scoop
+only ever writes to your clipboard and sends nothing anywhere.
 
 It is a local, unpacked Chrome extension. There is no store listing and no
 account.
@@ -13,12 +13,12 @@ account.
 Getting one specific element off a page usually means opening DevTools, picking
 the node, and choosing Copy element, and what you get back is every class, every
 `data-*`, and every icon SVG. Most of the time you just want to remember what a
-section said, or paste it into your notes, not reproduce how it was built. Steal
+section said, or paste it into your notes, not reproduce how it was built. Scoop
 is a one-key way to grab an element and choose how much of it comes across.
 
 ## How it works
 
-1. Click the **Steal** toolbar icon, or press **Cmd+Shift+S** (macOS) /
+1. Click the **Scoop** toolbar icon, or press **Cmd+Shift+S** (macOS) /
    **Ctrl+Shift+S** (Windows/Linux). An `ON` badge appears on the icon and the
    page switches to a crosshair cursor. This only affects the tab you turned it
    on in.
@@ -41,8 +41,8 @@ is a one-key way to grab an element and choose how much of it comes across.
 6. Press **Esc**, press the shortcut again, or click the toolbar icon to leave
    inspect mode without copying.
 
-The copy is page content only. Steal's own highlight box, label, and toast are
-never included, and any temporary change Steal made to the page is undone before
+The copy is page content only. Scoop's own highlight box, label, and toast are
+never included, and any temporary change Scoop made to the page is undone before
 the copy is taken, even when you copy `<body>` or the whole `<html>`.
 
 Chrome does not allow a bare `Shift+S` for extension shortcuts, so the default
@@ -96,13 +96,13 @@ The source is TypeScript under `src/`, built by Vite. `dist/` is generated and
 gitignored. `demo.html` is a manual test page with nested lists, links, and
 buttons.
 
-- **[`docs/steal-v01.md`](docs/steal-v01.md)** is the full reference: how every
+- **[`docs/scoop-v01.md`](docs/scoop-v01.md)** is the full reference: how every
   piece works, the module layout, and the low-level design.
 - **[`CHANGELOG.md`](CHANGELOG.md)** is the version history.
 
 ## Not included
 
-Iframes and cross-origin frames (Steal works on the top document only), CSS
+Iframes and cross-origin frames (Scoop works on the top document only), CSS
 selectors or XPath, computed styles, screenshots, a toolbar popup or options
 page, SVG-aware cleaning, GFM tables in Markdown mode, and non-Chromium
-browsers. See [`docs/steal-v01.md`](docs/steal-v01.md) for the complete list.
+browsers. See [`docs/scoop-v01.md`](docs/scoop-v01.md) for the complete list.

@@ -25,7 +25,7 @@ export default defineConfig(({ mode }) => {
       lib: {
         entry: `src/entries/${entry}.ts`,
         formats: ["iife"],
-        name: `__steal_${entry}`,
+        name: `__scoop_${entry}`,
         fileName: () => `${entry}.js`,
       },
     },

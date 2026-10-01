@@ -1,9 +1,9 @@
-# Steal
+# Scoop
 
-`README.md` is the reference for what Steal does, how it is used, the copy
+`README.md` is the reference for what Scoop does, how it is used, the copy
 modes, the install and reload workflow, and the `npm` commands. Read it first
 and do not restate it here. Update it in the same commit whenever behavior
-changes. `docs/steal-v01.md` is the low-level design; `CHANGELOG.md` is the
+changes. `docs/scoop-v01.md` is the low-level design; `CHANGELOG.md` is the
 version history, pre-release `0.0.x`.
 
 ## Layout
@@ -27,7 +27,7 @@ than claiming a browser check happened.
 Four behaviors have each already been the subject of a bug fix. Treat them as
 regression-prone and cover them with tests when touching nearby code.
 
-- Copies contain page content only, with Steal's own overlay nodes excluded and
+- Copies contain page content only, with Scoop's own overlay nodes excluded and
   any temporary change it made to the page undone first, including when copying
   `<body>` or `<html>`.
 - Nothing leaves the machine. No network calls, no analytics, no storage beyond
@@ -86,7 +86,7 @@ Stage the symlink itself, not the file inside it.
 
 ### Issue tracker
 
-Issues live in this repo's GitHub issues (`yahyabedirhan/steal`), through the `gh` CLI. See `docs/agents/issue-tracker.md`.
+Issues live in this repo's GitHub issues (`yahyabedirhan/scoop`), through the `gh` CLI. See `docs/agents/issue-tracker.md`.
 
 ### Triage labels
 
