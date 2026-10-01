@@ -43,18 +43,6 @@ src/
 └── transport/      # sends API requests
 ```
 
-- Show component interaction, control flow, or data flow with Mermaid:
-
-```mermaid
-sequenceDiagram
-    participant User
-    participant UI
-    participant Daemon
-    User->>UI: choose command
-    UI->>Daemon: send expanded prompt
-    Daemon-->>UI: stream result
-```
-
 - Use `diff` when the point is what changes and the surrounding shape already exists. Match the diff shape to the topic.
 
 For a component change:
@@ -114,7 +102,7 @@ function expandSkill(command: string): string {
 }
 ```
 
-- For a visual UI, layout, state comparison, or concept too dense for Mermaid, write one focused HTML file — a diagram, an infographic, or a short slide deck, whichever fits the point. Match the product's colors, type, spacing, and components; use real labels and data; support desktop and mobile. Then open it for the user:
+- For a visual UI, layout, state comparison, or concept too dense for a text view, write one focused HTML file — a diagram, an infographic, or a short slide deck, whichever fits the point. Match the product's colors, type, spacing, and components; use real labels and data; support desktop and mobile. Then open it for the user:
 
 ```
 Bash(open path/to/show-me-{description}.html)
