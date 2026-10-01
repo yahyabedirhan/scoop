@@ -13,7 +13,7 @@ import { MessageType } from "./messages";
  * of them, and therefore the only place that needs to know both exist.
  *
  * Everything that touches `chrome.*` is injected at the constructor boundary
- * (`getStoredModeId`, `setStoredModeId`, `notify`), so neither `Robber` nor its
+ * (`getStoredModeId`, `setStoredModeId`, `notify`), so neither `Scooper` nor its
  * tests ever need a mocked `chrome` global.
  */
 
@@ -46,15 +46,15 @@ const ICONS: Record<string, string> = {
     '<svg viewBox="0 0 24 24"><path d="M3 17V7l4 5 4-5v10M17 7v7M14 11l3 3 3-3" style="d:path(\'M3 17V7l4 5 4-5v10M17 7v7M14 11l3 3 3-3\')"/></svg>',
 };
 
-/** How `Robber` restores the last-used mode and reports lifecycle changes. */
-export interface RobberDeps {
+/** How `Scooper` restores the last-used mode and reports lifecycle changes. */
+export interface ScooperDeps {
   inspector: Inspector;
   scroller: Scroller;
   modes: readonly Mode[];
   /**
    * Read the persisted mode id. `cb` may be called synchronously or later; by
    * the time it runs the session may have ended or already moved on, which
-   * `Robber` checks before applying the result.
+   * `Scooper` checks before applying the result.
    */
   getStoredModeId: (cb: (id: string | undefined) => void) => void;
   setStoredModeId: (id: string) => void;
@@ -83,13 +83,13 @@ interface LengthCache {
 
 type StopReason = "copied" | "escape" | "toggle";
 
-export class Robber {
+export class Scooper {
   private readonly inspector: Inspector;
   private readonly scroller: Scroller;
   private readonly modes: readonly Mode[];
-  private readonly getStoredModeId: RobberDeps["getStoredModeId"];
-  private readonly setStoredModeId: RobberDeps["setStoredModeId"];
-  private readonly notify: RobberDeps["notify"];
+  private readonly getStoredModeId: ScooperDeps["getStoredModeId"];
+  private readonly setStoredModeId: ScooperDeps["setStoredModeId"];
+  private readonly notify: ScooperDeps["notify"];
   private readonly nav = new DomNavigator();
 
   private session: Session | null = null;
@@ -105,7 +105,7 @@ export class Robber {
 
   private readonly listeners: [keyof WindowEventMap, EventListener][];
 
-  constructor(deps: RobberDeps) {
+  constructor(deps: ScooperDeps) {
     this.inspector = deps.inspector;
     this.scroller = deps.scroller;
     this.modes = deps.modes;

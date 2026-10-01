@@ -10,7 +10,7 @@ version history, pre-release `0.0.x`.
 
 - `src/entries/` — the two build entry points, `content.ts` and `background.ts`.
 - `src/lib/` — the logic: `inspector.ts` (hover, highlight, label),
-  `dom-navigator.ts` (arrow-key traversal), `robber.ts` (the copy itself),
+  `dom-navigator.ts` (arrow-key traversal), `scooper.ts` (the copy itself),
   `modes/` (one module per copy mode), `scroll/`, `utils/`.
 - `test/` — Vitest suites mirroring `src/lib/`.
 - `.specs/` — numbered specs, `NN-<kebab-topic>.md`, one per feature increment.

@@ -167,8 +167,8 @@ Entities:
 - BackgroundEntry (src/entries/background.ts) - service worker: toolbar action,
                     keyboard command, script injection, per-tab ON badge
 - ContentEntry    (src/entries/content.ts)    - the chrome.storage/runtime
-                    boundary; constructs one Robber and guards double-injection
-- Robber          (src/lib/robber.ts)         - orchestrator: session, target,
+                    boundary; constructs one Scooper and guards double-injection
+- Scooper         (src/lib/scooper.ts)        - orchestrator: session, target,
                     UI, active mode, event listeners, copy sequencing
 - Inspector       (src/lib/inspector.ts)      - Steal's DOM footprint: injected
                     roots, the temporary inspect-cursor class, clean capture
@@ -183,17 +183,17 @@ Entities:
 Relationships:
 - BackgroundEntry -> chrome.scripting (injects the built content bundle)
 - BackgroundEntry -> MessageType (interprets Started / Ended, sends Toggle)
-- ContentEntry    -> Robber (constructs and owns one instance)
-- ContentEntry    -> MessageType, chrome.storage.local (injected into Robber as callbacks)
-- Robber -> Inspector  (has-a; sibling of Scroller)
-- Robber -> Scroller   (has-a; sibling of Inspector)
-- Robber -> MODES      (reads the active Mode)
-- Robber -> DomNavigator (arrow traversal, passing Inspector.isExtensionNode as the skip predicate)
-- Robber -> formatHTML (only when a Mode.transform returns a node)
+- ContentEntry    -> Scooper (constructs and owns one instance)
+- ContentEntry    -> MessageType, chrome.storage.local (injected into Scooper as callbacks)
+- Scooper -> Inspector  (has-a; sibling of Scroller)
+- Scooper -> Scroller   (has-a; sibling of Inspector)
+- Scooper -> MODES      (reads the active Mode)
+- Scooper -> DomNavigator (arrow traversal, passing Inspector.isExtensionNode as the skip predicate)
+- Scooper -> formatHTML (only when a Mode.transform returns a node)
 - Mode.transform -> html-tags (Plain Text, Markdown); formatHTML -> html-tags
 ```
 
-`Inspector` and `Scroller` hold no reference to each other. `Robber` is the only
+`Inspector` and `Scroller` hold no reference to each other. `Scooper` is the only
 entity that holds both, so it is the only place that has to know both exist.
 Nothing under `src/lib/` imports `chrome`; the two `src/entries/` files are the
 only place `chrome.*` appears.
@@ -201,7 +201,7 @@ only place `chrome.*` appears.
 ```mermaid
 graph TD
     BG[BackgroundEntry] -->|executeScript + Toggle| CE[ContentEntry]
-    CE --> R[Robber]
+    CE --> R[Scooper]
     R --> INS[Inspector]
     R --> SC[Scroller]
     R --> MR[MODES]
@@ -223,11 +223,11 @@ graph TD
 
 Top-down, orchestrator first.
 
-**`Robber`** - the orchestrator (the name is a pun on "Steal"). Registers the
+**`Scooper`** - the orchestrator (the name is a pun on "Steal"). Registers the
 capture-phase pointer and keyboard listeners, owns which mode is active, and
 sequences `Inspector` and `Scroller`. Everything `chrome.*` is injected at the
 constructor boundary (`getStoredModeId`, `setStoredModeId`, `notify`), so neither
-`Robber` nor its tests need a mocked `chrome`.
+`Scooper` nor its tests need a mocked `chrome`.
 
 | State | Behavior |
 |---|---|
@@ -300,7 +300,7 @@ interface Scroller {
 }
 ```
 
-`Robber` calls `scroller.flush()` immediately before `inspector.capture()` and
+`Scooper` calls `scroller.flush()` immediately before `inspector.capture()` and
 in `stop()`, so the live page carries no scroll residue by the time anything is
 cloned. That is what lets `Inspector` stay unaware `Scroller` exists.
 
@@ -331,7 +331,7 @@ Steal still owns (value unchanged, priority not raised to `!important`).
 | `nextTarget(node, "right", skip)` | first element child past `skip` |
 | `describeElement(el)` | `tag#id.class1.class2`, lowercase tag |
 
-`skip` defaults to `isSkippable`; `Robber` passes
+`skip` defaults to `isSkippable`; `Scooper` passes
 `el => nav.isSkippable(el) || inspector.isExtensionNode(el)`.
 
 **`Mode`** - a duck-typed Strategy object, no base class.
@@ -350,7 +350,7 @@ interface Mode {
 
 `transform` receives a fresh clone from `Inspector.capture`. A returned node is
 turned into text by `formatHTML`; a returned string is used as-is. `MODES` is the
-ordered registry `[fullHtml, cleanHtml, plainText, markdown]`; `Robber` and the
+ordered registry `[fullHtml, cleanHtml, plainText, markdown]`; `Scooper` and the
 label renderer are both driven entirely by it.
 
 **`formatHTML(el)`** - pure DOM node to 2-space-indented HTML string. Block
@@ -377,7 +377,7 @@ toggleOnTab(tab)
   on failure (restricted page): console.warn, do nothing
 ```
 
-`content.ts` runs once per injection; if `window.__stealRobber` is already set it
+`content.ts` runs once per injection; if `window.__stealScooper` is already set it
 bails, so the background's `Toggle` message is the single source of truth.
 `background.ts` keeps a `Set` of active tab ids, sets the `#1a73e8` `ON` badge on
 `Started`, clears it on `Ended`, on `tabs.onUpdated` `status === "loading"`, and
@@ -386,7 +386,7 @@ on `tabs.onRemoved`.
 **Toggle to copy.**
 
 ```text
-ContentEntry receives Toggle -> Robber.toggle() -> start()
+ContentEntry receives Toggle -> Scooper.toggle() -> start()
   session = { copying: false, mode: MODES[0] }
   ui = buildUI(); inspector.mount(ui.root)
   addEventListener (capture phase): mousemove, mousedown, mouseup, click, keydown, scroll, resize
@@ -492,7 +492,7 @@ fallback. A rejection becomes the "Copy failed" toast.
 
 - **A fifth mode** is one module exporting a `Mode` object plus one entry in the
   `MODES` array. A mode with its own label glyph also adds one entry to the
-  `ICONS` map in `robber.ts`. Keyboard handling, label rendering, persistence,
+  `ICONS` map in `scooper.ts`. Keyboard handling, label rendering, persistence,
   and every existing mode are untouched. This is the seam the modes were built
   behind; it has held for four.
 - **A different scrolling algorithm** (for example one that scrolls a scrollable
@@ -516,10 +516,10 @@ cannot load ES modules). The background pass also copies `manifest.json`,
 ```text
 src/
 ├── entries/
-│   ├── content.ts        # chrome.storage / chrome.runtime boundary; builds one Robber
+│   ├── content.ts        # chrome.storage / chrome.runtime boundary; builds one Scooper
 │   └── background.ts     # chrome.action / scripting / tabs / commands; the ON badge
 └── lib/
-    ├── robber.ts         # orchestrator + the ICONS map
+    ├── scooper.ts        # orchestrator + the ICONS map
     ├── inspector.ts
     ├── dom-navigator.ts
     ├── messages.ts
@@ -562,7 +562,7 @@ never private helpers or traversal order. This project has no issue tracker, so
 | `formatHTML(node)` on a parsed fragment | `test/format-html.test.ts` | inline vs block indentation, `pre`/`script`/`style`/`textarea` passthrough |
 | `mode.transform(element)` - a pure element-to-string(or-node) function | `test/modes.test.ts` | every conversion rule per mode, the registry order and keys `1`-`4` |
 | `Inspector` methods, no `chrome` and no scroll mock needed | `test/inspector.test.ts` | extension-node identity, clean capture, class restore including page-edited classes |
-| `Robber`, with `chrome.*` mocked at its constructor callbacks and `inspector` / `scroller` mocked at their interfaces | `test/robber.test.ts` | the state machine, digit-key mode switching, stale-completion guard, `flush()` before capture and on `stop()` |
+| `Scooper`, with `chrome.*` mocked at its constructor callbacks and `inspector` / `scroller` mocked at their interfaces | `test/scooper.test.ts` | the state machine, digit-key mode switching, stale-completion guard, `flush()` before capture and on `stop()` |
 | `MarginScroller` plus the pure `applyScrollMargin` / `restoreScrollMargin` | `test/scroll/margin-scroller.test.ts` | the `Map` / `requestAnimationFrame` / `flush()` timing, byte-exact vs per-property revert |
 
 `html-tags` and `MessageType` have no behavior of their own; `formatHTML`'s
@@ -593,10 +593,10 @@ placement. `demo.html` is the manual test page.
 ## Further Notes
 
 - The design arc that produced this structure (the `format` to `mode` rename,
-  the `Robber` / `Inspector` / `Scroller` split, the h4 ATX cap, `mdx-code` as
+  the `Scooper` / `Inspector` / `Scroller` split, the h4 ATX cap, `mdx-code` as
   the one class-based rule) is recorded in the numbered specs under `../.specs/`
   and the `../.handoff/` documents. `../CHANGELOG.md` is the version-level
   summary.
 - Naming in this codebase is literal and descriptive over short or clever, with
-  one sanctioned exception: `Robber`, a pun on "Steal".
+  one sanctioned exception: `Scooper`, a pun on "Steal".
 - No em dashes anywhere, including code comments and commit messages.

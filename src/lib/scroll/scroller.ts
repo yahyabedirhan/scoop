@@ -2,10 +2,10 @@
  * The swap point for "how do we bring a target into view."
  *
  * Fully independent of `Inspector`. A `Scroller` never references DOM-footprint
- * tracking, and `Inspector` never references scrolling. `Robber` is the only
+ * tracking, and `Inspector` never references scrolling. `Scooper` is the only
  * entity that holds both. Trying a different scrolling approach later (say one
  * that scrolls a scrollable ancestor rather than patching the target) is a
- * one-line swap in `Robber`.
+ * one-line swap in `Scooper`.
  */
 
 export interface ScrollAlignment {
@@ -22,7 +22,7 @@ export interface Scroller {
   /**
    * Synchronously settle any pending scroll patch right now.
    *
-   * `Robber` calls this immediately before `Inspector.capture()` and on
+   * `Scooper` calls this immediately before `Inspector.capture()` and on
    * `stop()`, so the live page never carries scroll-related residue by the time
    * anything is cloned, which is what lets `Inspector` stay unaware a
    * `Scroller` exists.

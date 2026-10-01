@@ -1,5 +1,5 @@
 import { test, expect, vi, afterEach } from "vitest";
-import { Robber } from "../src/lib/robber";
+import { Scooper } from "../src/lib/scooper";
 import { Inspector } from "../src/lib/inspector";
 import { MarginScroller } from "../src/lib/scroll/margin-scroller";
 import { MODES } from "../src/lib/modes/modes";
@@ -14,7 +14,7 @@ import type { Scroller } from "../src/lib/scroll/scroller";
  */
 
 interface Harness {
-  robber: Robber;
+  scooper: Scooper;
   writes: { text: string; resolve: () => void; reject: (e: unknown) => void }[];
   messages: string[];
   stored: Record<string, string>;
@@ -29,8 +29,8 @@ interface Harness {
 let active: Harness | null = null;
 
 afterEach(() => {
-  // Detach any listeners a still-running Robber left on `window`.
-  if (active && active.messages.at(-1) === "inspect:started") active.robber.toggle();
+  // Detach any listeners a still-running Scooper left on `window`.
+  if (active && active.messages.at(-1) === "inspect:started") active.scooper.toggle();
   active = null;
   vi.unstubAllGlobals();
   document.documentElement.innerHTML = "<head></head><body></body>";
@@ -76,7 +76,7 @@ function setup(
     },
   });
 
-  const robber = new Robber({
+  const scooper = new Scooper({
     inspector: new Inspector(),
     scroller,
     modes: MODES,
@@ -88,11 +88,11 @@ function setup(
   });
 
   const harness: Harness = {
-    robber,
+    scooper,
     writes,
     messages,
     stored: store,
-    toggle: () => robber.toggle(),
+    toggle: () => scooper.toggle(),
     key: (key) =>
       window.dispatchEvent(new KeyboardEvent("keydown", { key, bubbles: true, cancelable: true })),
     point: (el) => {
