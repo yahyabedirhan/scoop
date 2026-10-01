@@ -48,7 +48,7 @@ test("flush() settles a pending change synchronously, before its frame", () => {
   expect(el.hasAttribute("style")).toBe(false);
 });
 
-test("repeated navigation on the same element never retains a Steal margin", () => {
+test("repeated navigation on the same element never retains a Scoop margin", () => {
   const el = elementFor("<p>Hi</p>");
   const scroller = new MarginScroller();
   scroller.scrollIntoView(el, START);
@@ -91,7 +91,7 @@ test("restoreScrollMargin removes the style attribute entirely when there was no
   expect(el.hasAttribute("style")).toBe(false);
 });
 
-test("restoreScrollMargin keeps a page edit made after the patch, dropping only Steal's margins", () => {
+test("restoreScrollMargin keeps a page edit made after the patch, dropping only Scoop's margins", () => {
   const el = elementFor("<p>Hi</p>");
   const change = applyScrollMargin(el, 96);
   el.style.color = "blue";

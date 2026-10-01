@@ -1,9 +1,9 @@
 {
-  "name": "steal",
+  "name": "scoop",
   "version": "0.0.5",
   "private": true,
   "type": "module",
-  "description": "Steal, a Chrome MV3 extension. Point at an element and copy it to your clipboard.",
+  "description": "Scoop, a Chrome MV3 extension. Point at an element and copy it to your clipboard.",
   "scripts": {
     "clean": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\"",
     "build": "npm run clean && vite build --mode content && vite build --mode background",

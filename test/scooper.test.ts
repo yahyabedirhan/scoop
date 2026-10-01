@@ -165,7 +165,7 @@ test("a rejected copy leaves inspection running so it can be retried", async () 
   expect(app.messages.at(-1)).toBe("inspect:ended");
 });
 
-test("copying body excludes Steal UI while preserving page markup with similar names", () => {
+test("copying body excludes Scoop UI while preserving page markup with similar names", () => {
   const app = setup('<main data-inspect-copy=""><p id="__inspect_copy_ui">Page content</p></main>');
   app.toggle();
   app.point(document.body);
@@ -208,7 +208,7 @@ test("copying before the scroll frame preserves the original inline styles", () 
   expect(document.querySelector("p")!.getAttribute("style")).toBe("color:red;scroll-margin-top:7px!important");
 });
 
-test("scroll cleanup preserves page edits and repeated navigation never retains Steal margins", () => {
+test("scroll cleanup preserves page edits and repeated navigation never retains Scoop margins", () => {
   const app = setup('<main id="pick"><p>Child</p></main>');
   const child = document.querySelector("p") as HTMLElement;
   app.toggle();
@@ -268,7 +268,7 @@ test("an earlier success toast is excluded from the next body copy", async () =>
   expect(app.writes[1].text).toBe('<body>\n  <button id="pick">\n    Pick me\n  </button>\n</body>');
 });
 
-test("ordinary page elements with Steal's ID are selectable and their clicks are suppressed", () => {
+test("ordinary page elements with Scoop's ID are selectable and their clicks are suppressed", () => {
   const app = setup('<button id="__inspect_copy_ui">Page button</button>');
   const button = document.querySelector("button") as HTMLButtonElement;
   let pageClicks = 0;

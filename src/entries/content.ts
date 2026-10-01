@@ -15,7 +15,7 @@ const MODE_STORAGE_KEY = "activeModeId";
 
 declare global {
   interface Window {
-    __stealScooper?: Scooper;
+    __scoopScooper?: Scooper;
   }
 }
 
@@ -23,7 +23,7 @@ declare global {
  * Re-injected on every toolbar click. Once loaded, the background's
  * `MessageType.Toggle` message is the single source of truth, so just bail.
  */
-if (!window.__stealScooper) {
+if (!window.__scoopScooper) {
   const scooper = new Scooper({
     inspector: new Inspector(),
     scroller: new MarginScroller(),
@@ -57,7 +57,7 @@ if (!window.__stealScooper) {
     },
   });
 
-  window.__stealScooper = scooper;
+  window.__scoopScooper = scooper;
 
   chrome.runtime.onMessage.addListener((msg: Message) => {
     if (msg && msg.type === MessageType.Toggle) scooper.toggle();

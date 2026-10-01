@@ -1,5 +1,5 @@
 /**
- * The DOM-facing interface for everything Steal itself adds to or changes on
+ * The DOM-facing interface for everything Scoop itself adds to or changes on
  * the page.
  *
  * Owns three genuinely independent things:
@@ -14,9 +14,9 @@
 
 interface InspectClass {
   el: Element;
-  /** `class` attribute text before Steal touched it (`null` if absent). */
+  /** `class` attribute text before Scoop touched it (`null` if absent). */
   original: string | null;
-  /** `class` attribute text immediately after Steal added `ic-active`. */
+  /** `class` attribute text immediately after Scoop added `ic-active`. */
   applied: string | null;
 }
 
@@ -28,23 +28,23 @@ function restoreAttribute(el: Element, name: string, value: string | null): void
 }
 
 export class Inspector {
-  /** The actual UI root nodes Steal has mounted; membership is by identity. */
+  /** The actual UI root nodes Scoop has mounted; membership is by identity. */
   private readonly roots = new WeakSet<Node>();
   private inspectClass: InspectClass | null = null;
 
-  /** Register `root` as Steal's own and append it to the page. */
+  /** Register `root` as Scoop's own and append it to the page. */
   mount(root: Node): void {
     this.roots.add(root);
     (document.body || document.documentElement).appendChild(root);
   }
 
   /**
-   * Did Steal itself put this node here? (Is it inside a mounted root?)
+   * Did Scoop itself put this node here? (Is it inside a mounted root?)
    *
    * Used by `Scooper` as the arrow-traversal skip predicate and as the guard
    * before setting the pointer target, so navigation and clicks never land on
-   * Steal's own overlay. Follows node identity, not matching id / class /
-   * `data-*`, so a page element that happens to share Steal's id stays
+   * Scoop's own overlay. Follows node identity, not matching id / class /
+   * `data-*`, so a page element that happens to share Scoop's id stays
    * selectable.
    */
   isExtensionNode(el: Element | null): boolean {
@@ -69,7 +69,7 @@ export class Inspector {
   }
 
   /**
-   * A clone of `el` with Steal's own nodes removed and the inspect class undone,
+   * A clone of `el` with Scoop's own nodes removed and the inspect class undone,
    * ready for a mode's `transform()`.
    *
    * Match by position before removing anything: page-owned ids and classes may
@@ -92,7 +92,7 @@ export class Inspector {
    * Undo the `ic-active` token on `el` (which may be the live `<html>` or a
    * clone of it).
    *
-   * - If `class` is still exactly what Steal produced, restore the original
+   * - If `class` is still exactly what Scoop produced, restore the original
    *   attribute verbatim (including whether it existed at all).
    * - Otherwise the page has edited its classes; drop only our token.
    */

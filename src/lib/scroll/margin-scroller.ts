@@ -91,7 +91,7 @@ export function applyScrollMargin(el: Element, marginPx: number): ScrollMarginCh
  * - If the `style` attribute is still byte-for-byte what the patch produced,
  *   restore the original attribute exactly (including whether it existed).
  * - Otherwise the page has edited the element since; restore only the margin
- *   properties Steal still owns (value unchanged, priority not raised to
+ *   properties Scoop still owns (value unchanged, priority not raised to
  *   `!important`), leaving every other page edit alone, priorities included.
  */
 export function restoreScrollMargin(el: Element, change: ScrollMarginChange): void {

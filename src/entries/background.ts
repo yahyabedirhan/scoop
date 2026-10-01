@@ -35,7 +35,7 @@ async function toggleOnTab(tab: chrome.tabs.Tab | undefined): Promise<void> {
   } catch (e) {
     // Most common cause: a restricted page (chrome://, the Web Store, PDF
     // viewer) where content scripts cannot run.
-    console.warn("Steal: cannot run on this page.", e);
+    console.warn("Scoop: cannot run on this page.", e);
   }
 }
 
@@ -48,7 +48,7 @@ chrome.action.onClicked.addListener((tab) => void toggleOnTab(tab));
  * back to querying it.
  */
 chrome.commands.onCommand.addListener(async (command, tab) => {
-  if (command !== "toggle-steal") return;
+  if (command !== "toggle-scoop") return;
   if (!tab) {
     [tab] = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
   }

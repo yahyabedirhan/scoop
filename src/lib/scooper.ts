@@ -6,7 +6,7 @@ import { formatHTML } from "./utils/format-html";
 import { MessageType } from "./messages";
 
 /**
- * The orchestrator. The name is a pun on the extension itself ("Steal").
+ * The orchestrator, named after the extension itself ("Scoop").
  *
  * Registers the pointer/keyboard listeners, owns which mode is active, and
  * sequences `Inspector` and `Scroller`. It is the only entity that holds both
@@ -113,7 +113,7 @@ export class Scooper {
     this.setStoredModeId = deps.setStoredModeId;
     this.notify = deps.notify;
 
-    // All in the capture phase, so Steal sees events before the page does.
+    // All in the capture phase, so Scoop sees events before the page does.
     this.listeners = [
       ["mousemove", this.onMouseMove as EventListener],
       ["mousedown", this.swallow as EventListener],
@@ -156,7 +156,7 @@ export class Scooper {
     return { root, overlay, label, labelIcon, labelText };
   }
 
-  /** Arrow navigation skips document metadata and Steal's own overlay nodes. */
+  /** Arrow navigation skips document metadata and Scoop's own overlay nodes. */
   private skipForNav = (el: Element | null): boolean =>
     this.nav.isSkippable(el) || this.inspector.isExtensionNode(el);
 
