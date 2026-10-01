@@ -7,7 +7,7 @@
  * - the temporary `ic-active` class on `<html>` (the inspect cursor),
  * - clean capture: a clone of a subtree with both of the above undone.
  *
- * No knowledge of scrolling at all. `Robber` settles any pending scroll patch
+ * No knowledge of scrolling at all. `Scooper` settles any pending scroll patch
  * (via `Scroller.flush()`) before calling `capture()`, so by the time
  * `Inspector` clones anything the live page already carries no scroll residue.
  */
@@ -41,7 +41,7 @@ export class Inspector {
   /**
    * Did Steal itself put this node here? (Is it inside a mounted root?)
    *
-   * Used by `Robber` as the arrow-traversal skip predicate and as the guard
+   * Used by `Scooper` as the arrow-traversal skip predicate and as the guard
    * before setting the pointer target, so navigation and clicks never land on
    * Steal's own overlay. Follows node identity, not matching id / class /
    * `data-*`, so a page element that happens to share Steal's id stays

@@ -3,7 +3,7 @@
  * descriptions the hover label shows.
  *
  * Knows nothing about the extension runtime: it takes a `skip` predicate from
- * the caller (so `Robber` can fold in "is this Steal's own node?") and never
+ * the caller (so `Scooper` can fold in "is this Steal's own node?") and never
  * touches anything outside the nodes passed to it.
  */
 
@@ -65,7 +65,7 @@ export class DomNavigator {
    * - `left`: parent element (stops above `<html>`).
    * - `right`: first element child.
    *
-   * `skip` defaults to `isSkippable`; `Robber` passes one that also skips
+   * `skip` defaults to `isSkippable`; `Scooper` passes one that also skips
    * Steal's own overlay nodes.
    */
   nextTarget(

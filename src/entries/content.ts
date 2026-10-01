@@ -5,7 +5,7 @@
  * `src/lib/` and never touches `chrome.*`; this file only wires that logic to
  * the extension runtime and guards against being injected twice.
  */
-import { Robber } from "../lib/robber";
+import { Scooper } from "../lib/scooper";
 import { Inspector } from "../lib/inspector";
 import { MarginScroller } from "../lib/scroll/margin-scroller";
 import { MODES } from "../lib/modes/modes";
@@ -15,7 +15,7 @@ const MODE_STORAGE_KEY = "activeModeId";
 
 declare global {
   interface Window {
-    __stealRobber?: Robber;
+    __stealScooper?: Scooper;
   }
 }
 
@@ -23,8 +23,8 @@ declare global {
  * Re-injected on every toolbar click. Once loaded, the background's
  * `MessageType.Toggle` message is the single source of truth, so just bail.
  */
-if (!window.__stealRobber) {
-  const robber = new Robber({
+if (!window.__stealScooper) {
+  const scooper = new Scooper({
     inspector: new Inspector(),
     scroller: new MarginScroller(),
     modes: MODES,
@@ -57,9 +57,9 @@ if (!window.__stealRobber) {
     },
   });
 
-  window.__stealRobber = robber;
+  window.__stealScooper = scooper;
 
   chrome.runtime.onMessage.addListener((msg: Message) => {
-    if (msg && msg.type === MessageType.Toggle) robber.toggle();
+    if (msg && msg.type === MessageType.Toggle) scooper.toggle();
   });
 }

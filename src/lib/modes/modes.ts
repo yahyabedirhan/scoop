@@ -28,8 +28,8 @@ export interface Mode {
 }
 
 /**
- * The ordered mode registry. `Robber` and the label renderer are both driven by
+ * The ordered mode registry. `Scooper` and the label renderer are both driven by
  * this array. Adding a mode is adding a module plus one entry here (a mode with
- * a distinct hover-label glyph also needs an `ICONS` entry in `robber.ts`).
+ * a distinct hover-label glyph also needs an `ICONS` entry in `scooper.ts`).
  */
 export const MODES: readonly Mode[] = [fullHtml, cleanHtml, plainText, markdown];
