@@ -8,7 +8,7 @@ import { MessageType, type Message } from "../lib/messages";
 const activeTabs = new Set<number>();
 
 const BADGE_TEXT = "ON";
-const BADGE_COLOR = "#1a73e8";
+const BADGE_COLOR = "#37692c";
 
 async function setBadge(tabId: number, on: boolean): Promise<void> {
   try {
