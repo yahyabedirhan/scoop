@@ -1,6 +1,6 @@
 # 04 - Icon Redesign
 
-Status: implemented, awaiting the maintainer's pick of the final icon
+Status: in progress, second prototype round
 Last updated: 2026-10-03
 
 Builds on the ice-cream-scoop icon from 0.0.6 (`feat: draw an ice-cream-scoop
@@ -188,3 +188,35 @@ sections above where they disagree.
 - **Delivery.** PR #15 carries all of this. The maintainer picks the final
   icon from the six at review. The release stays `0.0.7`, with its changelog
   entry revised.
+
+## Second revision after PR review
+
+Added 2026-10-03, after the maintainer looked at the six candidates. It
+overrides the sections above where they disagree.
+
+- **Feedback.** None of the candidates shows an actual scoop, the tool you
+  scoop ice cream with. `pointer` is still the favourite. `clipboard` looks
+  nice and meaningful. `cone-cursor`, `bite`, `monogram` and `window-cup` look
+  meaningless.
+- **Kept.** `pointer` keeps shipping as the default and `clipboard` stays a
+  prototype, both unchanged.
+- **Archive.** `cone-cursor`, `bite`, `monogram` and `window-cup` leave the
+  generator and the README table. Their 512 px PNGs join `brackets` and `ball`
+  in `assets/images/logo/archive/`.
+- **Five new prototypes, each built around the scoop tool.** `cursor-scoop`
+  pairs a mouse pointer with a scoop. `clipboard-scoop` puts a scoop inside a
+  clipboard. `scooper`, `scoop-tub` and `scoop-cone` are three takes on a
+  scoop with ice cream: the scoop alone holding a ball, the scoop pulling a
+  ball out of a tub, and the scoop dropping a ball onto a cone.
+- **Known risk.** The first prototype round rejected the scoop tool because a
+  round bowl on a straight handle read as a magnifier and a side view read as
+  a ladle (Further Notes). The maintainer now asks for the tool explicitly, so
+  each figure must answer those failures. The ice cream should sit visibly
+  heaped in or on the bowl, and the scoop's own features, such as its thumb
+  lever and grip, should set it apart from a magnifier or a ladle.
+- **Rules unchanged.** The tile, palette, cream figure colour, pistachio tint,
+  separation gaps, no outline and silhouette-only below 32 px all stay, and
+  every figure must read at 16 px.
+- **Delivery.** PR #15 carries this round too. The maintainer picks from the
+  seven candidates, `pointer`, `clipboard` and the five new figures. The
+  release stays `0.0.7`.
