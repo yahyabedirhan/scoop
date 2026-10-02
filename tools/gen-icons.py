@@ -193,9 +193,50 @@ def draw_clipboard(detailed):
     return layers
 
 
+def _stroke(points, width):
+    """A polyline stroked with round caps and joins."""
+    segs = list(zip(points, points[1:]))
+    return lambda x, y: min(_seg_dist(x, y, a, b) for a, b in segs) - width / 2
+
+
+def _intersect(*sdfs):
+    return lambda x, y: max(f(x, y) for f in sdfs)
+
+
+def _below(y0):
+    """The half-plane below the line y = `y0` (y down)."""
+    return lambda x, y: y0 - y
+
+
+def draw_scooper(detailed):
+    # The ice-cream scoop tool on its own, a round pistachio ball heaped in
+    # its bowl. The bowl is a solid half disc opening upward, so the ball sits
+    # in it instead of being ringed like a magnifier's lens, and the handle
+    # leaves the bowl's side below the rim at a shallow angle, aimed below the
+    # ball's centre. A narrow neck widens into a thick, round-ended grip, and a
+    # thumb lever rises from the neck. Below DETAIL_MIN the lever goes, the
+    # bowl deepens, the handle thickens and the gap widens, tuned against the
+    # 16 px output so the gap under the ball fills one whole pixel row.
+    if detailed:
+        cx, cup_r, rim, ball_y, gap = 64, 27, 56, 39, 2.5
+    else:
+        cx, cup_r, rim, ball_y, gap = 64, 30, 56, 36.5, 7.5
+    cup = _intersect(_circle((cx, rim), cup_r), _below(rim))
+    ball = _circle((cx, ball_y), 21)
+    neck = _stroke([(cx - 22, rim + 6), (cx - 36, rim + 14)], 8 if detailed else 10)
+    grip = _stroke([(cx - 36, rim + 14), (cx - 52, rim + 24)], 14 if detailed else 15)
+    lever = _stroke([(cx - 28, rim + 6), (cx - 32, rim - 3)], 7)
+    layers = [(_union(cup, neck, grip), CREAM)]
+    if detailed:
+        layers.append((lever, CREAM))
+    layers += _separated(ball, TINT, gap)
+    return layers
+
+
 FIGURES = {
     "pointer": draw_pointer,
     "clipboard": draw_clipboard,
+    "scooper": draw_scooper,
 }
 
 
