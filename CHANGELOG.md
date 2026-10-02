@@ -15,12 +15,15 @@ milestones. `0.1.0` will be the first version considered ready to use.
 ### Added
 - The `README` opens with the Scoop logo, a 512 px render of the icon at
   `assets/images/logo/scoop.png`, centred above the title.
-- Five prototype icons, `cone-cursor`, `bite`, `clipboard`, `monogram` and
-  `window-cup`, kept as 512 px previews beside the logo and described in the
-  `README`. `npm run gen-icons -- --variant <name>` ships one of them instead
-  of the default `pointer`. The final icon is picked from the six at review.
-- The rejected `brackets` and `ball` prototypes, which never shipped, are kept
-  as 512 px renders in `assets/images/logo/archive/`.
+- Six prototype icons, `clipboard`, `cursor-scoop`, `clipboard-scoop`,
+  `scooper`, `scoop-tub` and `scoop-cone`, kept as 512 px previews beside the
+  logo and described in the `README`. Five of them are built around the
+  ice-cream scoop tool. `npm run gen-icons -- --variant <name>` ships one of
+  them instead of the default `pointer`. The final icon is picked from the
+  seven at review.
+- The rejected `brackets`, `ball`, `cone-cursor`, `bite`, `monogram` and
+  `window-cup` prototypes, which never shipped, are kept as 512 px renders in
+  `assets/images/logo/archive/`.
 
 ### Changed
 - A new icon replaces the ice-cream scoop. A pistachio ball with a scalloped
