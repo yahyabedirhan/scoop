@@ -1,7 +1,7 @@
 # 04 - Icon Redesign
 
-Status: implemented
-Last updated: 2026-10-02
+Status: in progress
+Last updated: 2026-10-03
 
 Builds on the ice-cream-scoop icon from 0.0.6 (`feat: draw an ice-cream-scoop
 icon`). Covers only the icon, the README header, and the `ON` badge colour.
@@ -161,3 +161,29 @@ review whether they stay: the ball with a mouse pointer, and the plain ball.
   motif turns to mush at 16 px. Mint was rejected by the maintainer, and pistachio was chosen.
 - The maintainer will give feedback on the icon after seeing it. Swapping the
   shipped variant should be a one-option change in the generator.
+
+## Revision after PR review
+
+Added 2026-10-03, after the maintainer looked at PR #15. It overrides the
+sections above where they disagree.
+
+- **Feedback.** The pistachio palette is liked and stays as it is. The
+  `pointer` icon is liked, but its ice cream looks odd, a dome with straight
+  sides. The `brackets` and `ball` icons look odd.
+- **Shipped icon.** `pointer` becomes the default variant, written as the
+  extension icons and the README logo, unchanged in shape. The README alt text
+  describes it.
+- **Archive.** `brackets` and `ball` leave the generator and the README note.
+  Their 512 px PNGs are kept as a record under `assets/images/logo/archive/`,
+  which the generator never writes or deletes. Git history keeps their code.
+- **Five new prototypes.** Five new figures, each a different take on Scoop's
+  name and purpose, built around the idea of a scoop rather than only an
+  ice-cream ball. Not every one carries a pointer. They use the same tile,
+  palette, cream figure colour and pistachio tint, and the same generator
+  rules (separation gaps, no outline, silhouette below 32 px). Each must read
+  at 16 px. None repeats a rejected motif from Further Notes or the
+  straight-sided dome. Each is a `--variant` choice with a 512 px preview
+  beside the README logo, as the alternates were.
+- **Delivery.** PR #15 carries all of this. The maintainer picks the final
+  icon from the six at review. The release stays `0.0.7`, with its changelog
+  entry revised.
