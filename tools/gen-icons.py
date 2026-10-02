@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """Generate the Scoop extension icons (16/32/48/128) and README logo as RGBA PNGs.
 
-Motif: a scoop of pistachio ice cream with a scalloped base and a cream mouse
-pointer over its lower right, as a flat figure on a pistachio squircle tile
-with a soft vertical gradient and a white sheen, in the format of Shipyard's
-logo. The figure has no outline.
+Shipped motif, `pointer`: a scoop of pistachio ice cream with a scalloped
+base and a cream mouse pointer over its lower right, as a flat figure on a
+pistachio squircle tile with a soft vertical gradient and a white sheen, in
+the format of Shipyard's logo. The figure has no outline.
 Below DETAIL_MIN px it drops its details and grows 10%, so the small icon is
 the bare silhouette. The 48 and 128 px tiles keep Chrome's transparent margin;
 the smaller tiles fill the canvas. The 512 px README logo keeps the 128 px
@@ -110,10 +110,53 @@ def _moved(sdf, dx, dy):
     return lambda x, y: sdf(x - dx, y - dy)
 
 
-def _quad(p0, p1, p2, steps=16):
-    """Points along a quadratic Bezier curve, for stroking as a polyline."""
-    return [tuple((1 - t) ** 2 * a + 2 * (1 - t) * t * b + t * t * c for a, b, c in zip(p0, p1, p2))
-            for t in (i / steps for i in range(steps + 1))]
+def _offset(sdf, d):
+    """`sdf` grown outward by `d`, or shrunk where `d` is negative."""
+    return lambda x, y: sdf(x, y) - d
+
+
+def _subtract(sdf, cut):
+    """`sdf` with the shape `cut` taken out of it."""
+    return lambda x, y: max(sdf(x, y), -cut(x, y))
+
+
+def _rounded_rect(x0, y0, x1, y1, r):
+    """A rectangle with corners rounded to radius `r`."""
+    return _offset(_rect(x0 + r, y0 + r, x1 - r, y1 - r), r)
+
+
+def _arc(c, r, a0, a1, steps=24):
+    """Points along a circular arc from angle `a0` to `a1` in degrees, y down."""
+    return [(c[0] + r * math.cos(math.radians(a)), c[1] + r * math.sin(math.radians(a)))
+            for a in (a0 + (a1 - a0) * i / steps for i in range(steps + 1))]
+
+
+def _hatched(sdf, normals, period, width):
+    """`sdf` clipped to parallel lines `period` apart, one family per normal."""
+    def lines(x, y):
+        d = min(abs(t - period * round(t / period)) for t in (x * nx + y * ny for nx, ny in normals))
+        return d - width / 2
+    return lambda x, y: max(sdf(x, y), lines(x, y))
+
+
+def _scalloped_ball(cx, cy, r, base, scallops, scallop_r):
+    """A ball whose lower half drops straight to `base`, edged with scallops.
+
+    The scallops are circles centred on `base` at the `scallops` x positions.
+    """
+    return _union(
+        _circle((cx, cy), r),
+        _rect(cx - r, cy, cx + r, base),
+        *(_circle((x, base), scallop_r) for x in scallops),
+    )
+
+
+def _natural_scoop(cx, cy, r, lumps):
+    """A round scoop with a soft, lumpy lower edge instead of straight sides.
+
+    `lumps` are (dx, dy, radius) circles relative to the centre, unioned on.
+    """
+    return _union(_circle((cx, cy), r), *(_circle((cx + dx, cy + dy), lr) for dx, dy, lr in lumps))
 
 
 def _separated(sdf, paint, gap):
@@ -122,25 +165,12 @@ def _separated(sdf, paint, gap):
     The figure has no outline, so this gap is what keeps an overlapping part
     readable against the part beneath it.
     """
-    return [(lambda x, y: sdf(x, y) - gap, ("tile", 1.0)), (sdf, paint)]
+    return [(_offset(sdf, gap), ("tile", 1.0)), (sdf, paint)]
 
 
 # ---------- figures ----------
 # A figure is a list of (sdf, paint) layers, back to front. A paint is an RGB
 # colour, or ("tile", alpha) for the tile's own colour at that opacity.
-
-def _scalloped_ball(cx, cy, r, base, scallops, scallop_r, drop=0):
-    """A ball whose lower half drops straight to `base`, edged with scallops.
-
-    The scallops are circles centred at the `scallops` x positions, `drop`
-    below `base`.
-    """
-    return _union(
-        _circle((cx, cy), r),
-        _rect(cx - r, cy, cx + r, base),
-        *(_circle((x, base + drop), scallop_r) for x in scallops),
-    )
-
 
 ARROW = [(60, 48), (60, 86), (69, 77), (76, 92), (83, 89), (76, 74), (88, 74)]
 
@@ -165,20 +195,6 @@ def draw_pointer(detailed):
         layers.append((_circle((36 + ox, 28 + oy), 4.5), ("tile", 0.35)))
     layers += _separated(_moved(_polygon(arrow), ox, oy), CREAM, gap)
     return layers
-
-
-def _rounded_rect(x0, y0, x1, y1, r):
-    """A rectangle with corners rounded to radius `r`."""
-    inner = _rect(x0 + r, y0 + r, x1 - r, y1 - r)
-    return lambda x, y: inner(x, y) - r
-
-
-def _natural_scoop(cx, cy, r, lumps):
-    """A round scoop with a soft, lumpy lower edge instead of straight sides.
-
-    `lumps` are (dx, dy, radius) circles relative to the centre, unioned on.
-    """
-    return _union(_circle((cx, cy), r), *(_circle((cx + dx, cy + dy), lr) for dx, dy, lr in lumps))
 
 
 def draw_clipboard(detailed):
@@ -235,12 +251,6 @@ def draw_window_cup(detailed):
     return layers
 
 
-def _arc(c, r, a0, a1, steps=24):
-    """Points along a circular arc from angle `a0` to `a1` in degrees, y down."""
-    return [(c[0] + r * math.cos(math.radians(a)), c[1] + r * math.sin(math.radians(a)))
-            for a in (a0 + (a1 - a0) * i / steps for i in range(steps + 1))]
-
-
 def draw_monogram(detailed):
     # A cream letter S whose lower curl is the bowl of a scoop, cradling a
     # round pistachio ball set off from the letter by a gap. The upper bowl's
@@ -256,14 +266,6 @@ def draw_monogram(detailed):
     if detailed:
         layers.append((_circle((39, 56), 3.5), ("tile", 0.35)))
     return layers
-
-
-def _hatched(sdf, normals, period, width):
-    """`sdf` clipped to parallel lines `period` apart, one family per normal."""
-    def lines(x, y):
-        d = min(abs(t - period * round(t / period)) for t in (x * nx + y * ny for nx, ny in normals))
-        return d - width / 2
-    return lambda x, y: max(sdf(x, y), lines(x, y))
 
 
 def draw_cone_cursor(detailed):
@@ -295,15 +297,6 @@ def draw_cone_cursor(detailed):
     return layers
 
 
-def _offset(sdf, d):
-    return lambda x, y: sdf(x, y) - d
-
-
-def _subtract(sdf, cut):
-    """`sdf` with the shape `cut` taken out of it."""
-    return lambda x, y: max(sdf(x, y), -cut(x, y))
-
-
 def draw_bite(detailed):
     # A cream block standing for a page element, with a round scoop taken out
     # of its upper right corner and the scooped pistachio ball lifted out of
@@ -315,9 +308,8 @@ def draw_bite(detailed):
     if detailed:
         block = _rounded_rect(8, 36, 76, 92, 8)
         hole = _circle((66, 40), 21)
-        ball = _union(_circle((72, 26), 17),
-                      *(_circle((72 + 14 * math.cos(a), 26 + 14 * math.sin(a)), 4.2)
-                        for a in (math.radians(d) for d in range(15, 166, 30))))
+        ball = _natural_scoop(72, 26, 17, [(14 * math.cos(a), 14 * math.sin(a), 4.2)
+                                           for a in (math.radians(d) for d in range(15, 166, 30))])
         gap = 3
     else:
         block = _rounded_rect(4, 34, 76, 96, 9)
