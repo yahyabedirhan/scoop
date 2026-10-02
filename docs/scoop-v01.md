@@ -564,7 +564,7 @@ never private helpers or traversal order. This project has no issue tracker, so
 | `Inspector` methods, no `chrome` and no scroll mock needed | `test/inspector.test.ts` | extension-node identity, clean capture, class restore including page-edited classes |
 | `Scooper`, with `chrome.*` mocked at its constructor callbacks and `inspector` / `scroller` mocked at their interfaces | `test/scooper.test.ts` | the state machine, digit-key mode switching, stale-completion guard, `flush()` before capture and on `stop()` |
 | `MarginScroller` plus the pure `applyScrollMargin` / `restoreScrollMargin` | `test/scroll/margin-scroller.test.ts` | the `Map` / `requestAnimationFrame` / `flush()` timing, byte-exact vs per-property revert |
-| the committed icon PNGs, as `manifest.json` declares them | `test/icons.test.ts` | every declared icon exists as a PNG of its declared size, the 16 px tile fills the canvas |
+| the committed icon PNGs as `manifest.json` declares them, the README logo, its previews and archive | `test/icons.test.ts` | every declared icon exists as a PNG of its declared size, the 16 px tile fills the canvas, the 512 px logo and each prototype preview keep a transparent margin, only the figures not shipped have previews, the archive holds the rejected icons |
 
 `html-tags` and `MessageType` have no behavior of their own; `formatHTML`'s
 tests guard that sharing the tag sets changed nothing.
