@@ -114,7 +114,7 @@ figure in `tools/gen-icons.py` is a prototype, written as a 512 px preview
 | Figure | Preview | Description |
 |---|---|---|
 | `pointer` | <img src="assets/images/logo/scoop.png" width="64" alt="pointer icon"> | A pistachio ball with a scalloped base and a cream mouse pointer over its lower right. The icon that ships. |
-| `cone-cursor` | <img src="assets/images/logo/scoop-cone-cursor.png" width="64" alt="cone-cursor icon"> | A cream waffle cone drawn as a pointer's arrowhead, tip up, holding a round pistachio scoop at its wide end. |
+| `cone-cursor` | <img src="assets/images/logo/scoop-cone-cursor.png" width="64" alt="cone-cursor icon"> | A cream waffle cone drawn as a pointer's arrowhead, tip up and to the left, holding a round pistachio scoop at its wide end. |
 | `bite` | <img src="assets/images/logo/scoop-bite.png" width="64" alt="bite icon"> | A cream page block with three lines of text, a round notch scooped from its upper right corner and the pistachio ball lifted out of it. |
 | `clipboard` | <img src="assets/images/logo/scoop-clipboard.png" width="64" alt="clipboard icon"> | A cream clipboard with its clip and a round pistachio scoop on the board. |
 | `monogram` | <img src="assets/images/logo/scoop-monogram.png" width="64" alt="monogram icon"> | A cream letter S whose lower curl is a scoop's bowl cradling a pistachio ball. |

@@ -1,6 +1,6 @@
 # 04 - Icon Redesign
 
-Status: implemented
+Status: implemented, awaiting the maintainer's pick of the final icon
 Last updated: 2026-10-03
 
 Builds on the ice-cream-scoop icon from 0.0.6 (`feat: draw an ice-cream-scoop
@@ -31,7 +31,8 @@ Shipyard's does. The toolbar's `ON` badge moves from Chrome blue to a deep
 pistachio so it belongs to the same palette.
 
 Two runner-up icons are kept as alternates until the maintainer decides at PR
-review whether they stay: the ball with a mouse pointer, and the plain ball.
+review whether they stay. They are the ball with a mouse pointer and the
+plain ball.
 
 ## User Stories
 

@@ -19,6 +19,8 @@ milestones. `0.1.0` will be the first version considered ready to use.
   `window-cup`, kept as 512 px previews beside the logo and described in the
   `README`. `npm run gen-icons -- --variant <name>` ships one of them instead
   of the default `pointer`. The final icon is picked from the six at review.
+- The rejected `brackets` and `ball` prototypes, which never shipped, are kept
+  as 512 px renders in `assets/images/logo/archive/`.
 
 ### Changed
 - A new icon replaces the ice-cream scoop. A pistachio ball with a scalloped
@@ -27,10 +29,6 @@ milestones. `0.1.0` will be the first version considered ready to use.
   rather than a sticker.
 - The toolbar `ON` badge is deep pistachio (`#37692c`) instead of Chrome blue,
   to match the new icon.
-
-### Removed
-- The `brackets` and `ball` icons leave the generator. Their 512 px renders
-  are kept as a record in `assets/images/logo/archive/`.
 
 ## [0.0.6] - 2026-10-01
 
