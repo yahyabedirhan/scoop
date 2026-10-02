@@ -374,6 +374,53 @@ def draw_cursor_scoop(detailed):
     return layers
 
 
+def draw_clipboard_scoop(detailed):
+    # The cream clipboard of `clipboard` with an ice-cream scoop tool laid on
+    # the board, cut out in tile colour, holding a round pistachio ball, so the
+    # icon says "scoop it to the clipboard". A round bowl on a straight handle
+    # reads as a magnifier, so the bowl is a wide, flat-topped half ellipse,
+    # broader than the ball heaped three quarters out of it, and the handle
+    # has a thin neck and a thick grip. The ball is ringed by a gap of tile
+    # colour, since the pistachio tint barely shows on cream. The detailed
+    # figure adds the thumb lever rising from the neck. Below DETAIL_MIN the
+    # clip is shorter, the gaps widen, the bowl is deeper and the handle is
+    # shorter and steeper, tuned against the 16 px output, where a level
+    # handle read as a stripe cutting the board in two and a shallow bowl lost
+    # its round bottom. At every size the grip stops short of the board's edge
+    # for the same reason.
+    def capsule(a, b, r):
+        return lambda x, y: _seg_dist(x, y, a, b) - r
+
+    def bowl(cx, rim, rx, ry):
+        # Lower half of an ellipse centred on the rim. An approximate distance,
+        # exact enough at this size.
+        return lambda x, y: max((math.hypot((x - cx) / rx, (y - rim) / ry) - 1) * min(rx, ry), rim - y)
+
+    board = _rounded_rect(12, 17, 88, 97, 9)
+    clip = _rounded_rect(34, 7, 66, 25 if detailed else 22, 5)
+    if detailed:
+        gap, ring = 3, 3
+        ball = _circle((37, 54), 14)
+        tool = _union(
+            bowl(37, 61, 22, 21),
+            capsule((57, 70), (65, 68), 4),     # neck
+            capsule((67, 67), (77, 61), 7),     # grip
+            capsule((58, 66), (62, 58), 2.5),   # thumb lever
+        )
+    else:
+        gap, ring = 6, 5
+        ball = _circle((36, 54), 13)
+        tool = _union(
+            bowl(36, 62, 21, 22),
+            capsule((52, 74), (60, 70), 4),     # neck
+            capsule((61, 69), (74, 60), 6.5),   # grip
+        )
+    layers = [(board, CREAM)]
+    layers += _separated(clip, CREAM, gap)
+    layers += [(_offset(ball, ring), ("tile", 1.0)), (ball, TINT), (tool, ("tile", 1.0))]
+    return layers
+
+
 FIGURES = {
     "pointer": draw_pointer,
     "clipboard": draw_clipboard,
@@ -381,6 +428,7 @@ FIGURES = {
     "scoop-tub": draw_scoop_tub,
     "scoop-cone": draw_scoop_cone,
     "cursor-scoop": draw_cursor_scoop,
+    "clipboard-scoop": draw_clipboard_scoop,
 }
 
 
