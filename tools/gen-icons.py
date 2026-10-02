@@ -295,11 +295,108 @@ def draw_cone_cursor(detailed):
     return layers
 
 
+def _offset(sdf, d):
+    return lambda x, y: sdf(x, y) - d
+
+
+def _subtract(sdf, cut):
+    """`sdf` with the shape `cut` taken out of it."""
+    return lambda x, y: max(sdf(x, y), -cut(x, y))
+
+
+def _quad(p0, p1, p2, steps=16):
+    """Points along a quadratic Bezier curve, for stroking as a polyline."""
+    return [tuple((1 - t) ** 2 * a + 2 * (1 - t) * t * b + t * t * c for a, b, c in zip(p0, p1, p2))
+            for t in (i / steps for i in range(steps + 1))]
+
+
+def _separated(sdf, paint, gap):
+    """Layers drawing `sdf` over earlier parts, ringed by a `gap` of tile colour.
+
+    The figure has no outline, so this gap is what keeps an overlapping part
+    readable against the part beneath it.
+    """
+    return [(lambda x, y: sdf(x, y) - gap, ("tile", 1.0)), (sdf, paint)]
+
+
+# ---------- figures ----------
+# A figure is a list of (sdf, paint) layers, back to front. A paint is an RGB
+# colour, or ("tile", alpha) for the tile's own colour at that opacity.
+
+def _scalloped_ball(cx, cy, r, base, scallops, scallop_r, drop=0):
+    """A ball whose lower half drops straight to `base`, edged with scallops.
+
+    The scallops are circles centred at the `scallops` x positions, `drop`
+    below `base`.
+    """
+    return _union(
+        _circle((cx, cy), r),
+        _rect(cx - r, cy, cx + r, base),
+        *(_circle((x, base + drop), scallop_r) for x in scallops),
+    )
+
+
+ARROW = [(60, 48), (60, 86), (69, 77), (76, 92), (83, 89), (76, 74), (88, 74)]
+
+
+def draw_pointer(detailed):
+    # The prototype's "Ball + pointer", shifted by (-4, -3): the ball with a
+    # scalloped base and a cream mouse pointer over its lower right, set off
+    # from the ball by a gap. Below DETAIL_MIN the ball moves up and left with
+    # three bigger scallops, the pointer grows 25% about a tip moved up-left, and
+    # the gap widens, tuned against the 16 px output so the pointer reads as an
+    # arrow instead of a smudge on the ball.
+    ox, oy = -4, -3
+    if detailed:
+        ball = _scalloped_ball(46, 40, 26, 56, (26, 39, 52, 65), 6.5)
+        arrow, gap = ARROW, 2
+    else:
+        ball = _scalloped_ball(42, 38, 26, 54, (24, 42, 60), 8.5)
+        arrow = [(56 + (x - 60) * 1.25, 40 + (y - 48) * 1.25) for x, y in ARROW]
+        gap = 5
+    layers = [(_moved(ball, ox, oy), TINT)]
+    if detailed:
+        layers.append((_circle((36 + ox, 28 + oy), 4.5), ("tile", 0.35)))
+    layers += _separated(_moved(_polygon(arrow), ox, oy), CREAM, gap)
+    return layers
+
+
+def draw_bite(detailed):
+    # A cream block standing for a page element, with a round scoop taken out
+    # of its upper right corner and the scooped pistachio ball lifted out of
+    # the hole, its bottom still dipping into it. The ball is round with a
+    # frilled lower edge, not a straight-sided dome, and the block carries
+    # three lines of "text". Below DETAIL_MIN the ball is a plain circle, and
+    # the block, hole and ball grow, tuned against the 16 px output so the
+    # bite reads as a round notch rather than a clipped corner.
+    if detailed:
+        block = _rounded_rect(8, 36, 76, 92, 8)
+        hole = _circle((66, 40), 21)
+        ball = _union(_circle((72, 26), 17),
+                      *(_circle((72 + 14 * math.cos(a), 26 + 14 * math.sin(a)), 4.2)
+                        for a in (math.radians(d) for d in range(15, 166, 30))))
+        gap = 3
+    else:
+        block = _rounded_rect(4, 34, 76, 96, 9)
+        hole = _circle((70, 38), 29)
+        ball = _circle((74, 24), 20)
+        gap = 4
+    # The gap is cut from the block rather than painted as a ring of tile
+    # colour, which would show as a darker halo against the tile's sheen.
+    layers = [(_subtract(block, _union(hole, _offset(ball, gap))), CREAM)]
+    if detailed:
+        for y, x1 in ((50, 50), (62, 62), (74, 54)):
+            layers.append((_stroke([(21, y), (x1, y)], 5), ("tile", 0.3)))
+    layers.append((ball, TINT))
+    return layers
+
+
 FIGURES = {
     "pointer": draw_pointer,
     "clipboard": draw_clipboard,
     "window-cup": draw_window_cup,
     "monogram": draw_monogram,
+    "bite": draw_bite,
     "cone-cursor": draw_cone_cursor,
 }
 
