@@ -3,7 +3,7 @@
 Status: implemented
 Last updated: 2026-09-05
 
-Builds on [00-steal.md](./00-steal.md) and [01-multi-format-copy.md](./01-multi-format-copy.md).
+Builds on [00-scoop.md](./00-scoop.md) and [01-multi-format-copy.md](./01-multi-format-copy.md).
 This spec is structural only — build tooling, module boundaries, and
 terminology. No behavior change: every user story in 00 and 01 continues to
 hold exactly as written. `README.md` and `.specs/00`/`.specs/01` are
@@ -13,7 +13,7 @@ current-state document.
 
 ## Problem Statement
 
-As the sole maintainer of Steal, plain JavaScript with hand-rolled UMD-style
+As the sole maintainer of Scoop, plain JavaScript with hand-rolled UMD-style
 module wrappers (`(typeof module === "object" && module.exports) ? ... :
 (typeof self !== "undefined" ? self : this, function (deps) {...})`) has
 become the wrong tradeoff. Every `lib/` file spends its first and last few
@@ -178,7 +178,7 @@ copy()
   navigator.clipboard.writeText(html)
 ```
 
-**`Inspector`** — the DOM-facing interface for everything Steal itself adds
+**`Inspector`** — the DOM-facing interface for everything Scoop itself adds
 to or changes on the page. No knowledge of scrolling at all:
 
 | State | Behavior |
@@ -199,10 +199,10 @@ capture(el)
 ```
 
 `isExtensionNode` (renamed from an earlier `isOwnNode` naming pass) answers
-"did Steal itself put this node here?" — used by `Robber` as the traversal
-skip-predicate (so arrow keys never land on Steal's own overlay) and as a
-guard before setting the pointer target (so a click never copies Steal's own
-UI). Both are existing requirements from `00-steal.md`, not new behavior.
+"did Scoop itself put this node here?" — used by `Robber` as the traversal
+skip-predicate (so arrow keys never land on Scoop's own overlay) and as a
+guard before setting the pointer target (so a click never copies Scoop's own
+UI). Both are existing requirements from `00-scoop.md`, not new behavior.
 
 **`Scroller`** (interface) — the swap point for "how do we bring a target
 into view," fully independent of `Inspector`:
@@ -351,7 +351,7 @@ BackgroundEntry receives MessageType.Ended -> badge cleared for that tab
   (the only context where the picker is usable) already meets its user-gesture
   requirement, and a rejection still surfaces as the "Copy failed" toast. This
   is the one deliberate behavior change in this pass, made after the deprecation
-  was raised directly; `00-steal.md` and `01-multi-format-copy.md` still
+  was raised directly; `00-scoop.md` and `01-multi-format-copy.md` still
   describe the old fallback chain until the consolidation pass.
 
 - **Plain Text lists**: also added during implementation. Plain Text now keeps
@@ -394,16 +394,16 @@ easy to accidentally drop.
 
 ## Out of Scope
 
-- Any user-facing behavior change — every user story in `00-steal.md` and
+- Any user-facing behavior change — every user story in `00-scoop.md` and
   `01-multi-format-copy.md` must still hold exactly.
-- Rewriting `README.md` or `.specs/00-steal.md` / `.specs/01-multi-format-copy.md`
+- Rewriting `README.md` or `.specs/00-scoop.md` / `.specs/01-multi-format-copy.md`
   — deferred to a later pass that consolidates 00, 01, and this spec into one
   cohesive current-state document.
 - HMR / auto-reload dev tooling.
 - Implementing `AncestorScroller` (interface only).
 - Populating `src/lib/utils/` beyond `format-html.ts`, or `src/lib/scroll/`
   beyond `scroller.ts` and `margin-scroller.ts`.
-- Chrome Web Store publication (already out of scope per `00-steal.md`).
+- Chrome Web Store publication (already out of scope per `00-scoop.md`).
 
 ## Further Notes
 
@@ -420,6 +420,6 @@ landing on `Robber` as the one place that composes both, with `Scroller`
 exposing `flush()` instead of a per-node `restoreInto` hook. No issue tracker
 is configured for this vault, so this spec is filed as
 `.specs/02-typescript-rewrite.md` per the project's own existing convention
-(see `00-steal.md`, `01-multi-format-copy.md`) rather than published
+(see `00-scoop.md`, `01-multi-format-copy.md`) rather than published
 externally. `Status` will move to `implemented` once the rewrite lands, at
 which point the planned 00+01+02 consolidation pass can happen.

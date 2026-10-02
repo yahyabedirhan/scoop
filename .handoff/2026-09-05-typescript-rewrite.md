@@ -1,7 +1,7 @@
-# Handoff — Steal TypeScript rewrite
+# Handoff — Scoop TypeScript rewrite
 
 Date: 2026-09-05
-Project: `personal-projects/steal/` (inside the job-search vault, tracked there, no nested git repo)
+Project: `personal-projects/scoop/` (inside the job-search vault, tracked there, no nested git repo)
 
 ## What this is
 
@@ -19,7 +19,7 @@ abstraction).
   low-level design (entities, class design, key flows), the rename table, the
   directory layout, and the testing plan. Read it before doing anything else.
   This handoff does not repeat anything in it.
-- **Prior specs** (unchanged by this rewrite): [`.specs/00-steal.md`](../.specs/00-steal.md),
+- **Prior specs** (unchanged by this rewrite): [`.specs/00-scoop.md`](../.specs/00-scoop.md),
   [`.specs/01-multi-format-copy.md`](../.specs/01-multi-format-copy.md) — still
   say "format" instead of "mode" and describe the current plain-JS
   implementation. This is intentional, not staleness — see "Explicitly
@@ -36,7 +36,7 @@ abstraction).
 
 ## Explicitly deferred (do not touch this pass)
 
-- `README.md` and `.specs/00-steal.md`/`.specs/01-multi-format-copy.md` keep
+- `README.md` and `.specs/00-scoop.md`/`.specs/01-multi-format-copy.md` keep
   saying "format." The user will consolidate 00 + 01 + 02 into one cohesive
   current-state spec **after** implementation lands, and update the README
   then, in one pass. A natural instinct mid-implementation will be to "fix"
@@ -132,8 +132,7 @@ class design in the spec:
    the page's DOM footprint (renamed `Inspector`) shouldn't own scroll logic
    *at all*, not even behind an interface. `Scroller` moved out to be a full
    sibling of `Inspector`, both owned directly by a new top-level
-   orchestrator the user named `Robber` (playing on the extension's own name,
-   "Steal"). This also meant `Scroller`'s per-node `restoreInto` hook (which
+   orchestrator the user named `Robber` (playing on the extension's own name). This also meant `Scroller`'s per-node `restoreInto` hook (which
    still required `Inspector` to know `Scroller` existed) was replaced with a
    plain `flush()` that `Robber` calls before `capture()` and on `stop()` —
    `Inspector` now has zero awareness that scrolling exists.
@@ -155,7 +154,7 @@ object — see the spec's Class Design for the current, final shape.
   that just repeat the folder they're in (`-entry`, `-controller` when the
   file is already named for its role). The one deliberate exception is
   `Robber` for the orchestrator — a pun on the extension's own name
-  ("Steal") the user chose on purpose; don't "fix" it back to something
+  the user chose on purpose; don't "fix" it back to something
   literal like `Orchestrator` or `Controller`.
 - **A useful naming test that came up repeatedly**: a class name should read
   naturally as the subject of its own methods (noun-verb fit). `PageFootprint`
@@ -164,7 +163,7 @@ object — see the spec's Class Design for the current, final shape.
   Worth applying this test to any new class introduced during implementation.
 - **Mermaid doesn't render in this chat client** — use plain text/pseudocode
   diagrams in chat responses. It renders fine inside actual Markdown files
-  (the spec and `00-steal.md` both use it successfully), so this only affects
+  (the spec and `00-scoop.md` both use it successfully), so this only affects
   what you show inline during a `/show-me`-style discussion, not what you
   write to disk.
 - **Design-principle grounding**: when discussing whether something is a good

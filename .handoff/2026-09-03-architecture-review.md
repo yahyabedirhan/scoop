@@ -1,4 +1,4 @@
-# Steal architecture handoff
+# Scoop architecture handoff
 
 Both accepted architecture candidates and the interface/documentation follow-ups
 are implemented. No further structural refactor was recommended.
@@ -9,12 +9,12 @@ The user requested a low-level design review informed by the vault's design
 principles and patterns articles, adapted to a small JavaScript extension.
 The review identified two concrete ownership problems: an old clipboard result
 could stop a newly started inspection, and copying a page ancestor could include
-Steal's own UI. The user approved both fixes and chose page HTML without Steal's
+Scoop's own UI. The user approved both fixes and chose page HTML without Scoop's
 additions, then requested a narrower controller interface and cohesive
 current-state documentation.
 
 ```diff
- Steal
+ Scoop
  ├── content.js
 -│   exposes toggle, start, stop, isActive
 -│   copy completion uses whichever inspection exists
@@ -25,7 +25,7 @@ current-state documentation.
  │
 +├── lib/page-content.js
 +│   owns injected nodes and temporary class/style changes
-+│   copies page HTML without Steal’s additions
++│   copies page HTML without Scoop’s additions
 +│   preserves page-owned content and edits
  │
  ├── lib/dom-nav.js
@@ -36,18 +36,18 @@ current-state documentation.
  │
  ├── README.md
 +│   lifecycle diagram and ownership rules
- └── .specs/00-steal.md
+ └── .specs/00-scoop.md
 +    cohesive description of the current implementation
 ```
 
 Stale copies cannot stop a new inspection; copying `<body>` or `<html>` excludes
-Steal's UI. Additional copy requests during a pending write are ignored, not
+Scoop's UI. Additional copy requests during a pending write are ignored, not
 queued. All 24 tests and the controlled Chrome checks pass; real clipboard
 permissions still need an unpacked-extension check.
 
 ## Read first
 
-- [Current specification](../.specs/00-steal.md) is the authoritative description
+- [Current specification](../.specs/00-scoop.md) is the authoritative description
   of architecture, inspection ownership, page-content fidelity, and limitations.
 - [README](../README.md) contains the file map, lifecycle diagram, and local
   development instructions.
@@ -57,7 +57,7 @@ permissions still need an unpacked-extension check.
 
 The controller owns pending copies per inspection and exposes only `toggle()`.
 The page-content module owns temporary DOM changes and captures page HTML without
-Steal additions. Navigation retains its existing design. The specification was
+Scoop additions. Navigation retains its existing design. The specification was
 rewritten cohesively around the current implementation.
 
 All 24 tests, JavaScript syntax checks, and whitespace checks passed. Standards

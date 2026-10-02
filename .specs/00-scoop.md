@@ -1,10 +1,10 @@
-# 00 - Steal
+# 00 - Scoop
 
 Status: implemented
 Last updated: 2026-09-05
 
-Steal is a local, unpacked Chrome extension for selecting an element and copying
-its page HTML without Steal-owned additions.
+Scoop is a local, unpacked Chrome extension for selecting an element and copying
+its page HTML without Scoop-owned additions.
 
 ## Problem Statement
 
@@ -50,7 +50,7 @@ off.
 19. As a user, I want to click the highlighted element to copy it, so that the interaction matches how I already point at things.
 20. As a user, I want to press Enter to copy the current selection, so that I can finish a keyboard-only traversal without reaching for the mouse.
 21. As a user, I want my click fully suppressed on the page (no link navigation, no button activation), so that inspecting never triggers the page's own behavior.
-22. As a user, I want the selected element's page HTML copied without Steal's own additions or formatting changes, so that I get the page content I selected.
+22. As a user, I want the selected element's page HTML copied without Scoop's own additions or formatting changes, so that I get the page content I selected.
 23. As a user, I want a small toast at my cursor position confirming the copy and naming what was copied, so that I have immediate feedback.
 24. As a user, I want the toast to fade away on its own after about a second, so that it does not get in my way.
 25. As a user, I want inspect mode to turn itself off after a successful copy, so that the page returns to normal without another step.
@@ -62,7 +62,7 @@ off.
 
 ## Architecture
 
-Steal ships plain JavaScript, HTML, and CSS as a Chrome Manifest V3 extension.
+Scoop ships plain JavaScript, HTML, and CSS as a Chrome Manifest V3 extension.
 There is no bundler, TypeScript, build step, or runtime dependency. It operates
 in the top document of the activated tab.
 
@@ -86,7 +86,7 @@ hides traversal and skip rules.
 ### Activation and messages
 
 The manifest requests only `activeTab` and `scripting`, with no host permissions
-or declared content scripts. The toolbar action and `toggle-steal` keyboard
+or declared content scripts. The toolbar action and `toggle-scoop` keyboard
 command both call `toggleOnTab(tab)` in `background.js`. The default shortcut is
 `Ctrl+Shift+S`, or `Command+Shift+S` on macOS, rebindable at
 `chrome://extensions/shortcuts`.
@@ -147,7 +147,7 @@ inspection's root immediately.
 
 There is one current target. Mouse movement selects
 `document.elementFromPoint(clientX, clientY)`, replacing any arrow-key selection.
-Steal-owned nodes cannot become the target.
+Scoop-owned nodes cannot become the target.
 
 `nextTarget(node, direction, skip)` in `lib/dom-nav.js` determines arrow moves:
 
@@ -158,7 +158,7 @@ Steal-owned nodes cannot become the target.
 | Left | Parent element, stopping at `<html>`. |
 | Right | First eligible element child. |
 
-Traversal skips non-elements, Steal-owned nodes, and `head`, `meta`, `title`,
+Traversal skips non-elements, Scoop-owned nodes, and `head`, `meta`, `title`,
 `script`, `link`, `style`, `base`, and `noscript`. The controller supplies the
 ownership check alongside the navigation module's `isSkippable` predicate.
 There is no wrap-around; a move with no eligible destination leaves selection
@@ -203,18 +203,18 @@ IDs, classes, or data attributes. Page-owned lookalikes remain selectable and
 copyable. A pre-existing `ic-active` class remains page-owned.
 
 To capture HTML, the module clones the selected subtree, removes recorded
-Steal roots from the detached copy, restores recorded temporary changes on
+Scoop roots from the detached copy, restores recorded temporary changes on
 that copy, and reads its `outerHTML`. Capture does not remove or rewrite nodes
 in the live page. This excludes the current overlay and any lingering success
 toast, including when the target is `<body>` or `<html>`. There is no
 pretty-printing or other intentional content transformation.
 
 The same restoration rules apply to capture and live cleanup. When an
-attribute still matches the value Steal applied, its original text is restored
+attribute still matches the value Scoop applied, its original text is restored
 exactly, including whether the attribute existed. If the page has edited it,
 only still-owned class tokens or style properties are restored; the page's
 other edits and property priorities are preserved. A page rewrite to exactly
-the same token/value is indistinguishable from Steal's own value.
+the same token/value is indistinguishable from Scoop's own value.
 
 ### Clipboard write and result
 
@@ -255,7 +255,7 @@ through the same input and output paths used by the extension.
 ## Local installation and development
 
 1. Open `chrome://extensions` and enable Developer mode.
-2. Choose **Load unpacked** and select `personal-projects/steal/`.
+2. Choose **Load unpacked** and select `personal-projects/scoop/`.
 3. Pin the toolbar icon.
 
 After editing source files, reload the extension and the target page. The

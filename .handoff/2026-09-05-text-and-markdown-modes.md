@@ -1,7 +1,7 @@
-# Handoff — Steal: structured Plain Text + new Markdown mode
+# Handoff — Scoop: structured Plain Text + new Markdown mode
 
 Date: 2026-09-05
-Project: `personal-projects/steal/` (inside the job-search vault, tracked there, no nested git repo)
+Project: `personal-projects/scoop/` (inside the job-search vault, tracked there, no nested git repo)
 
 ## What this is
 
@@ -28,7 +28,7 @@ block/inline.
   escaping rule, the shared-refactor decision, a worked before/after example,
   the `transform` dispatch pseudocode, and the testing plan. Read it first;
   this handoff does not repeat it.
-- **Prior specs** (context, unchanged by this work): [`00-steal.md`](../.specs/00-steal.md),
+- **Prior specs** (context, unchanged by this work): [`00-scoop.md`](../.specs/00-scoop.md),
   [`01-multi-format-copy.md`](../.specs/01-multi-format-copy.md),
   [`02-typescript-rewrite.md`](../.specs/02-typescript-rewrite.md). Spec 01 still
   says Plain Text is "just the text, no tags" — that wording is reconciled in the
@@ -72,7 +72,7 @@ to "improve" on it:
 - **Tables flatten.** No GFM table generation — certainty is too low.
 - **Escaping is leading-token only.** `\#  \>  \-  \+  \*` and `1\.`, each only
   before a space, only at the start of an emitted paragraph line, never
-  mid-line, never in fences, never on Steal's own prefixed lines. `_` is never
+  mid-line, never in fences, never on Scoop's own prefixed lines. `_` is never
   escaped (this content is full of `event_id`, `user_id`).
 - **Plain Text separator is a single `\n`; Markdown is `\n\n`.** Different on
   purpose — Markdown needs the blank line to render.
@@ -106,11 +106,11 @@ to "improve" on it:
   only for genuinely multi-part rationale. Attach rationale to the type/const
   it explains.
 - **Naming**: literal and descriptive over short or clever. The one sanctioned
-  exception is `Robber` (a pun on "Steal").
+  exception is `Robber` (a pun on the extension's own name).
 - **`dist/` is gitignored**; `npm run build` (two Vite passes) must still be run
   and pass. `npm test` = Vitest, `npm run typecheck` = `tsc --noEmit`.
 - Commit style: lowercase, multi-line, bullet body; `Co-Authored-By: Claude
-  Sonnet 5 <noreply@anthropic.com>`. Commit only `personal-projects/steal/`
+  Sonnet 5 <noreply@anthropic.com>`. Commit only `personal-projects/scoop/`
   paths — the repo has unrelated staged changes elsewhere. Do not `git add`
   outside the project without being asked.
 - After implementing: run `/code-review` (two-axis, Standards + Spec) against

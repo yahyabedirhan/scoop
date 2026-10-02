@@ -1,7 +1,7 @@
-# Handoff — Steal: docs consolidation + README refresh
+# Handoff — Scoop: docs consolidation + README refresh
 
 Date: 2026-09-05
-Project: `personal-projects/steal/` (inside the job-search vault, tracked there, no nested git repo)
+Project: `personal-projects/scoop/` (inside the job-search vault, tracked there, no nested git repo)
 
 ## Current status
 
@@ -33,9 +33,9 @@ for the exact intent.
 
 What the consolidation needs to do:
 
-- Produce a single spec that describes Steal **as it is now**, not as a chain of
-  diffs. Candidate: a rewritten `.specs/00-steal.md`, or a new
-  `.specs/steal.md` that the numbered four link to as superseded. Decide the
+- Produce a single spec that describes Scoop **as it is now**, not as a chain of
+  diffs. Candidate: a rewritten `.specs/00-scoop.md`, or a new
+  `.specs/scoop.md` that the numbered four link to as superseded. Decide the
   filing convention with the user if unsure; the project has no external issue
   tracker, hence the numbered-spec chain.
 - **Reconcile the stale wording.** `.specs/01` still says Plain Text is "just
@@ -115,7 +115,7 @@ instead of the four numbered ones.
   Markdown (tables, headers) and copied source text are fine.
 - Commit style: lowercase, multi-line, bullet body, trailer
   `Co-Authored-By: Claude Sonnet 5 <noreply@anthropic.com>`. Commit only
-  `personal-projects/steal/` paths; the repo has unrelated staged changes
+  `personal-projects/scoop/` paths; the repo has unrelated staged changes
   under `interview-prep/` that must not be added.
 - These are doc-only jobs, so no build/test impact is expected, but run
   `npm test` and `npm run build` once at the end anyway to be sure a stray
