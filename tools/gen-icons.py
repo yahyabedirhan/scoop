@@ -14,7 +14,15 @@ layers. Every size is rendered by the same `render`, so a new figure or a new
 output size needs no change to the renderer. Pure standard library,
 supersampled for clean edges, and deterministic. Re-run after tweaking
 geometry or colours.
+
+`--variant` picks the figure shipped as the icons and README logo, `brackets`
+by default. Every other figure is written as a 512 px preview beside the
+logo, `scoop-<figure>.png`, never into icons/, which the build copies into
+dist/ whole. The shipped figure's own preview is deleted, so switching back
+and forth leaves no stale file. TODO: drop the `pointer` and `ball` figures if
+the maintainer rejects them at review.
 """
+import argparse
 import math
 import os
 import struct
@@ -25,8 +33,9 @@ DETAIL_MIN = 32              # smallest size that gets the figure's details
 ROOT = os.path.join(os.path.dirname(__file__), os.pardir)
 OUT_DIR = os.path.join(ROOT, "icons")
 LOGO_SIZE = 512
-LOGO_PATH = os.path.join(ROOT, "assets", "images", "logo", "scoop.png")
-SHIPPED_FIGURE = "brackets"
+LOGO_DIR = os.path.join(ROOT, "assets", "images", "logo")
+LOGO_PATH = os.path.join(LOGO_DIR, "scoop.png")
+DEFAULT_FIGURE = "brackets"
 
 # Pistachio: Shipyard's khaki shifted to hue 140 in OKLCH (lightness +0.02,
 # chroma x0.95). The figure is Shipyard's cream, the ball a light tint.
@@ -69,6 +78,52 @@ def _stroke(points, width):
     return lambda x, y: min(_seg_dist(x, y, a, b) for a, b in segs) - width / 2
 
 
+def _rect(x0, y0, x1, y1):
+    cx, cy, hx, hy = (x0 + x1) / 2, (y0 + y1) / 2, (x1 - x0) / 2, (y1 - y0) / 2
+
+    def sdf(x, y):
+        dx, dy = abs(x - cx) - hx, abs(y - cy) - hy
+        return math.hypot(max(dx, 0), max(dy, 0)) + min(max(dx, dy), 0)
+    return sdf
+
+
+def _polygon(points):
+    """A filled polygon: distance to its edges, negative inside (even-odd)."""
+    edges = list(zip(points, points[1:] + points[:1]))
+
+    def sdf(x, y):
+        d = min(_seg_dist(x, y, a, b) for a, b in edges)
+        inside = False
+        for (ax, ay), (bx, by) in edges:
+            if (ay > y) != (by > y) and x < ax + (y - ay) * (bx - ax) / (by - ay):
+                inside = not inside
+        return -d if inside else d
+    return sdf
+
+
+def _union(*sdfs):
+    return lambda x, y: min(f(x, y) for f in sdfs)
+
+
+def _moved(sdf, dx, dy):
+    return lambda x, y: sdf(x - dx, y - dy)
+
+
+def _quad(p0, p1, p2, steps=16):
+    """Points along a quadratic Bezier curve, for stroking as a polyline."""
+    return [tuple((1 - t) ** 2 * a + 2 * (1 - t) * t * b + t * t * c for a, b, c in zip(p0, p1, p2))
+            for t in (i / steps for i in range(steps + 1))]
+
+
+def _separated(sdf, paint, gap):
+    """Layers drawing `sdf` over earlier parts, ringed by a `gap` of tile colour.
+
+    The figure has no outline, so this gap is what keeps an overlapping part
+    readable against the part beneath it.
+    """
+    return [(lambda x, y: sdf(x, y) - gap, ("tile", 1.0)), (sdf, paint)]
+
+
 # ---------- figures ----------
 # A figure is a list of (sdf, paint) layers, back to front. A paint is an RGB
 # colour, or ("tile", alpha) for the tile's own colour at that opacity.
@@ -89,8 +144,73 @@ def draw_brackets(detailed):
     return layers
 
 
+def _scalloped_ball(cx, cy, r, base, scallops, scallop_r, drop=0):
+    """A ball whose lower half drops straight to `base`, edged with scallops.
+
+    The scallops are circles centred at the `scallops` x positions, `drop`
+    below `base`.
+    """
+    return _union(
+        _circle((cx, cy), r),
+        _rect(cx - r, cy, cx + r, base),
+        *(_circle((x, base + drop), scallop_r) for x in scallops),
+    )
+
+
+ARROW = [(60, 48), (60, 86), (69, 77), (76, 92), (83, 89), (76, 74), (88, 74)]
+
+
+def draw_pointer(detailed):
+    # The prototype's "Ball + pointer", shifted by (-4, -3): the ball with a
+    # scalloped base and a cream mouse pointer over its lower right, set off
+    # from the ball by a gap. Below DETAIL_MIN the ball moves up and left with
+    # three bigger scallops, the pointer grows 25% about a tip moved up-left, and
+    # the gap widens, tuned against the 16 px output so the pointer reads as an
+    # arrow instead of a smudge on the ball.
+    ox, oy = -4, -3
+    if detailed:
+        ball = _scalloped_ball(46, 40, 26, 56, (26, 39, 52, 65), 6.5)
+        arrow, gap = ARROW, 2
+    else:
+        ball = _scalloped_ball(42, 38, 26, 54, (24, 42, 60), 8.5)
+        arrow = [(56 + (x - 60) * 1.25, 40 + (y - 48) * 1.25) for x, y in ARROW]
+        gap = 5
+    layers = [(_moved(ball, ox, oy), TINT)]
+    if detailed:
+        layers.append((_circle((36 + ox, 28 + oy), 4.5), ("tile", 0.35)))
+    layers += _separated(_moved(_polygon(arrow), ox, oy), CREAM, gap)
+    return layers
+
+
+def draw_ball(detailed):
+    # The prototype's "Ball only", shifted by (0, 4): the ball with a scalloped
+    # base and a drip. The crease and shine are details. Below DETAIL_MIN the
+    # four scallops become three bigger ones hung lower and the drip thickens,
+    # tuned against the 16 px output so the notches and drip still show.
+    oy = 4
+    if detailed:
+        ball = _union(
+            _scalloped_ball(50, 40, 28, 58, (29, 43, 57, 71), 7),
+            _stroke([(62, 62), (62, 76)], 9),
+        )
+    else:
+        ball = _union(
+            _scalloped_ball(50, 36, 30, 50, (28, 50, 72), 11, drop=8),
+            _stroke([(61, 64), (61, 82)], 11),
+        )
+    layers = [(_moved(ball, 0, oy), TINT)]
+    if detailed:
+        layers += [
+            (_stroke([(x, y + oy) for x, y in _quad((24, 46), (50, 54), (76, 46))], 3), ("tile", 1.0)),
+            (_circle((40, 27 + oy), 4.5), ("tile", 0.35)),
+        ]
+    return layers
+
+
 FIGURES = {
     "brackets": draw_brackets,
+    "pointer": draw_pointer,
+    "ball": draw_ball,
 }
 
 
@@ -165,15 +285,34 @@ def write_png(path, size, raw):
         f.write(sig + chunk(b"IHDR", ihdr) + chunk(b"IDAT", idat) + chunk(b"IEND", b""))
 
 
+def preview_path(figure):
+    return os.path.join(LOGO_DIR, f"scoop-{figure}.png")
+
+
 def main():
+    parser = argparse.ArgumentParser(description="Generate the Scoop icons, README logo and previews.")
+    parser.add_argument("--variant", choices=FIGURES, default=DEFAULT_FIGURE,
+                        help=f"figure shipped as the icons and README logo (default: {DEFAULT_FIGURE})")
+    shipped = parser.parse_args().variant
+
     os.makedirs(OUT_DIR, exist_ok=True)
     for s in SIZES:
         p = os.path.join(OUT_DIR, f"icon{s}.png")
-        write_png(p, s, render(SHIPPED_FIGURE, s))
+        write_png(p, s, render(shipped, s))
         print("wrote", os.path.relpath(p))
-    os.makedirs(os.path.dirname(LOGO_PATH), exist_ok=True)
-    write_png(LOGO_PATH, LOGO_SIZE, render(SHIPPED_FIGURE, LOGO_SIZE))
+    os.makedirs(LOGO_DIR, exist_ok=True)
+    write_png(LOGO_PATH, LOGO_SIZE, render(shipped, LOGO_SIZE))
     print("wrote", os.path.relpath(LOGO_PATH))
+
+    # The shipped figure is the logo, so its preview from an earlier run with
+    # another variant would be stale.
+    if os.path.exists(preview_path(shipped)):
+        os.remove(preview_path(shipped))
+        print("removed", os.path.relpath(preview_path(shipped)))
+    for figure in FIGURES:
+        if figure != shipped:
+            write_png(preview_path(figure), LOGO_SIZE, render(figure, LOGO_SIZE))
+            print("wrote", os.path.relpath(preview_path(figure)))
 
 
 if __name__ == "__main__":

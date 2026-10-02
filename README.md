@@ -92,7 +92,21 @@ The extension stays installed across restarts as long as the folder stays put.
 | `npm run dev` | The same build in watch mode. |
 | `npm run typecheck` | `tsc --noEmit` in strict mode. |
 | `npm test` | Run the test suite with Vitest (jsdom, with the icon-file suite in Node). |
-| `npm run gen-icons` | Regenerate the toolbar and extension icons at 16, 32, 48 and 128 px, a pistachio ice-cream ball between cream angle brackets (`<●>`) on a pistachio squircle tile, plus the 512 px README logo at `assets/images/logo/scoop.png` (`tools/gen-icons.py`, standard library only). |
+| `npm run gen-icons` | Regenerate the toolbar and extension icons at 16, 32, 48 and 128 px, a pistachio ice-cream ball between cream angle brackets (`<●>`) on a pistachio squircle tile, plus the 512 px README logo at `assets/images/logo/scoop.png` and 512 px previews of the alternate icons beside it (`tools/gen-icons.py`, standard library only). |
+
+### Alternate icons
+
+TODO: remove this section, the `pointer` and `ball` figures in
+`tools/gen-icons.py` and their previews if the maintainer rejects them at review.
+
+Two runner-up icons are kept as alternates. `pointer` is the ball with a
+scalloped base and a cream mouse pointer over its lower right, and `ball` is the
+ball with a scalloped base and a drip. Their previews are
+[`scoop-pointer.png`](assets/images/logo/scoop-pointer.png) and
+[`scoop-ball.png`](assets/images/logo/scoop-ball.png). To ship one instead of
+`brackets`, run `npm run gen-icons -- --variant pointer` (or `ball`). That
+writes the chosen figure as the extension icons and README logo, and a preview
+of each figure not shipped. `npm run gen-icons` on its own restores `brackets`.
 
 The source is TypeScript under `src/`, built by Vite. `dist/` is generated and
 gitignored. `demo.html` is a manual test page with nested lists, links, and
