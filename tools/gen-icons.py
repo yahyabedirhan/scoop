@@ -328,12 +328,59 @@ def draw_scoop_cone(detailed):
     return layers
 
 
+def _rotated(sdf, c, deg):
+    """`sdf` turned by `deg` degrees about `c`, clockwise on screen (y down)."""
+    co, si = math.cos(math.radians(deg)), math.sin(math.radians(deg))
+
+    def sdf_turned(x, y):
+        dx, dy = x - c[0], y - c[1]
+        return sdf(c[0] + dx * co + dy * si, c[1] - dx * si + dy * co)
+    return sdf_turned
+
+
+def _ellipse(c, rx, ry):
+    """An ellipse. Its distance is approximated by scaling, close enough for fills and gaps."""
+    return lambda x, y: (math.hypot((x - c[0]) / rx, (y - c[1]) / ry) - 1) * min(rx, ry)
+
+
+def draw_cursor_scoop(detailed):
+    # An ice-cream scoop tool holding a round pistachio ball, with a cream mouse
+    # pointer below its bowl, so the icon says "point at it and scoop it". The
+    # bowl is a deep half-ellipse whose front lip is drawn over the ball, set
+    # off by a gap, so the ball sits heaped in the bowl instead of inside a ring
+    # that would read as a magnifier. The handle leaves the bowl's back down
+    # to the left and thickens into a grip. Detailed sizes add the thumb lever
+    # as a tab off the bowl's back. Below DETAIL_MIN the lever goes, the ball
+    # rises further out of a deeper bowl, the scoop moves up and left, and the
+    # pointer grows 20% with a wider gap, tuned against the 16 px output so the
+    # ball stays round and the pointer reads as an arrow.
+    if detailed:
+        c, rx, ry, kr, kh = (50, 42), 27, 22, 21, 12
+        handle = _union(_stroke([(34, 54), (8, 90)], 10), _stroke([(19, 76), (8, 90)], 16),
+                        _stroke([(30, 56), (24, 49), (19, 48)], 8))
+        arrow = [(70 + (x - 60) * 0.9, 58 + (y - 48) * 0.9) for x, y in ARROW]
+        gap = 2.5
+    else:
+        c, rx, ry, kr, kh = (40, 40), 27, 27, 20, 15
+        handle = _union(_stroke([(24, 49), (5, 84)], 11), _stroke([(11, 72), (5, 84)], 17))
+        arrow = [(65 + (x - 60) * 1.2, 50 + (y - 48) * 1.2) for x, y in ARROW]
+        gap = 5
+    tilt = -12                                # the bowl's opening leans up and right
+    bowl = _rotated(lambda x, y: max(_ellipse(c, rx, ry)(x, y), c[1] - y), c, tilt)
+    ball = _rotated(_circle((c[0], c[1] - kh), kr), c, tilt)
+    layers = [(ball, TINT)]
+    layers += _separated(_union(bowl, handle), CREAM, gap)
+    layers += _separated(_polygon(arrow), CREAM, gap)
+    return layers
+
+
 FIGURES = {
     "pointer": draw_pointer,
     "clipboard": draw_clipboard,
     "scooper": draw_scooper,
     "scoop-tub": draw_scoop_tub,
     "scoop-cone": draw_scoop_cone,
+    "cursor-scoop": draw_cursor_scoop,
 }
 
 
