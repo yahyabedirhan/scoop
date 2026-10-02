@@ -280,11 +280,60 @@ def draw_scoop_tub(detailed):
     return layers
 
 
+def _cup(c, r, d, depth):
+    """The bowl of a scoop: a disc cut by a chord, open toward unit vector `d`.
+
+    The chord sits `depth` past the centre along `d`, so a positive `depth`
+    makes the bowl deeper than a half disc.
+    """
+    disc = _circle(c, r)
+    return lambda x, y: max(disc(x, y), (x - c[0]) * d[0] + (y - c[1]) * d[1] - depth)
+
+
+def draw_scoop_cone(detailed):
+    # An ice-cream scoop tipping a round pistachio ball onto a cream cone. The
+    # bowl's mouth faces down and left, toward the cone, with the ball half out
+    # of it. The handle rises up and right, thin at the neck and thick at the
+    # grip, with a thumb lever arching over the neck, so the tool reads as a
+    # scoop rather than a magnifier or a ladle. The bowl sits in front of the
+    # ball, so the ball shows heaped in its mouth instead of the bowl showing
+    # as a ring. Below DETAIL_MIN the lever goes, the ball and bowl grow, and
+    # the gap widens to about one pixel, tuned against the 16 px output so the
+    # bowl, ball and cone stay three separate shapes.
+    a, m = math.radians(-25), math.radians(120)
+    u = (math.cos(a), math.sin(a))          # along the handle, right and up
+    d = (math.cos(m), math.sin(m))          # the bowl's mouth, down and left
+    n = (-u[1], u[0])                        # across the handle
+    if detailed:
+        bowl_c, bowl_r, ball_r, sink, cone_top, gap = (37, 28), 24, 21, 13, 60, 3
+    else:
+        bowl_c, bowl_r, ball_r, sink, cone_top, gap = (37, 26), 26, 24, 11, 62, 7
+    ball_c = (bowl_c[0] + d[0] * sink, bowl_c[1] + d[1] * sink)
+
+    def at(t, s=0):
+        return (bowl_c[0] + u[0] * t + n[0] * s, bowl_c[1] + u[1] * t + n[1] * s)
+
+    cx = ball_c[0]
+    cone = _polygon([(cx - 21, cone_top), (cx + 21, cone_top), (cx, 100)])
+    bowl = _cup(bowl_c, bowl_r, d, 2)
+    neck = _stroke([at(bowl_r - 8), at(bowl_r + 12)], 8)
+    grip = _stroke([at(bowl_r + 12), at(bowl_r + 38)], 14)
+    ball = _circle(ball_c, ball_r)
+    layers = [(cone, CREAM)]
+    layers += _separated(ball, TINT, gap)
+    tool = [bowl, neck, grip]
+    if detailed:
+        tool.append(_stroke([at(bowl_r - 8, -17), at(bowl_r + 6, -13), at(bowl_r + 22, -7)], 4.5))
+    layers += _separated(_union(*tool), CREAM, gap)
+    return layers
+
+
 FIGURES = {
     "pointer": draw_pointer,
     "clipboard": draw_clipboard,
     "scooper": draw_scooper,
     "scoop-tub": draw_scoop_tub,
+    "scoop-cone": draw_scoop_cone,
 }
 
 
