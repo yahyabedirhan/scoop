@@ -1,6 +1,6 @@
 // @vitest-environment node
 /// <reference types="node" />
-import { readFileSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 import { inflateSync } from "node:zlib";
 import { describe, test, expect } from "vitest";
 
@@ -78,6 +78,12 @@ describe("extension icons", () => {
     expect([png.width, png.height]).toEqual([Number(size), Number(size)]);
   });
 
+  test("icons/ holds only the declared icons, since the build copies the folder into dist/ whole", () => {
+    const declaredFiles = Object.values(manifest.icons).map((path) => path.replace(/^icons\//, ""));
+    const files = readdirSync(new URL("icons/", ROOT)).filter((name) => !name.startsWith("."));
+    expect(files.sort()).toEqual(declaredFiles.sort());
+  });
+
   test("the 16 px tile fills the canvas, so the middle of its left edge is opaque", () => {
     const png = readPng(manifest.icons["16"]);
     expect(alphaAt(png, 0, 8)).toBe(255);
@@ -94,6 +100,21 @@ describe("README logo", () => {
 
   test("keeps a transparent margin around the tile, as the 128 px icon does", () => {
     const png = readPng(LOGO);
+    expect(alphaAt(png, 0, 256)).toBe(0);
+  });
+});
+
+describe("alternate icon previews", () => {
+  // The variants not shipped are written beside the README logo as previews.
+  const previews = readdirSync(new URL("assets/images/logo/", ROOT)).filter((name) => /^scoop-.+\.png$/.test(name));
+
+  test("the pointer and ball variants have previews", () => {
+    expect(previews.sort()).toEqual(["scoop-ball.png", "scoop-pointer.png"]);
+  });
+
+  test.each(previews)("%s is a 512 x 512 PNG with the logo's transparent margin", (name) => {
+    const png = readPng(`assets/images/logo/${name}`);
+    expect([png.width, png.height]).toEqual([512, 512]);
     expect(alphaAt(png, 0, 256)).toBe(0);
   });
 });
