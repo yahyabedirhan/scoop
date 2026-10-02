@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """Generate the Scoop extension icons (16/32/48/128) and README logo as RGBA PNGs.
 
-Motif: a scoop of pistachio ice cream between two angle brackets, `<●>`, as a
-flat figure on a pistachio squircle tile with a soft vertical gradient and a
-white sheen, in the format of Shipyard's logo. The figure has no outline.
+Motif: a scoop of pistachio ice cream with a scalloped base and a cream mouse
+pointer over its lower right, as a flat figure on a pistachio squircle tile
+with a soft vertical gradient and a white sheen, in the format of Shipyard's
+logo. The figure has no outline.
 Below DETAIL_MIN px it drops its details and grows 10%, so the small icon is
 the bare silhouette. The 48 and 128 px tiles keep Chrome's transparent margin;
 the smaller tiles fill the canvas. The 512 px README logo keeps the 128 px
@@ -15,12 +16,12 @@ output size needs no change to the renderer. Pure standard library,
 supersampled for clean edges, and deterministic. Re-run after tweaking
 geometry or colours.
 
-`--variant` picks the figure shipped as the icons and README logo, `brackets`
+`--variant` picks the figure shipped as the icons and README logo, `pointer`
 by default. Every other figure is written as a 512 px preview beside the
 logo, `scoop-<figure>.png`, never into icons/, which the build copies into
 dist/ whole. The shipped figure's own preview is deleted, so switching back
-and forth leaves no stale file. TODO: drop the `pointer` and `ball` figures if
-the maintainer rejects them at review.
+and forth leaves no stale file. Rejected figures are kept as PNGs under
+assets/images/logo/archive/, which this script never writes or deletes.
 """
 import argparse
 import math
@@ -35,7 +36,7 @@ OUT_DIR = os.path.join(ROOT, "icons")
 LOGO_SIZE = 512
 LOGO_DIR = os.path.join(ROOT, "assets", "images", "logo")
 LOGO_PATH = os.path.join(LOGO_DIR, "scoop.png")
-DEFAULT_FIGURE = "brackets"
+DEFAULT_FIGURE = "pointer"
 
 # Pistachio: Shipyard's khaki shifted to hue 140 in OKLCH (lightness +0.02,
 # chroma x0.95). The figure is Shipyard's cream, the ball a light tint.
@@ -128,22 +129,6 @@ def _separated(sdf, paint, gap):
 # A figure is a list of (sdf, paint) layers, back to front. A paint is an RGB
 # colour, or ("tile", alpha) for the tile's own colour at that opacity.
 
-def draw_brackets(detailed):
-    # Below DETAIL_MIN the brackets spread out, the strokes thicken and the
-    # ball shrinks, tuned against the 16 px output so `<●>` keeps a tile-coloured
-    # gap between ball and brackets instead of merging into one blob.
-    tip, arm, width, r = (10, 27, 10, 19) if detailed else (8, 26, 12, 17)
-    layers = [
-        (_stroke([(arm, 30), (tip, 50), (arm, 70)], width), CREAM),
-        (_stroke([(100 - arm, 30), (100 - tip, 50), (100 - arm, 70)], width), CREAM),
-        (_circle((50, 46), r), TINT),
-        (_stroke([(56, 60), (56, 72)], 8), TINT),
-    ]
-    if detailed:
-        layers.append((_circle((43, 39), 3.5), ("tile", 0.35)))
-    return layers
-
-
 def _scalloped_ball(cx, cy, r, base, scallops, scallop_r, drop=0):
     """A ball whose lower half drops straight to `base`, edged with scallops.
 
@@ -182,35 +167,8 @@ def draw_pointer(detailed):
     return layers
 
 
-def draw_ball(detailed):
-    # The prototype's "Ball only", shifted by (0, 4): the ball with a scalloped
-    # base and a drip. The crease and shine are details. Below DETAIL_MIN the
-    # four scallops become three bigger ones hung lower and the drip thickens,
-    # tuned against the 16 px output so the notches and drip still show.
-    oy = 4
-    if detailed:
-        ball = _union(
-            _scalloped_ball(50, 40, 28, 58, (29, 43, 57, 71), 7),
-            _stroke([(62, 62), (62, 76)], 9),
-        )
-    else:
-        ball = _union(
-            _scalloped_ball(50, 36, 30, 50, (28, 50, 72), 11, drop=8),
-            _stroke([(61, 64), (61, 82)], 11),
-        )
-    layers = [(_moved(ball, 0, oy), TINT)]
-    if detailed:
-        layers += [
-            (_stroke([(x, y + oy) for x, y in _quad((24, 46), (50, 54), (76, 46))], 3), ("tile", 1.0)),
-            (_circle((40, 27 + oy), 4.5), ("tile", 0.35)),
-        ]
-    return layers
-
-
 FIGURES = {
-    "brackets": draw_brackets,
     "pointer": draw_pointer,
-    "ball": draw_ball,
 }
 
 

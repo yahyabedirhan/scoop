@@ -109,15 +109,31 @@ describe("README logo", () => {
 
 describe("alternate icon previews", () => {
   // The variants not shipped are written beside the README logo as previews.
+  // `pointer` ships, so it has none.
+  const EXPECTED: string[] = [];
   const previews = readdirSync(new URL("assets/images/logo/", ROOT)).filter((name) => /^scoop-.+\.png$/.test(name));
 
-  test("the pointer and ball variants have previews", () => {
-    expect(previews.sort()).toEqual(["scoop-ball.png", "scoop-pointer.png"]);
+  test("only the figures not shipped have previews", () => {
+    expect(previews.sort()).toEqual(EXPECTED.sort());
   });
 
   test.each(previews)("%s is a 512 x 512 PNG with the logo's transparent margin", (name) => {
     const png = readPng(`assets/images/logo/${name}`);
     expect([png.width, png.height]).toEqual([512, 512]);
     expect(alphaAt(png, 0, 256)).toBe(0);
+  });
+});
+
+describe("archived icons", () => {
+  // Rejected figures kept as a record. The generator never writes here.
+  const archived = readdirSync(new URL("assets/images/logo/archive/", ROOT)).filter((name) => !name.startsWith("."));
+
+  test("the brackets and ball icons are archived", () => {
+    expect(archived.sort()).toEqual(["scoop-ball.png", "scoop-brackets.png"]);
+  });
+
+  test.each(archived)("%s is a 512 x 512 PNG", (name) => {
+    const png = readPng(`assets/images/logo/archive/${name}`);
+    expect([png.width, png.height]).toEqual([512, 512]);
   });
 });
