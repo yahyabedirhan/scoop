@@ -94,6 +94,14 @@ The extension stays installed across restarts as long as the folder stays put.
 | `npm test` | Run the test suite with Vitest (jsdom, with the icon-file suite in Node). |
 | `npm run gen-icons` | Regenerate the toolbar and extension icons at 16, 32, 48 and 128 px, a pistachio ice-cream ball between cream angle brackets (`<●>`) on a pistachio squircle tile, plus the 512 px README logo at `assets/images/logo/scoop.png` and 512 px previews of the alternate icons beside it (`tools/gen-icons.py`, standard library only). |
 
+The source is TypeScript under `src/`, built by Vite. `dist/` is generated and
+gitignored. `demo.html` is a manual test page with nested lists, links, and
+buttons.
+
+- **[`docs/scoop-v01.md`](docs/scoop-v01.md)** is the full reference: how every
+  piece works, the module layout, and the low-level design.
+- **[`CHANGELOG.md`](CHANGELOG.md)** is the version history.
+
 ### Alternate icons
 
 TODO: remove this section, the `pointer` and `ball` figures in
@@ -107,14 +115,6 @@ ball with a scalloped base and a drip. Their previews are
 `brackets`, run `npm run gen-icons -- --variant pointer` (or `ball`). That
 writes the chosen figure as the extension icons and README logo, and a preview
 of each figure not shipped. `npm run gen-icons` on its own restores `brackets`.
-
-The source is TypeScript under `src/`, built by Vite. `dist/` is generated and
-gitignored. `demo.html` is a manual test page with nested lists, links, and
-buttons.
-
-- **[`docs/scoop-v01.md`](docs/scoop-v01.md)** is the full reference: how every
-  piece works, the module layout, and the low-level design.
-- **[`CHANGELOG.md`](CHANGELOG.md)** is the version history.
 
 ## Not included
 

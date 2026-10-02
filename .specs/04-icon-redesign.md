@@ -82,8 +82,9 @@ review whether they stay: the ball with a mouse pointer, and the plain ball.
 - **Palette.** These colours come from the prototype, which shifted Shipyard's
   khaki (`#809741` → `#637532`) to hue 140 in OKLCH, with lightness +0.02 and
   chroma × 0.95. The tile runs from `#6da361` at the top to `#557f4b` at the
-  bottom (middle `#619257`). The figure is cream `#FBF6EA`, Shipyard's figure
-  colour, and the ball is `#ceebc8`. The `ON` badge is `#37692c`.
+  bottom (a straight sRGB blend, about `#619156` at the middle). The figure is
+  cream `#FBF6EA`, Shipyard's figure colour, and the ball is `#ceebc8`. The
+  `ON` badge is `#37692c`.
 - **Figure size.** The figure spans about 76% of the tile at 32 px and up, and
   10% more at 16 px, matching Shipyard's habit of enlarging the small figure.
 - **Small sizes.** Below 32 px the figure drops its details (the ball's shine)
@@ -154,9 +155,9 @@ review whether they stay: the ball with a mouse pointer, and the plain ball.
 - The prototype that settled this direction is on the `prototype/icon-redesign`
   branch as `tools/icon-prototype.html`. Open it in Chrome to compare all ten
   motifs, nine palettes, three figure colourings, three body styles and three
-  badge colours. Rejected motifs and why: the original scoop tool reads as a
-  magnifier on a tile, the side-view disher as a ladle, the curl as a snail, the
-  double scoop as a figurine, and the selection-bracket motif turns to mush at
-  16 px. Mint was rejected by the maintainer, and pistachio was chosen.
+  badge colours. Each rejected motif failed for its own reason. The original
+  scoop tool reads as a magnifier on a tile, the side-view disher as a ladle,
+  the curl as a snail, the double scoop as a figurine, and the selection-bracket
+  motif turns to mush at 16 px. Mint was rejected by the maintainer, and pistachio was chosen.
 - The maintainer will give feedback on the icon after seeing it. Swapping the
   shipped variant should be a one-option change in the generator.

@@ -15,8 +15,7 @@ Date: 2026-10-02
 
 - Effort: `icon-redesign`
 - Branch: `feat/icon-redesign`, cut from `origin/main` at `8092a93`, no upstream yet
-- Worktree: `/Users/yahyabedirhanpak/.treehouse/scoop-abb122/1/scoop`, leased
-  through `treehouse` (holder `icon-redesign`, lease id
+- Worktree: the `treehouse` worktree leased as `icon-redesign` (lease id
   `d9e3c95a0a16d43b5663dba337b7012f`)
 
 ## Where things are

@@ -1,4 +1,7 @@
 // @vitest-environment node
+// This reference adds Node types to the whole program, since there is one
+// tsconfig. That is accepted because these tests need node:fs and node:zlib,
+// and src/ must still not rely on Node globals.
 /// <reference types="node" />
 import { readdirSync, readFileSync } from "node:fs";
 import { inflateSync } from "node:zlib";
