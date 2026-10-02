@@ -83,3 +83,17 @@ describe("extension icons", () => {
     expect(alphaAt(png, 0, 8)).toBe(255);
   });
 });
+
+describe("README logo", () => {
+  const LOGO = "assets/images/logo/scoop.png";
+
+  test("is a 512 x 512 PNG, so the 128 px README image is sharp on retina screens", () => {
+    const png = readPng(LOGO);
+    expect([png.width, png.height]).toEqual([512, 512]);
+  });
+
+  test("keeps a transparent margin around the tile, as the 128 px icon does", () => {
+    const png = readPng(LOGO);
+    expect(alphaAt(png, 0, 256)).toBe(0);
+  });
+});
