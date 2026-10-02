@@ -202,9 +202,43 @@ def draw_clipboard(detailed):
     return layers
 
 
+def draw_window_cup(detailed):
+    # A browser window used as a cup: the window tapers like an ice-cream cup,
+    # its header bar is the rim, and a round pistachio scoop sits in its open
+    # top, the scoop's lower part hidden behind the window and set off from it
+    # by a gap. A line of tile colour parts the header bar, with three window
+    # controls, from the page, with two lines of text. The scoop shows more than
+    # its upper half, so it stays round rather than a straight-sided dome.
+    # Edges fall on pixel rows at 32 px. Below DETAIL_MIN the scoop grows, and
+    # the figure moves down one pixel with its rim, line and base on whole
+    # pixel rows, tuned against the 16 px output so the header line stays a
+    # crisp row instead of a blur.
+    if detailed:
+        ball = _circle((50, 32), 27)
+        cup = _polygon([(14, 54.1), (86, 54.1), (78, 91.1), (22, 91.1)])
+        header = _rect(6, 62.3, 94, 66.4)
+        gap = 2.5
+    else:
+        ball = _circle((50, 33.5), 29)
+        cup = _polygon([(10, 57.5), (90, 57.5), (80, 94.85), (20, 94.85)])
+        header = _rect(6, 64.95, 94, 72.4)
+        gap = 6
+    layers = [(ball, TINT)]
+    if detailed:
+        layers.append((_circle((39, 20), 5), ("tile", 0.35)))
+    layers += _separated(cup, CREAM, gap)
+    layers.append((header, ("tile", 1.0)))
+    if detailed:
+        layers += [(_circle((x, 58.2), 2), ("tile", 1.0)) for x in (22, 29, 36)]
+        layers += [(_stroke([(28, 75), (66, 75)], 3), ("tile", 0.35)),
+                   (_stroke([(32, 83), (56, 83)], 3), ("tile", 0.35))]
+    return layers
+
+
 FIGURES = {
     "pointer": draw_pointer,
     "clipboard": draw_clipboard,
+    "window-cup": draw_window_cup,
 }
 
 
