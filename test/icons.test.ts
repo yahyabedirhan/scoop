@@ -110,7 +110,7 @@ describe("README logo", () => {
 describe("alternate icon previews", () => {
   // The variants not shipped are written beside the README logo as previews.
   // `pointer` ships, so it has none of its own.
-  const EXPECTED: string[] = ["scoop-bite.png", "scoop-clipboard.png", "scoop-cone-cursor.png", "scoop-monogram.png", "scoop-window-cup.png"];
+  const EXPECTED: string[] = ["scoop-clipboard.png"];
   const previews = readdirSync(new URL("assets/images/logo/", ROOT)).filter((name) => /^scoop-.+\.png$/.test(name));
 
   test("only the figures not shipped have previews", () => {
@@ -128,8 +128,15 @@ describe("archived icons", () => {
   // Rejected figures kept as a record. The generator never writes here.
   const archived = readdirSync(new URL("assets/images/logo/archive/", ROOT)).filter((name) => !name.startsWith("."));
 
-  test("the brackets and ball icons are archived", () => {
-    expect(archived.sort()).toEqual(["scoop-ball.png", "scoop-brackets.png"]);
+  test("the brackets, ball, cone-cursor, bite, monogram and window-cup icons are archived", () => {
+    expect(archived.sort()).toEqual([
+      "scoop-ball.png",
+      "scoop-bite.png",
+      "scoop-brackets.png",
+      "scoop-cone-cursor.png",
+      "scoop-monogram.png",
+      "scoop-window-cup.png",
+    ]);
   });
 
   test.each(archived)("%s is a 512 x 512 PNG", (name) => {
