@@ -1,6 +1,6 @@
 {
   "name": "scoop",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "private": true,
   "type": "module",
   "description": "Scoop, a Chrome MV3 extension. Point at an element and copy it to your clipboard.",
