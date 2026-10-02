@@ -543,7 +543,7 @@ src/
 | `npm run dev` | the same two passes in `--watch` mode |
 | `npm run typecheck` | `tsc --noEmit`, `strict` |
 | `npm test` | `vitest run` (jsdom, with the icon-file suite in Node) |
-| `npm run gen-icons` | regenerate the icons at 16, 32, 48 and 128 px, a pistachio ice-cream ball with a scalloped base and a cream mouse pointer over its lower right, on a pistachio squircle tile, plus the 512 px README logo at `assets/images/logo/scoop.png` and a 512 px preview beside it of each prototype (`cone-cursor`, `bite`, `clipboard`, `monogram`, `window-cup`); `-- --variant <figure>` ships one of the six figures instead of `pointer`. Rejected icons are kept in `assets/images/logo/archive/`, which the generator never touches (`tools/gen-icons.py`, standard library only) |
+| `npm run gen-icons` | regenerate the icons at 16, 32, 48 and 128 px, a pistachio ice-cream ball with a scalloped base and a cream mouse pointer over its lower right, on a pistachio squircle tile, plus the 512 px README logo at `assets/images/logo/scoop.png` and a 512 px preview beside it of the `clipboard` prototype; `-- --variant clipboard` ships it instead of `pointer`. Rejected icons are kept in `assets/images/logo/archive/`, which the generator never touches (`tools/gen-icons.py`, standard library only) |
 
 Install: `chrome://extensions` -> Developer mode -> Load unpacked -> pick
 `dist/`. After changing code, rebuild (or run the watch), click reload on the

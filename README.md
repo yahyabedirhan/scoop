@@ -109,23 +109,20 @@ picked from `tools/gen-icons.py`, with their previews and this section.
 
 `pointer` ships as the icon, the logo at the top of this file. Each other
 figure in `tools/gen-icons.py` is a prototype, written as a 512 px preview
-`scoop-<figure>.png` beside the README logo. The six candidates are these.
+`scoop-<figure>.png` beside the README logo. The two candidates are these.
 
 | Figure | Preview | Description |
 |---|---|---|
 | `pointer` | <img src="assets/images/logo/scoop.png" width="64" alt="pointer icon"> | A pistachio ball with a scalloped base and a cream mouse pointer over its lower right. The icon that ships. |
-| `cone-cursor` | <img src="assets/images/logo/scoop-cone-cursor.png" width="64" alt="cone-cursor icon"> | A cream waffle cone drawn as a pointer's arrowhead, tip up and to the left, holding a round pistachio scoop at its wide end. |
-| `bite` | <img src="assets/images/logo/scoop-bite.png" width="64" alt="bite icon"> | A cream page block with three lines of text, a round notch scooped from its upper right corner and the pistachio ball lifted out of it. |
 | `clipboard` | <img src="assets/images/logo/scoop-clipboard.png" width="64" alt="clipboard icon"> | A cream clipboard with its clip and a round pistachio scoop on the board. |
-| `monogram` | <img src="assets/images/logo/scoop-monogram.png" width="64" alt="monogram icon"> | A cream letter S whose lower curl is a scoop's bowl cradling a pistachio ball. |
-| `window-cup` | <img src="assets/images/logo/scoop-window-cup.png" width="64" alt="window-cup icon"> | A browser window tapered into an ice-cream cup, its header bar the rim, with a round pistachio scoop in its open top. |
 
 To ship a prototype instead, run `npm run gen-icons -- --variant <figure>`.
 That writes the chosen figure as the extension icons and README logo, and a
 preview of each figure not shipped. `npm run gen-icons` on its own restores
 `pointer`.
 
-The rejected `brackets` and `ball` icons are kept as a record in
+The rejected `brackets`, `ball`, `cone-cursor`, `bite`, `monogram` and
+`window-cup` icons are kept as a record in
 [`assets/images/logo/archive/`](assets/images/logo/archive/), which the
 generator never touches. Git history keeps their code.
 

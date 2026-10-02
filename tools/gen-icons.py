@@ -73,12 +73,6 @@ def _circle(c, r):
     return lambda x, y: math.hypot(x - c[0], y - c[1]) - r
 
 
-def _stroke(points, width):
-    """A polyline stroked with round caps and joins."""
-    segs = list(zip(points, points[1:]))
-    return lambda x, y: min(_seg_dist(x, y, a, b) for a, b in segs) - width / 2
-
-
 def _rect(x0, y0, x1, y1):
     cx, cy, hx, hy = (x0 + x1) / 2, (y0 + y1) / 2, (x1 - x0) / 2, (y1 - y0) / 2
 
@@ -115,28 +109,9 @@ def _offset(sdf, d):
     return lambda x, y: sdf(x, y) - d
 
 
-def _subtract(sdf, cut):
-    """`sdf` with the shape `cut` taken out of it."""
-    return lambda x, y: max(sdf(x, y), -cut(x, y))
-
-
 def _rounded_rect(x0, y0, x1, y1, r):
     """A rectangle with corners rounded to radius `r`."""
     return _offset(_rect(x0 + r, y0 + r, x1 - r, y1 - r), r)
-
-
-def _arc(c, r, a0, a1, steps=24):
-    """Points along a circular arc from angle `a0` to `a1` in degrees, y down."""
-    return [(c[0] + r * math.cos(math.radians(a)), c[1] + r * math.sin(math.radians(a)))
-            for a in (a0 + (a1 - a0) * i / steps for i in range(steps + 1))]
-
-
-def _hatched(sdf, normals, period, width):
-    """`sdf` clipped to parallel lines `period` apart, one family per normal."""
-    def lines(x, y):
-        d = min(abs(t - period * round(t / period)) for t in (x * nx + y * ny for nx, ny in normals))
-        return d - width / 2
-    return lambda x, y: max(sdf(x, y), lines(x, y))
 
 
 def _scalloped_ball(cx, cy, r, base, scallops, scallop_r):
@@ -218,121 +193,9 @@ def draw_clipboard(detailed):
     return layers
 
 
-def draw_window_cup(detailed):
-    # A browser window used as a cup: the window tapers like an ice-cream cup,
-    # its header bar is the rim, and a round pistachio scoop sits in its open
-    # top, the scoop's lower part hidden behind the window and set off from it
-    # by a gap. A line of tile colour parts the header bar, with three window
-    # controls, from the page, with two lines of text. The scoop shows more than
-    # its upper half, so it stays round rather than a straight-sided dome.
-    # Edges fall on pixel rows at 32 px. Below DETAIL_MIN the scoop grows, and
-    # the figure moves down one pixel with its rim, line and base on whole
-    # pixel rows, tuned against the 16 px output so the header line stays a
-    # crisp row instead of a blur.
-    if detailed:
-        ball = _circle((50, 32), 27)
-        cup = _polygon([(14, 54.1), (86, 54.1), (78, 91.1), (22, 91.1)])
-        header = _rect(6, 62.3, 94, 66.4)
-        gap = 2.5
-    else:
-        ball = _circle((50, 33.5), 29)
-        cup = _polygon([(10, 57.5), (90, 57.5), (80, 94.85), (20, 94.85)])
-        header = _rect(6, 64.95, 94, 72.4)
-        gap = 6
-    layers = [(ball, TINT)]
-    if detailed:
-        layers.append((_circle((39, 20), 5), ("tile", 0.35)))
-    layers += _separated(cup, CREAM, gap)
-    layers.append((header, ("tile", 1.0)))
-    if detailed:
-        layers += [(_circle((x, 58.2), 2), ("tile", 1.0)) for x in (22, 29, 36)]
-        layers += [(_stroke([(28, 75), (66, 75)], 3), ("tile", 0.35)),
-                   (_stroke([(32, 83), (56, 83)], 3), ("tile", 0.35))]
-    return layers
-
-
-def draw_monogram(detailed):
-    # A cream letter S whose lower curl is the bowl of a scoop, cradling a
-    # round pistachio ball set off from the letter by a gap. The upper bowl's
-    # terminal turns down so its counter stays open, and the lower curl runs
-    # on past the left to make a lip under the ball. Below DETAIL_MIN the
-    # stroke thickens and the gap widens, tuned against the 16 px output so
-    # the upper counter and the ball stay apart from the letter.
-    s, gap = (12, 3) if detailed else (13, 4)
-    top = _arc((41, 25), 15, -15, -270)
-    low = _arc((52, 64), 24, -90, 158)
-    layers = [(_stroke(top + low, s), CREAM)]
-    layers += _separated(_circle((45, 62), 15.5), TINT, gap)
-    if detailed:
-        layers.append((_circle((39, 56), 3.5), ("tile", 0.35)))
-    return layers
-
-
-def draw_cone_cursor(detailed):
-    # A waffle cone drawn as the head of a mouse-pointer arrow, tip up-left,
-    # holding a round pistachio scoop at its wide end, so the pointer and the
-    # ice cream are one shape. The cone has the system pointer's vertical left
-    # edge and 45 degree right edge, and is long enough to read as an arrow at
-    # 16 px. The scoop is just wider than the rim, so it still reads as ice
-    # cream, and sits past it along the cone's axis, set off by a gap. Tuned
-    # against the 16 px output; the figure is centred in the box.
-    length, r, lift = 58, 21.5, 0.7
-    half = math.pi / 8                       # half the tip angle
-    axis = (math.sin(half), math.cos(half))
-    s = length / math.sqrt(2)
-    left, right = (0, length), (s, s)
-    rim = (s / 2, (length + s) / 2)
-    centre = (rim[0] + lift * r * axis[0], rim[1] + lift * r * axis[1])
-    dx = 50 - (min(0, centre[0] - r) + max(s, centre[0] + r)) / 2
-    dy = 50 - (centre[1] + r) / 2
-    cone = _moved(_polygon([(0, 0), left, right]), dx, dy)
-    centre = (centre[0] + dx, centre[1] + dy)
-    layers = [(cone, CREAM)]
-    if detailed:
-        # Waffle lines parallel to the cone's two edges.
-        layers.append((_hatched(cone, [(1, 0), (s / length, -s / length)], 11, 1.6), ("tile", 0.3)))
-    layers += _separated(_circle(centre, r), TINT, 2 if detailed else 4)
-    if detailed:
-        layers.append((_circle((centre[0] - 0.4 * r, centre[1] - 0.4 * r), 4), ("tile", 0.35)))
-    return layers
-
-
-def draw_bite(detailed):
-    # A cream block standing for a page element, with a round scoop taken out
-    # of its upper right corner and the scooped pistachio ball lifted out of
-    # the hole, its bottom still dipping into it. The ball is round with a
-    # frilled lower edge, not a straight-sided dome, and the block carries
-    # three lines of "text". Below DETAIL_MIN the ball is a plain circle, and
-    # the block, hole and ball grow, tuned against the 16 px output so the
-    # bite reads as a round notch rather than a clipped corner.
-    if detailed:
-        block = _rounded_rect(8, 36, 76, 92, 8)
-        hole = _circle((66, 40), 21)
-        ball = _natural_scoop(72, 26, 17, [(14 * math.cos(a), 14 * math.sin(a), 4.2)
-                                           for a in (math.radians(d) for d in range(15, 166, 30))])
-        gap = 3
-    else:
-        block = _rounded_rect(4, 34, 76, 96, 9)
-        hole = _circle((70, 38), 29)
-        ball = _circle((74, 24), 20)
-        gap = 4
-    # The gap is cut from the block rather than painted as a ring of tile
-    # colour, which would show as a darker halo against the tile's sheen.
-    layers = [(_subtract(block, _union(hole, _offset(ball, gap))), CREAM)]
-    if detailed:
-        for y, x1 in ((50, 50), (62, 62), (74, 54)):
-            layers.append((_stroke([(21, y), (x1, y)], 5), ("tile", 0.3)))
-    layers.append((ball, TINT))
-    return layers
-
-
 FIGURES = {
     "pointer": draw_pointer,
     "clipboard": draw_clipboard,
-    "window-cup": draw_window_cup,
-    "monogram": draw_monogram,
-    "bite": draw_bite,
-    "cone-cursor": draw_cone_cursor,
 }
 
 
