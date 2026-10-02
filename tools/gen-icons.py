@@ -258,11 +258,49 @@ def draw_monogram(detailed):
     return layers
 
 
+def _hatched(sdf, normals, period, width):
+    """`sdf` clipped to parallel lines `period` apart, one family per normal."""
+    def lines(x, y):
+        d = min(abs(t - period * round(t / period)) for t in (x * nx + y * ny for nx, ny in normals))
+        return d - width / 2
+    return lambda x, y: max(sdf(x, y), lines(x, y))
+
+
+def draw_cone_cursor(detailed):
+    # A waffle cone drawn as the head of a mouse-pointer arrow, tip up-left,
+    # holding a round pistachio scoop at its wide end, so the pointer and the
+    # ice cream are one shape. The cone has the system pointer's vertical left
+    # edge and 45 degree right edge, and is long enough to read as an arrow at
+    # 16 px. The scoop is just wider than the rim, so it still reads as ice
+    # cream, and sits past it along the cone's axis, set off by a gap. Tuned
+    # against the 16 px output; the figure is centred in the box.
+    length, r, lift = 58, 21.5, 0.7
+    half = math.pi / 8                       # half the tip angle
+    axis = (math.sin(half), math.cos(half))
+    s = length / math.sqrt(2)
+    left, right = (0, length), (s, s)
+    rim = (s / 2, (length + s) / 2)
+    centre = (rim[0] + lift * r * axis[0], rim[1] + lift * r * axis[1])
+    dx = 50 - (min(0, centre[0] - r) + max(s, centre[0] + r)) / 2
+    dy = 50 - (centre[1] + r) / 2
+    cone = _moved(_polygon([(0, 0), left, right]), dx, dy)
+    centre = (centre[0] + dx, centre[1] + dy)
+    layers = [(cone, CREAM)]
+    if detailed:
+        # Waffle lines parallel to the cone's two edges.
+        layers.append((_hatched(cone, [(1, 0), (s / length, -s / length)], 11, 1.6), ("tile", 0.3)))
+    layers += _separated(_circle(centre, r), TINT, 2 if detailed else 4)
+    if detailed:
+        layers.append((_circle((centre[0] - 0.4 * r, centre[1] - 0.4 * r), 4), ("tile", 0.35)))
+    return layers
+
+
 FIGURES = {
     "pointer": draw_pointer,
     "clipboard": draw_clipboard,
     "window-cup": draw_window_cup,
     "monogram": draw_monogram,
+    "cone-cursor": draw_cone_cursor,
 }
 
 
