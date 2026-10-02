@@ -167,8 +167,44 @@ def draw_pointer(detailed):
     return layers
 
 
+def _rounded_rect(x0, y0, x1, y1, r):
+    """A rectangle with corners rounded to radius `r`."""
+    inner = _rect(x0 + r, y0 + r, x1 - r, y1 - r)
+    return lambda x, y: inner(x, y) - r
+
+
+def _natural_scoop(cx, cy, r, lumps):
+    """A round scoop with a soft, lumpy lower edge instead of straight sides.
+
+    `lumps` are (dx, dy, radius) circles relative to the centre, unioned on.
+    """
+    return _union(_circle((cx, cy), r), *(_circle((cx + dx, cy + dy), lr) for dx, dy, lr in lumps))
+
+
+def draw_clipboard(detailed):
+    # A cream clipboard whose clip holds a round pistachio scoop on the board,
+    # since Scoop copies what you point at to the clipboard. The clip sits over
+    # the board's top edge and the scoop in its middle, each set off by a gap
+    # of tile colour. The scoop is a round ball with a soft, lumpy underside
+    # rather than a straight-sided dome. Below DETAIL_MIN the scoop is a plain
+    # circle, the clip is shorter and the gap doubles, tuned against the 16 px
+    # output so the gap under the clip lands on a whole pixel row.
+    board = _rounded_rect(17, 17, 83, 97, 9)
+    clip = _rounded_rect(33, 7, 67, 25 if detailed else 20, 5)
+    if detailed:
+        scoop = _natural_scoop(50, 59, 21, ((-14, 12, 6.5), (-5, 16, 6.5), (5, 16, 6.5), (14, 12, 6.5)))
+    else:
+        scoop = _circle((50, 62), 19)
+    layers = [(board, CREAM)]
+    gap = 3 if detailed else 6
+    layers += _separated(clip, CREAM, gap)
+    layers += _separated(scoop, TINT, gap)
+    return layers
+
+
 FIGURES = {
     "pointer": draw_pointer,
+    "clipboard": draw_clipboard,
 }
 
 
