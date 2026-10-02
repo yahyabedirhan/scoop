@@ -379,7 +379,7 @@ toggleOnTab(tab)
 
 `content.ts` runs once per injection; if `window.__scoopScooper` is already set it
 bails, so the background's `Toggle` message is the single source of truth.
-`background.ts` keeps a `Set` of active tab ids, sets the `#1a73e8` `ON` badge on
+`background.ts` keeps a `Set` of active tab ids, sets the `#37692c` `ON` badge on
 `Started`, clears it on `Ended`, on `tabs.onUpdated` `status === "loading"`, and
 on `tabs.onRemoved`.
 
