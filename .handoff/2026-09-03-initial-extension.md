@@ -1,7 +1,7 @@
-# Handoff — Steal (Chrome inspect-and-copy extension)
+# Handoff — Scoop (Chrome inspect-and-copy extension)
 
 Date: 2026-09-03 (last updated after the keyboard-shortcut change, commit `eab7697`)
-Project: `personal-projects/steal/` (inside the job-search vault, tracked there,
+Project: `personal-projects/scoop/` (inside the job-search vault, tracked there,
 no nested git repo)
 
 ## What this is
@@ -9,8 +9,7 @@ no nested git repo)
 A small Chrome MV3 extension. Toolbar icon or a keyboard shortcut toggles an
 "inspect mode": hover highlights the element under the cursor, arrow keys walk
 the DOM, click or Enter copies that element's raw `outerHTML` to the clipboard,
-then inspect mode exits. The name "Steal" is an ironic joke chosen by the
-user — it only touches the clipboard.
+then inspect mode exits.
 
 ## Current status: done and working
 
@@ -26,7 +25,7 @@ user comes back with more changes.
 
 ## Authoritative sources (do not re-derive)
 
-- **Spec**: [`.specs/00-steal.md`](../.specs/00-steal.md) — a clean latest-state
+- **Spec**: [`.specs/00-scoop.md`](../.specs/00-scoop.md) — a clean latest-state
   spec (rewritten in `1da0611`, kept current since). The single source of truth
   for intended behavior; check it before changing anything.
 - **README**: [`../README.md`](../README.md) — user-facing usage + unpacked
@@ -36,15 +35,15 @@ user comes back with more changes.
   `lib/dom-nav.js` (pure `nextTarget` / `describeElement` / `isSkippable`),
   `tools/gen-icons.py` (pure-stdlib icon generator, 4x supersampled),
   `test/dom-nav.test.js`, `demo.html` (manual test page).
-- **Git history** (`git log --oneline -- personal-projects/steal/`): the
+- **Git history** (`git log --oneline -- personal-projects/scoop/`): the
   requirement-by-requirement evolution lives here, starting `0f15a2c`. Notable:
-  `bf5df3b` renamed `inspect-copy-extension/` → `steal/` and replaced the icon.
+  `bf5df3b` renamed `inspect-copy-extension/` → `scoop/` and replaced the icon.
 
 ## Key design decisions already made (see spec for detail)
 
 - Plain JS, no build step. `activeTab` + `scripting` only, on-demand injection.
 - Two entry points routed through one `toggleOnTab(tab)` in `background.js`: the
-  toolbar icon (`chrome.action.onClicked`) and a `toggle-steal` keyboard command
+  toolbar icon (`chrome.action.onClicked`) and a `toggle-scoop` keyboard command
   (`chrome.commands.onCommand`), default `Ctrl+Shift+S` / `Command+Shift+S` on
   macOS. Chrome forbids a bare `Shift+S` (needs a Ctrl/Alt/Command modifier);
   user rebinds at `chrome://extensions/shortcuts`. `commands` needs no permission.
@@ -81,7 +80,7 @@ user comes back with more changes.
   runs as an inline self-review, not the two-subagent flow.)
 - No skill needed for routine bug fixes or spec edits — follow the pattern in
   this conversation: edit → `node --test` → browser-verify via local HTTP server
-  → update `.specs/00-steal.md` and README → commit with a lowercase multi-line
+  → update `.specs/00-scoop.md` and README → commit with a lowercase multi-line
   message ending `Co-Authored-By: Claude Sonnet 5 <noreply@anthropic.com>`.
 
 ## Vault conventions that apply

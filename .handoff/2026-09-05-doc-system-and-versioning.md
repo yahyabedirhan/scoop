@@ -1,7 +1,7 @@
-# Handoff: Steal documentation system, changelog, and versioning reset
+# Handoff: Scoop documentation system, changelog, and versioning reset
 
 Date: 2026-09-05
-Project: `personal-projects/steal/` (inside the job-search vault, tracked there, no nested git repo)
+Project: `personal-projects/scoop/` (inside the job-search vault, tracked there, no nested git repo)
 
 Continues from [`2026-09-05-docs-consolidation-and-readme.md`](./2026-09-05-docs-consolidation-and-readme.md).
 Both jobs in that handoff (consolidate the specs, refresh the README) are now
@@ -11,7 +11,7 @@ done, plus follow-on work the user asked for during the session.
 
 Everything below is on disk, not committed. `npm run typecheck`, `npm test`
 (86 passing), and `npm run build` are all clean. The user has not asked for a
-commit yet. When they do: commit only `personal-projects/steal/` paths (the repo
+commit yet. When they do: commit only `personal-projects/scoop/` paths (the repo
 has unrelated staged changes under `interview-prep/`).
 
 The one thing still open from earlier handoffs is unchanged: the real-browser
@@ -23,9 +23,9 @@ live page) cannot be done from here. Manual step for the user.
 Documentation and versioning only. No feature or bugfix work. The concrete
 edits are visible in the working tree; do not re-derive them. Summary:
 
-- **New `docs/steal-v01.md`**, a standalone description of the final project
+- **New `docs/scoop-v01.md`**, a standalone description of the final project
   state (behavior + low-level design), replacing the plan to rewrite
-  `.specs/00-steal.md` in place. It was briefly at `.specs/steal.md`, then the
+  `.specs/00-scoop.md` in place. It was briefly at `.specs/scoop.md`, then the
   user moved it to `docs/` and reframed it as a doc, not a spec.
 - **`.specs/00`–`03` left as historical records.** An earlier draft added
   "superseded by" banners to each; the user rejected that. They are back to
@@ -41,7 +41,7 @@ edits are visible in the working tree; do not re-derive them. Summary:
   comments describe the code as it stands. Touched `robber.ts`,
   `scroll/margin-scroller.ts`, `scroll/scroller.ts`, `modes/modes.ts`,
   `modes/plain-text.ts`, `modes/markdown.ts`.
-- **Handoff filename consistency**, `00-handoff-steal-extension.md` and
+- **Handoff filename consistency**, `00-handoff-scoop-extension.md` and
   `01-architecture.md` renamed to the dated `YYYY-MM-DD-<topic>.md` scheme
   (the vault convention, see root `CLAUDE.md`) as
   `2026-09-03-initial-extension.md` and `2026-09-03-architecture-review.md`.
@@ -54,11 +54,11 @@ This is the part to carry forward. Four artifacts, each with one job. They do
 **not** cross-link into a web; each stands on its own.
 
 ```text
-personal-projects/steal/
+personal-projects/scoop/
 ├── README.md              # what it is + how to use it, for someone landing on the repo
 ├── CHANGELOG.md           # what changed, version by version
 ├── docs/
-│   └── steal-v01.md       # how the final state works: behavior + low-level design
+│   └── scoop-v01.md       # how the final state works: behavior + low-level design
 └── .specs/
     └── 00..03             # the design record: decisions + rejected alternatives,
                            #   one file per stage of the work, frozen
@@ -70,7 +70,7 @@ Scope, per artifact:
   high level, how it works from the user's side, install, dev commands. **Not**
   how it is designed: no module tables, no lifecycle diagram. May point to
   `docs/` and `CHANGELOG.md` briefly.
-- **docs/steal-v01.md**, the **final state only**: how it behaves and how it is
+- **docs/scoop-v01.md**, the **final state only**: how it behaves and how it is
   built now. Not a diff, not a history. Reads standalone. Carries the low-level
   design in the Hello Interview delivery-framework shape (requirements /
   entities and relationships / class design / implementation / extensibility;
@@ -117,4 +117,4 @@ Cross-cutting:
   `interview-prep/data/catalogs/personal-project.yaml` is modified in the wider
   working tree and may be tracking this project. Not this session's concern.
 - No skill needed for a straight commit. Follow the commit style above and
-  stage only `personal-projects/steal/` paths.
+  stage only `personal-projects/scoop/` paths.

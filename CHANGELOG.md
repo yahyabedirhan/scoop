@@ -20,12 +20,10 @@ milestones. `0.1.0` will be the first version considered ready to use.
 - A 32 px icon, for toolbars on high-density screens.
 
 ### Changed
-- Renamed from **Steal** to **Scoop**, because the old name read as aggressive
-  from the outside. The repository moved to `yahyabedirhan/scoop`.
 - A new ice-cream-scoop icon replaces the cursor-snatch logo. It shows a
   smiling scoop of strawberry ice cream from 48 px up.
 - The keyboard command id is now `toggle-scoop`. A custom shortcut set for the
-  old `toggle-steal` id is dropped, so set it again in
+  old id is dropped, so set it again in
   `chrome://extensions/shortcuts` if you changed it. The default stays
   `Cmd+Shift+S` / `Ctrl+Shift+S`.
 - The orchestrator class `Robber` is now `Scooper`, in `src/lib/scooper.ts`.
@@ -67,7 +65,7 @@ milestones. `0.1.0` will be the first version considered ready to use.
   to `activeModeId`; `lib/formats/` became `src/lib/modes/`; `serialize()`
   became `formatHTML()`.
 - The `page-content` module split into three collaborators with no reference to
-  each other: `Robber` (orchestrator), `Inspector` (Steal's DOM footprint and
+  each other: `Robber` (orchestrator), `Inspector` (Scoop's DOM footprint and
   clean capture), and `Scroller` (bring-into-view, behind a swappable
   interface, implemented by `MarginScroller`).
 - The three cross-file `chrome.runtime` message strings became a single typed
@@ -132,15 +130,15 @@ milestones. `0.1.0` will be the first version considered ready to use.
   `scroll-margin`, aligned to whichever viewport edge it passed.
 - The `ON` toolbar badge tracks per-tab inspect state; state is cleared on
   navigation and never restored across it.
-- Capture excludes Steal's own overlay, label, and toast and restores any
+- Capture excludes Scoop's own overlay, label, and toast and restores any
   temporary class or style change before reading `outerHTML`, so the copy is
   page content only. Ownership follows node identity, so page elements that
-  share Steal's ids or classes stay selectable.
+  share Scoop's ids or classes stay selectable.
 - Each pending copy belongs to the inspection that started it, so a stale
   clipboard result cannot end a newer inspection.
 
 ### Changed
-- Renamed from "inspect-copy-extension" to **Steal**, with a new
+- Renamed from "inspect-copy-extension" to **Scoop**, with a new
   cursor-snatch logo.
 - Default shortcut set to `Cmd+Shift+S` / `Ctrl+Shift+S` (Chrome forbids a
   bare `Shift+S`).

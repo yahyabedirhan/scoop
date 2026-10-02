@@ -3,7 +3,7 @@
 Status: implemented
 Last updated: 2026-09-05
 
-Builds on [00-steal.md](./00-steal.md), [01-multi-format-copy.md](./01-multi-format-copy.md),
+Builds on [00-scoop.md](./00-scoop.md), [01-multi-format-copy.md](./01-multi-format-copy.md),
 and [02-typescript-rewrite.md](./02-typescript-rewrite.md). Covers only what
 changes. The inspect lifecycle, the mode registry mechanism (a mode is a module
 plus one `MODES` entry), the `format` -> `mode` terminology, and `formatHTML`'s

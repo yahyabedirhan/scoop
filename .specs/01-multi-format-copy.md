@@ -3,23 +3,23 @@
 Status: implemented
 Last updated: 2026-09-05
 
-Builds on [00-steal.md](./00-steal.md). This spec only covers what changes or adds
+Builds on [00-scoop.md](./00-scoop.md). This spec only covers what changes or adds
 to that baseline; the inspect lifecycle, navigation rules, scrolling, overlay
 mechanics, and clipboard-write fallback described there are unchanged except
 where noted below.
 
 ## Problem Statement
 
-When I point Steal at an element, I always get its exact page HTML: every
+When I point Scoop at an element, I always get its exact page HTML: every
 Tailwind class, every `data-*` and `aria-*` attribute, every icon SVG. That is
 right when I actually want the markup, but most of the time I am pulling a
 snippet off a page to remind myself what it said, not how it was built. The
 class soup and icon noise bury the one or two lines of real content I wanted,
-and there is no way to ask Steal for anything less than the whole raw element.
+and there is no way to ask Scoop for anything less than the whole raw element.
 
 ## Solution
 
-Steal gains multiple copy formats, chosen per-copy without leaving inspect
+Scoop gains multiple copy formats, chosen per-copy without leaving inspect
 mode. Three formats ship in this pass:
 
 - **Full HTML** - today's behavior, unchanged in content, now pretty-printed.
@@ -238,7 +238,7 @@ logic.
   instead of dropping them). Clean HTML always drops SVG content for now.
 - Any change to arrow-key navigation, scrolling, overlay drawing beyond the
   label content itself, the click-suppression model, or the clipboard-write
-  fallback chain described in `00-steal.md`. All of that stays as-is.
+  fallback chain described in `00-scoop.md`. All of that stays as-is.
 - Debounce/throttling of the live label preview computation. Only added if
   the naive "recompute on target change" approach is observed to be slow.
 - Per-tab format state. The active/persisted format is a single global
@@ -248,10 +248,10 @@ logic.
 
 - This spec assumes `page.capture`-style cloning (from `lib/page-content.js`)
   is reused or paralleled for the fresh clone each format's `transform`
-  receives, so that Steal's own overlay/label/toast nodes and any temporary
+  receives, so that Scoop's own overlay/label/toast nodes and any temporary
   page mutations it applied are already excluded before a format ever sees
   the subtree, exactly as they are for today's single-format `capture`.
 - This project has no issue tracker; per its own conventions (see
-  `CLAUDE.md` at the vault root and the existing `00-steal.md`), this spec
+  `CLAUDE.md` at the vault root and the existing `00-scoop.md`), this spec
   lives as a numbered Markdown file under `.specs/` rather than being filed
   and triage-labeled externally.
