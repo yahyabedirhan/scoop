@@ -235,10 +235,34 @@ def draw_window_cup(detailed):
     return layers
 
 
+def _arc(c, r, a0, a1, steps=24):
+    """Points along a circular arc from angle `a0` to `a1` in degrees, y down."""
+    return [(c[0] + r * math.cos(math.radians(a)), c[1] + r * math.sin(math.radians(a)))
+            for a in (a0 + (a1 - a0) * i / steps for i in range(steps + 1))]
+
+
+def draw_monogram(detailed):
+    # A cream letter S whose lower curl is the bowl of a scoop, cradling a
+    # round pistachio ball set off from the letter by a gap. The upper bowl's
+    # terminal turns down so its counter stays open, and the lower curl runs
+    # on past the left to make a lip under the ball. Below DETAIL_MIN the
+    # stroke thickens and the gap widens, tuned against the 16 px output so
+    # the upper counter and the ball stay apart from the letter.
+    s, gap = (12, 3) if detailed else (13, 4)
+    top = _arc((41, 25), 15, -15, -270)
+    low = _arc((52, 64), 24, -90, 158)
+    layers = [(_stroke(top + low, s), CREAM)]
+    layers += _separated(_circle((45, 62), 15.5), TINT, gap)
+    if detailed:
+        layers.append((_circle((39, 56), 3.5), ("tile", 0.35)))
+    return layers
+
+
 FIGURES = {
     "pointer": draw_pointer,
     "clipboard": draw_clipboard,
     "window-cup": draw_window_cup,
+    "monogram": draw_monogram,
 }
 
 

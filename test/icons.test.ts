@@ -110,7 +110,7 @@ describe("README logo", () => {
 describe("alternate icon previews", () => {
   // The variants not shipped are written beside the README logo as previews.
   // `pointer` ships, so it has none of its own.
-  const EXPECTED: string[] = ["scoop-clipboard.png", "scoop-window-cup.png"];
+  const EXPECTED: string[] = ["scoop-clipboard.png", "scoop-monogram.png", "scoop-window-cup.png"];
   const previews = readdirSync(new URL("assets/images/logo/", ROOT)).filter((name) => /^scoop-.+\.png$/.test(name));
 
   test("only the figures not shipped have previews", () => {
