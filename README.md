@@ -1,4 +1,6 @@
-# Scoop
+<p align="center"><img src="assets/images/logo/scoop.png" width="128" alt="Scoop's logo: a pistachio scoop of ice cream between two angle brackets, on a pistachio green tile"></p>
+
+<h1 align="center">Scoop</h1>
 
 Point at any element on a web page and copy it straight to your clipboard, in
 whatever shape you need it: the full HTML, a cleaned-up version, plain text, or
@@ -90,7 +92,7 @@ The extension stays installed across restarts as long as the folder stays put.
 | `npm run dev` | The same build in watch mode. |
 | `npm run typecheck` | `tsc --noEmit` in strict mode. |
 | `npm test` | Run the test suite with Vitest (jsdom, with the icon-file suite in Node). |
-| `npm run gen-icons` | Regenerate the toolbar and extension icons at 16, 32, 48 and 128 px, a pistachio ice-cream ball between cream angle brackets (`<●>`) on a pistachio squircle tile (`tools/gen-icons.py`, standard library only). |
+| `npm run gen-icons` | Regenerate the toolbar and extension icons at 16, 32, 48 and 128 px, a pistachio ice-cream ball between cream angle brackets (`<●>`) on a pistachio squircle tile, plus the 512 px README logo at `assets/images/logo/scoop.png` (`tools/gen-icons.py`, standard library only). |
 
 The source is TypeScript under `src/`, built by Vite. `dist/` is generated and
 gitignored. `demo.html` is a manual test page with nested lists, links, and

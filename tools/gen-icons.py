@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
-"""Generate the Scoop extension icons (16/32/48/128) as RGBA PNGs.
+"""Generate the Scoop extension icons (16/32/48/128) and README logo as RGBA PNGs.
 
 Motif: a scoop of pistachio ice cream between two angle brackets, `<●>`, as a
 flat figure on a pistachio squircle tile with a soft vertical gradient and a
 white sheen, in the format of Shipyard's logo. The figure has no outline.
 Below DETAIL_MIN px it drops its details and grows 10%, so the small icon is
 the bare silhouette. The 48 and 128 px tiles keep Chrome's transparent margin;
-the smaller tiles fill the canvas.
+the smaller tiles fill the canvas. The 512 px README logo keeps the 128 px
+margin, so it matches the toolbar icon and Shipyard's logo on GitHub.
 
 Each figure is a draw function in FIGURES, keyed by name, returning its
 layers. Every size is rendered by the same `render`, so a new figure or a new
@@ -21,7 +22,10 @@ import zlib
 
 SIZES = (16, 32, 48, 128)
 DETAIL_MIN = 32              # smallest size that gets the figure's details
-OUT_DIR = os.path.join(os.path.dirname(__file__), os.pardir, "icons")
+ROOT = os.path.join(os.path.dirname(__file__), os.pardir)
+OUT_DIR = os.path.join(ROOT, "icons")
+LOGO_SIZE = 512
+LOGO_PATH = os.path.join(ROOT, "assets", "images", "logo", "scoop.png")
 SHIPPED_FIGURE = "brackets"
 
 # Pistachio: Shipyard's khaki shifted to hue 140 in OKLCH (lightness +0.02,
@@ -36,12 +40,13 @@ SQUIRCLE_N = 5               # superellipse exponent of the tile
 SHEEN_ALPHA = 0.14           # white at the tile's top, fading out at its middle
 FIGURE_SPAN = 0.76           # figure box as a share of the tile
 SMALL_GROWTH = 1.1           # extra figure scale below DETAIL_MIN
-MARGIN = {48: 0.06, 128: 0.125}  # transparent margin per side; 0 elsewhere
+MARGIN = {48: 0.06, 128: 0.125, LOGO_SIZE: 0.125}  # transparent margin per side; 0 elsewhere
 
 
 def _supersample(size):
-    # Small icons have few pixels, so they can afford finer edges.
-    return 8 if size < 48 else 4
+    # Small icons have few pixels, so they can afford finer edges. The logo's
+    # pixels are already fine, and 4x would make it slow to render.
+    return 8 if size < 48 else 4 if size < LOGO_SIZE else 2
 
 
 # ---------- shapes: signed distances in the 100 x 100 figure box ----------
@@ -166,6 +171,9 @@ def main():
         p = os.path.join(OUT_DIR, f"icon{s}.png")
         write_png(p, s, render(SHIPPED_FIGURE, s))
         print("wrote", os.path.relpath(p))
+    os.makedirs(os.path.dirname(LOGO_PATH), exist_ok=True)
+    write_png(LOGO_PATH, LOGO_SIZE, render(SHIPPED_FIGURE, LOGO_SIZE))
+    print("wrote", os.path.relpath(LOGO_PATH))
 
 
 if __name__ == "__main__":
