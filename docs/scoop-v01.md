@@ -542,8 +542,8 @@ src/
 | `npm run build` | clean `dist/`, then the content and background Vite passes |
 | `npm run dev` | the same two passes in `--watch` mode |
 | `npm run typecheck` | `tsc --noEmit`, `strict` |
-| `npm test` | `vitest run` (jsdom) |
-| `npm run gen-icons` | regenerate the ice-cream-scoop icons at 16, 32, 48 and 128 px (`tools/gen-icons.py`, standard library only) |
+| `npm test` | `vitest run` (jsdom, with the icon-file suite in Node) |
+| `npm run gen-icons` | regenerate the icons at 16, 32, 48 and 128 px, a pistachio ice-cream ball between cream angle brackets (`<●>`) on a pistachio squircle tile (`tools/gen-icons.py`, standard library only) |
 
 Install: `chrome://extensions` -> Developer mode -> Load unpacked -> pick
 `dist/`. After changing code, rebuild (or run the watch), click reload on the
@@ -564,6 +564,7 @@ never private helpers or traversal order. This project has no issue tracker, so
 | `Inspector` methods, no `chrome` and no scroll mock needed | `test/inspector.test.ts` | extension-node identity, clean capture, class restore including page-edited classes |
 | `Scooper`, with `chrome.*` mocked at its constructor callbacks and `inspector` / `scroller` mocked at their interfaces | `test/scooper.test.ts` | the state machine, digit-key mode switching, stale-completion guard, `flush()` before capture and on `stop()` |
 | `MarginScroller` plus the pure `applyScrollMargin` / `restoreScrollMargin` | `test/scroll/margin-scroller.test.ts` | the `Map` / `requestAnimationFrame` / `flush()` timing, byte-exact vs per-property revert |
+| the committed icon PNGs, as `manifest.json` declares them | `test/icons.test.ts` | every declared icon exists as a PNG of its declared size, the 16 px tile fills the canvas |
 
 `html-tags` and `MessageType` have no behavior of their own; `formatHTML`'s
 tests guard that sharing the tag sets changed nothing.

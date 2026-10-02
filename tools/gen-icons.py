@@ -1,51 +1,50 @@
 #!/usr/bin/env python3
 """Generate the Scoop extension icons (16/32/48/128) as RGBA PNGs.
 
-Motif: an ice-cream scoop lifting one round, smiling scoop of strawberry ice
-cream. Each shape is a signed distance function painted back to front with a
-dark outline, so it reads on light and dark toolbars. The face, sprinkles
-and shine only appear from DETAIL_MIN px up; at 16 px the icon is
-the bare silhouette. Pure standard library, 4x supersampled for clean edges.
-Re-run after tweaking geometry or colors.
+Motif: a scoop of pistachio ice cream between two angle brackets, `<●>`, as a
+flat figure on a pistachio squircle tile with a soft vertical gradient and a
+white sheen, in the format of Shipyard's logo. The figure has no outline.
+Below DETAIL_MIN px it drops its details and grows 10%, so the small icon is
+the bare silhouette. The 48 and 128 px tiles keep Chrome's transparent margin;
+the smaller tiles fill the canvas.
+
+Each figure is a draw function in FIGURES, keyed by name, returning its
+layers. Every size is rendered by the same `render`, so a new figure or a new
+output size needs no change to the renderer. Pure standard library,
+supersampled for clean edges, and deterministic. Re-run after tweaking
+geometry or colours.
 """
 import math
 import os
 import struct
 import zlib
 
-SS = 4                       # supersampling factor
 SIZES = (16, 32, 48, 128)
-DETAIL_MIN = 48              # smallest size that gets the face and decorations
+DETAIL_MIN = 32              # smallest size that gets the figure's details
 OUT_DIR = os.path.join(os.path.dirname(__file__), os.pardir, "icons")
+SHIPPED_FIGURE = "brackets"
 
-OUTLINE = (46, 16, 101)      # #2e1065 deep violet
-SCOOP = (124, 58, 237)       # #7c3aed violet, the old accent kept for the tool
-SCOOP_SHADE = (91, 33, 182)  # #5b21b6 the handle, a step darker than the bowl
-ICE_CREAM = (244, 114, 182)  # #f472b6 strawberry pink
-SHINE = (255, 255, 255)
-SPRINKLES = [(250, 204, 21), (34, 211, 238), (255, 255, 255)]
+# Pistachio: Shipyard's khaki shifted to hue 140 in OKLCH (lightness +0.02,
+# chroma x0.95). The figure is Shipyard's cream, the ball a light tint.
+TILE_TOP = (0x6D, 0xA3, 0x61)     # #6da361
+TILE_BOTTOM = (0x55, 0x7F, 0x4B)  # #557f4b
+CREAM = (0xFB, 0xF6, 0xEA)        # #FBF6EA
+TINT = (0xCE, 0xEB, 0xC8)         # #ceebc8
+WHITE = (255, 255, 255)
 
-# All geometry in a 0..1 unit square, y pointing down.
+SQUIRCLE_N = 5               # superellipse exponent of the tile
+SHEEN_ALPHA = 0.14           # white at the tile's top, fading out at its middle
+FIGURE_SPAN = 0.76           # figure box as a share of the tile
+SMALL_GROWTH = 1.1           # extra figure scale below DETAIL_MIN
+MARGIN = {48: 0.06, 128: 0.125}  # transparent margin per side; 0 elsewhere
 
-OUTLINE_W = 0.035
 
-BALL_C, BALL_R = (0.42, 0.36), 0.22
-BOWL_C, BOWL_R = (0.42, 0.52), 0.30   # only the half below BOWL_C[1] is drawn
-HANDLE = ((0.62, 0.70), (0.90, 0.92))
-HANDLE_W = 0.15
+def _supersample(size):
+    # Small icons have few pixels, so they can afford finer edges.
+    return 8 if size < 48 else 4
 
-# Decorations, drawn only at DETAIL_MIN px and up.
-EYES = [(0.35, 0.33), (0.49, 0.33)]
-EYE_R = 0.028
-SMILE_C, SMILE_R, SMILE_W = (0.42, 0.38), 0.065, 0.028
-SHINE_C, SHINE_R = (0.33, 0.23), 0.035
-SPRINKLE_SEGS = [
-    ((0.43, 0.18), (0.47, 0.20)),
-    ((0.53, 0.24), (0.55, 0.28)),
-    ((0.26, 0.31), (0.27, 0.35)),
-]
-SPRINKLE_W = 0.03
 
+# ---------- shapes: signed distances in the 100 x 100 figure box ----------
 
 def _seg_dist(px, py, a, b):
     ax, ay = a
@@ -55,85 +54,95 @@ def _seg_dist(px, py, a, b):
     return math.hypot(px - (ax + t * dx), py - (ay + t * dy))
 
 
-def _circle(px, py, c, r):
-    return math.hypot(px - c[0], py - c[1]) - r
+def _circle(c, r):
+    return lambda x, y: math.hypot(x - c[0], y - c[1]) - r
 
 
-def _capsule(px, py, a, b, w):
-    return _seg_dist(px, py, a, b) - w / 2
+def _stroke(points, width):
+    """A polyline stroked with round caps and joins."""
+    segs = list(zip(points, points[1:]))
+    return lambda x, y: min(_seg_dist(x, y, a, b) for a, b in segs) - width / 2
 
 
-def _bowl(px, py):
-    # Lower half-disc: inside the circle and below its centre line.
-    return max(_circle(px, py, BOWL_C, BOWL_R), BOWL_C[1] - py)
+# ---------- figures ----------
+# A figure is a list of (sdf, paint) layers, back to front. A paint is an RGB
+# colour, or ("tile", alpha) for the tile's own colour at that opacity.
 
-
-def _smile(px, py):
-    # The lower arc of a circle, between 25 and 155 degrees.
-    ang = math.degrees(math.atan2(py - SMILE_C[1], px - SMILE_C[0]))
-    if 25 <= ang <= 155:
-        return abs(math.hypot(px - SMILE_C[0], py - SMILE_C[1]) - SMILE_R) - SMILE_W / 2
-    ends = [(SMILE_C[0] + SMILE_R * math.cos(math.radians(a)),
-             SMILE_C[1] + SMILE_R * math.sin(math.radians(a))) for a in (25, 155)]
-    return min(math.hypot(px - ex, py - ey) for ex, ey in ends) - SMILE_W / 2
-
-
-def _layers(detailed):
-    """(sdf, fill, outlined) from back to front."""
+def draw_brackets(detailed):
+    # Below DETAIL_MIN the brackets spread out, the strokes thicken and the
+    # ball shrinks, tuned against the 16 px output so `<●>` keeps a tile-coloured
+    # gap between ball and brackets instead of merging into one blob.
+    tip, arm, width, r = (10, 27, 10, 19) if detailed else (8, 26, 12, 17)
     layers = [
-        (lambda u, v: _capsule(u, v, *HANDLE, HANDLE_W), SCOOP_SHADE, True),
-        (lambda u, v: _circle(u, v, BALL_C, BALL_R), ICE_CREAM, True),
-        (_bowl, SCOOP, True),
+        (_stroke([(arm, 30), (tip, 50), (arm, 70)], width), CREAM),
+        (_stroke([(100 - arm, 30), (100 - tip, 50), (100 - arm, 70)], width), CREAM),
+        (_circle((50, 46), r), TINT),
+        (_stroke([(56, 60), (56, 72)], 8), TINT),
     ]
     if detailed:
-        layers += [
-            (lambda u, v: _circle(u, v, SHINE_C, SHINE_R), SHINE, False),
-        ]
-        layers += [(lambda u, v, s=s: _capsule(u, v, *s, SPRINKLE_W), SPRINKLES[i % len(SPRINKLES)], False)
-                   for i, s in enumerate(SPRINKLE_SEGS)]
-        layers += [(lambda u, v, e=e: _circle(u, v, e, EYE_R), OUTLINE, False) for e in EYES]
-        layers.append((_smile, OUTLINE, False))
+        layers.append((_circle((43, 39), 3.5), ("tile", 0.35)))
     return layers
 
 
-def _sample(u, v, layers):
-    """RGBA at unit coords (u, v): the front-most layer, or its outline, wins."""
-    color = None
-    for sdf, fill, outlined in layers:
-        d = sdf(u, v)
-        if d <= 0:
-            color = fill
-        elif outlined and d <= OUTLINE_W:
-            color = OUTLINE
-    return (0, 0, 0, 0) if color is None else (*color, 255)
+FIGURES = {
+    "brackets": draw_brackets,
+}
 
 
-def make_pixels(size):
-    layers = _layers(size >= DETAIL_MIN)
-    hi = size * SS
+# ---------- rendering ----------
+
+def _mix(base, over, alpha):
+    return tuple(b + (o - b) * alpha for b, o in zip(base, over))
+
+
+def render(figure, size):
+    """RGBA bytes of `figure` on the tile at `size` x `size` px."""
+    detailed = size >= DETAIL_MIN
+    layers = FIGURES[figure](detailed)
+    margin = MARGIN.get(size, 0.0)
+    half = 0.5 - margin                       # tile half-width, canvas units
+    scale = FIGURE_SPAN * (1 if detailed else SMALL_GROWTH) * 2 * half
+    ss = _supersample(size)
+    hi = size * ss
+
+    def sample(u, v):
+        """Straight RGB and coverage (0 or 1) at canvas coords (u, v)."""
+        dx, dy = abs(u - 0.5) / half, abs(v - 0.5) / half
+        if dx >= 1 or dy >= 1 or dx ** SQUIRCLE_N + dy ** SQUIRCLE_N > 1:
+            return None
+        t = (v - (0.5 - half)) / (2 * half)   # 0 at the tile's top, 1 at its bottom
+        tile = _mix(TILE_TOP, TILE_BOTTOM, t)
+        color = _mix(tile, WHITE, SHEEN_ALPHA * (1 - 2 * t)) if t < 0.5 else tile
+        fx = 50 + (u - 0.5) * 100 / scale
+        fy = 50 + (v - 0.5) * 100 / scale
+        for sdf, paint in layers:
+            if sdf(fx, fy) <= 0:
+                color = _mix(color, tile, paint[1]) if isinstance(paint[0], str) else paint
+        return color
+
     px = bytearray()
     for y in range(size):
         for x in range(size):
-            # Average premultiplied samples, then un-premultiply.
-            r = g = b = a = 0
-            for dy in range(SS):
-                v = (y * SS + dy + 0.5) / hi
-                for dx in range(SS):
-                    u = (x * SS + dx + 0.5) / hi
-                    sr, sg, sb, sa = _sample(u, v, layers)
-                    r += sr * sa
-                    g += sg * sa
-                    b += sb * sa
-                    a += sa
-            if a == 0:
+            r = g = b = n = 0
+            for sy in range(ss):
+                v = (y * ss + sy + 0.5) / hi
+                for sx in range(ss):
+                    c = sample((x * ss + sx + 0.5) / hi, v)
+                    if c is not None:
+                        r += c[0]
+                        g += c[1]
+                        b += c[2]
+                        n += 1
+            if n == 0:
                 px += bytes(4)
             else:
-                px += bytes((round(r / a), round(g / a), round(b / a), round(a / (SS * SS))))
+                # Every covered sample is opaque, so averaging them is the
+                # un-premultiplied colour.
+                px += bytes((round(r / n), round(g / n), round(b / n), round(255 * n / (ss * ss))))
     return bytes(px)
 
 
-def write_png(path, size):
-    raw = make_pixels(size)
+def write_png(path, size, raw):
     stride = size * 4
     scan = bytearray()
     for y in range(size):
@@ -155,7 +164,7 @@ def main():
     os.makedirs(OUT_DIR, exist_ok=True)
     for s in SIZES:
         p = os.path.join(OUT_DIR, f"icon{s}.png")
-        write_png(p, s)
+        write_png(p, s, render(SHIPPED_FIGURE, s))
         print("wrote", os.path.relpath(p))
 
 
