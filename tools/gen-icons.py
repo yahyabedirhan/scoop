@@ -233,10 +233,58 @@ def draw_scooper(detailed):
     return layers
 
 
+def _tub_bowl(c, r, opening):
+    """A scoop's bowl seen from the side: the half of a disc away from `opening`.
+
+    `opening` is the unit vector the bowl's mouth faces.
+    """
+    nx, ny = opening
+    disc = _circle(c, r)
+    return lambda x, y: max(disc(x, y), (x - c[0]) * nx + (y - c[1]) * ny)
+
+
+def draw_scoop_tub(detailed):
+    # A cream ice-cream scoop, seen from the side, pulling a round pistachio
+    # ball up out of a tub heaped with more. The bowl's near wall hides the
+    # lower part of the ball, so the ice cream sits visibly in the bowl rather
+    # than behind a ring, which is what made the first scoop read as a
+    # magnifier. The handle narrows at its neck, ends in a thicker grip and
+    # carries a thumb lever, so the tool cannot pass for a ladle or a spoon.
+    # Below DETAIL_MIN the ball rides higher in the bowl, the tub's ice cream
+    # heaps higher, the grip thickens and the lever joins the handle as a bump
+    # instead of a separate loop, tuned against the 16 px output so the handle
+    # stays one piece.
+    c, r = (46, 42), 27
+    opening = (-0.3, -0.95)
+    nx, ny = opening
+    rim = (c[0] - ny * r, c[1] + nx * r)
+    bowl = _tub_bowl(c, r, opening)
+    if detailed:
+        lift, br, lump, gap = 8, 21, 11, 2.5
+        handle = _union(_stroke([(rim[0] - 6, rim[1] + 4), (86, 27)], 8), _stroke([(84, 27), (106, 17)], 15))
+        lever = _stroke([(68, 30), (72, 18), (79, 15)], 5)
+    else:
+        lift, br, lump, gap = 11, 22, 14, 5
+        handle = _union(_stroke([(rim[0] - 6, rim[1] + 4), (82, 28)], 10), _stroke([(82, 27), (98, 20)], 18),
+                        _stroke([(66, 32), (69, 21)], 8))
+        lever = None
+    ball = _circle((c[0] + nx * lift, c[1] + ny * lift), br)
+    tub = _polygon([(-4, 78), (52, 78), (46, 104), (2, 104)])
+    contents = _union(*(_circle((x, 77), lump) for x in (6, 24, 42)))
+    layers = [(contents, TINT)]
+    layers += _separated(tub, CREAM, gap)
+    layers += _separated(ball, TINT, gap)
+    layers += _separated(_union(bowl, handle), CREAM, gap)
+    if lever:
+        layers += _separated(lever, CREAM, gap)
+    return layers
+
+
 FIGURES = {
     "pointer": draw_pointer,
     "clipboard": draw_clipboard,
     "scooper": draw_scooper,
+    "scoop-tub": draw_scoop_tub,
 }
 
 
