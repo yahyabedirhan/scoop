@@ -304,63 +304,6 @@ def _subtract(sdf, cut):
     return lambda x, y: max(sdf(x, y), -cut(x, y))
 
 
-def _quad(p0, p1, p2, steps=16):
-    """Points along a quadratic Bezier curve, for stroking as a polyline."""
-    return [tuple((1 - t) ** 2 * a + 2 * (1 - t) * t * b + t * t * c for a, b, c in zip(p0, p1, p2))
-            for t in (i / steps for i in range(steps + 1))]
-
-
-def _separated(sdf, paint, gap):
-    """Layers drawing `sdf` over earlier parts, ringed by a `gap` of tile colour.
-
-    The figure has no outline, so this gap is what keeps an overlapping part
-    readable against the part beneath it.
-    """
-    return [(lambda x, y: sdf(x, y) - gap, ("tile", 1.0)), (sdf, paint)]
-
-
-# ---------- figures ----------
-# A figure is a list of (sdf, paint) layers, back to front. A paint is an RGB
-# colour, or ("tile", alpha) for the tile's own colour at that opacity.
-
-def _scalloped_ball(cx, cy, r, base, scallops, scallop_r, drop=0):
-    """A ball whose lower half drops straight to `base`, edged with scallops.
-
-    The scallops are circles centred at the `scallops` x positions, `drop`
-    below `base`.
-    """
-    return _union(
-        _circle((cx, cy), r),
-        _rect(cx - r, cy, cx + r, base),
-        *(_circle((x, base + drop), scallop_r) for x in scallops),
-    )
-
-
-ARROW = [(60, 48), (60, 86), (69, 77), (76, 92), (83, 89), (76, 74), (88, 74)]
-
-
-def draw_pointer(detailed):
-    # The prototype's "Ball + pointer", shifted by (-4, -3): the ball with a
-    # scalloped base and a cream mouse pointer over its lower right, set off
-    # from the ball by a gap. Below DETAIL_MIN the ball moves up and left with
-    # three bigger scallops, the pointer grows 25% about a tip moved up-left, and
-    # the gap widens, tuned against the 16 px output so the pointer reads as an
-    # arrow instead of a smudge on the ball.
-    ox, oy = -4, -3
-    if detailed:
-        ball = _scalloped_ball(46, 40, 26, 56, (26, 39, 52, 65), 6.5)
-        arrow, gap = ARROW, 2
-    else:
-        ball = _scalloped_ball(42, 38, 26, 54, (24, 42, 60), 8.5)
-        arrow = [(56 + (x - 60) * 1.25, 40 + (y - 48) * 1.25) for x, y in ARROW]
-        gap = 5
-    layers = [(_moved(ball, ox, oy), TINT)]
-    if detailed:
-        layers.append((_circle((36 + ox, 28 + oy), 4.5), ("tile", 0.35)))
-    layers += _separated(_moved(_polygon(arrow), ox, oy), CREAM, gap)
-    return layers
-
-
 def draw_bite(detailed):
     # A cream block standing for a page element, with a round scoop taken out
     # of its upper right corner and the scooped pistachio ball lifted out of
