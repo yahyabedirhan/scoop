@@ -109,12 +109,17 @@ picked from `tools/gen-icons.py`, with their previews and this section.
 
 `pointer` ships as the icon, the logo at the top of this file. Each other
 figure in `tools/gen-icons.py` is a prototype, written as a 512 px preview
-`scoop-<figure>.png` beside the README logo. The two candidates are these.
+`scoop-<figure>.png` beside the README logo. The seven candidates are these.
 
 | Figure | Preview | Description |
 |---|---|---|
 | `pointer` | <img src="assets/images/logo/scoop.png" width="64" alt="pointer icon"> | A pistachio ball with a scalloped base and a cream mouse pointer over its lower right. The icon that ships. |
 | `clipboard` | <img src="assets/images/logo/scoop-clipboard.png" width="64" alt="clipboard icon"> | A cream clipboard with its clip and a round pistachio scoop on the board. |
+| `cursor-scoop` | <img src="assets/images/logo/scoop-cursor-scoop.png" width="64" alt="cursor-scoop icon"> | A cream ice-cream scoop holding a round pistachio ball heaped in its bowl, its handle running down to the left, with a cream mouse pointer below the bowl. |
+| `clipboard-scoop` | <img src="assets/images/logo/scoop-clipboard-scoop.png" width="64" alt="clipboard-scoop icon"> | The cream clipboard of `clipboard` with an ice-cream scoop cut out in tile colour on the board, holding a round pistachio ball. |
+| `scooper` | <img src="assets/images/logo/scoop-scooper.png" width="64" alt="scooper icon"> | The ice-cream scoop on its own, a round pistachio ball heaped in its cream bowl, with a handle to the lower left and a thumb lever. |
+| `scoop-tub` | <img src="assets/images/logo/scoop-scoop-tub.png" width="64" alt="scoop-tub icon"> | A cream ice-cream scoop, seen from the side, pulling a round pistachio ball up out of a cream tub heaped with more. |
+| `scoop-cone` | <img src="assets/images/logo/scoop-scoop-cone.png" width="64" alt="scoop-cone icon"> | A cream ice-cream scoop, its handle rising up and right, tipping a round pistachio ball onto a cream cone. |
 
 To ship a prototype instead, run `npm run gen-icons -- --variant <figure>`.
 That writes the chosen figure as the extension icons and README logo, and a
