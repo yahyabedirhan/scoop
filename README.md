@@ -92,7 +92,7 @@ The extension stays installed across restarts as long as the folder stays put.
 | `npm run dev` | The same build in watch mode. |
 | `npm run typecheck` | `tsc --noEmit` in strict mode. |
 | `npm test` | Run the test suite with Vitest (jsdom, with the icon-file suite in Node). |
-| `npm run gen-icons` | Regenerate the toolbar and extension icons at 16, 32, 48 and 128 px, a pistachio ice-cream ball with a scalloped base and a cream mouse pointer over its lower right, on a pistachio squircle tile, plus the 512 px README logo at `assets/images/logo/scoop.png` and a 512 px preview beside it of each alternate icon (`tools/gen-icons.py`, standard library only). |
+| `npm run gen-icons` | Regenerate the toolbar and extension icons at 16, 32, 48 and 128 px, a pistachio ice-cream ball with a scalloped base and a cream mouse pointer over its lower right, on a pistachio squircle tile, plus the 512 px README logo at `assets/images/logo/scoop.png` and a 512 px preview beside it of each prototype icon (`tools/gen-icons.py`, standard library only). |
 
 The source is TypeScript under `src/`, built by Vite. `dist/` is generated and
 gitignored. `demo.html` is a manual test page with nested lists, links, and
@@ -107,11 +107,23 @@ buttons.
 TODO: the maintainer picks the final icon at review. Remove the figures not
 picked from `tools/gen-icons.py`, with their previews and this section.
 
-`pointer` ships as the icon. Each other figure in `tools/gen-icons.py` is an
-alternate, written as a 512 px preview `scoop-<figure>.png` beside the README
-logo. To ship one instead, run `npm run gen-icons -- --variant <figure>`. That
-writes the chosen figure as the extension icons and README logo, and a preview
-of each figure not shipped. `npm run gen-icons` on its own restores `pointer`.
+`pointer` ships as the icon, the logo at the top of this file. Each other
+figure in `tools/gen-icons.py` is a prototype, written as a 512 px preview
+`scoop-<figure>.png` beside the README logo. The six candidates are these.
+
+| Figure | Preview | Description |
+|---|---|---|
+| `pointer` | <img src="assets/images/logo/scoop.png" width="64" alt="pointer icon"> | A pistachio ball with a scalloped base and a cream mouse pointer over its lower right. The icon that ships. |
+| `cone-cursor` | <img src="assets/images/logo/scoop-cone-cursor.png" width="64" alt="cone-cursor icon"> | A cream waffle cone drawn as a pointer's arrowhead, tip up, holding a round pistachio scoop at its wide end. |
+| `bite` | <img src="assets/images/logo/scoop-bite.png" width="64" alt="bite icon"> | A cream page block with three lines of text, a round notch scooped from its upper right corner and the pistachio ball lifted out of it. |
+| `clipboard` | <img src="assets/images/logo/scoop-clipboard.png" width="64" alt="clipboard icon"> | A cream clipboard with its clip and a round pistachio scoop on the board. |
+| `monogram` | <img src="assets/images/logo/scoop-monogram.png" width="64" alt="monogram icon"> | A cream letter S whose lower curl is a scoop's bowl cradling a pistachio ball. |
+| `window-cup` | <img src="assets/images/logo/scoop-window-cup.png" width="64" alt="window-cup icon"> | A browser window tapered into an ice-cream cup, its header bar the rim, with a round pistachio scoop in its open top. |
+
+To ship a prototype instead, run `npm run gen-icons -- --variant <figure>`.
+That writes the chosen figure as the extension icons and README logo, and a
+preview of each figure not shipped. `npm run gen-icons` on its own restores
+`pointer`.
 
 The rejected `brackets` and `ball` icons are kept as a record in
 [`assets/images/logo/archive/`](assets/images/logo/archive/), which the

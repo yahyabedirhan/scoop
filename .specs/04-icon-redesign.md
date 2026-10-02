@@ -1,6 +1,6 @@
 # 04 - Icon Redesign
 
-Status: in progress
+Status: implemented
 Last updated: 2026-10-03
 
 Builds on the ice-cream-scoop icon from 0.0.6 (`feat: draw an ice-cream-scoop
