@@ -8,8 +8,7 @@ thinking is done. The next session orchestrates the build and opens the PR.
 ## Where things are
 
 - Effort: `icon-redesign`, issue label `effort:icon-redesign`.
-- Worktree: `/Users/yahyabedirhanpak/.treehouse/scoop-abb122/1/scoop`, leased
-  through `treehouse` (holder `icon-redesign`).
+- Worktree: the `treehouse` worktree leased as `icon-redesign`.
 - Branch: `feat/icon-redesign`, pushed to `origin`. It holds the spec at
   `.specs/04-icon-redesign.md` and both handoffs. No code has changed yet.
 - Spec: "Spec: icon redesign",
@@ -53,8 +52,8 @@ thinking is done. The next session orchestrates the build and opens the PR.
 
 ## Reaching the thinking session
 
-The session that wrote this runs in Herdr, pane `w1Q:p1`, and can be prompted
-there with a question about intent. Prefer deciding small open questions
+The session that wrote this runs in a Herdr pane on the maintainer's machine,
+and can be prompted there with a question about intent. Prefer deciding small open questions
 yourself and listing them in the PR description.
 
 ## Suggested skills
