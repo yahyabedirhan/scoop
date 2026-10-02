@@ -15,16 +15,22 @@ milestones. `0.1.0` will be the first version considered ready to use.
 ### Added
 - The `README` opens with the Scoop logo, a 512 px render of the icon at
   `assets/images/logo/scoop.png`, centred above the title.
-- Two alternate icons, `pointer` and `ball`, kept as 512 px previews beside the
-  logo. `npm run gen-icons -- --variant <name>` ships one of them instead of the
-  default `brackets`.
+- Five prototype icons, `cone-cursor`, `bite`, `clipboard`, `monogram` and
+  `window-cup`, kept as 512 px previews beside the logo and described in the
+  `README`. `npm run gen-icons -- --variant <name>` ships one of them instead
+  of the default `pointer`. The final icon is picked from the six at review.
 
 ### Changed
-- A new icon replaces the ice-cream scoop. A pistachio ball sits between cream
-  angle brackets, `<●>`, on a pistachio squircle tile with a soft gradient, so
-  it reads as a flat, quiet mark in the toolbar rather than a sticker.
+- A new icon replaces the ice-cream scoop. A pistachio ball with a scalloped
+  base has a cream mouse pointer over its lower right, on a pistachio squircle
+  tile with a soft gradient, so it reads as a flat, quiet mark in the toolbar
+  rather than a sticker.
 - The toolbar `ON` badge is deep pistachio (`#37692c`) instead of Chrome blue,
   to match the new icon.
+
+### Removed
+- The `brackets` and `ball` icons leave the generator. Their 512 px renders
+  are kept as a record in `assets/images/logo/archive/`.
 
 ## [0.0.6] - 2026-10-01
 
