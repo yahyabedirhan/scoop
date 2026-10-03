@@ -299,7 +299,11 @@ class Variant:
     def __init__(self, name, master, small_master, span, small_span):
         self.name = name
         self.box, self.paths = load_master(master)
-        _, self.small = load_master(small_master)
+        small_box, self.small = load_master(small_master)
+        # Both cuts are scaled by the full master's box, so they must share it.
+        if small_box != self.box:
+            raise SystemExit(f"{os.path.relpath(small_master)}: viewBox {small_box:g} differs from "
+                             f"{os.path.relpath(master)}'s {self.box:g}")
         self.span, self.small_span = span, small_span
 
     def icon(self, size, colourway=ICON_TILE):
