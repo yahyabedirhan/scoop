@@ -1,29 +1,27 @@
 #!/usr/bin/env python3
 """Generate the Scoop extension icons (16/32/48/128) and README logos as RGBA PNGs.
 
-The mark, `spoon-pointer`, is drawn once as a black SVG master at
-assets/images/logo/scoop.svg. A page outline is missing a softened block from
-its lower-right corner, and a spoon drawn as a mouse pointer (the bowl is the
-arrowhead, the flared handle its tail) carries that block in its bowl, turned
-to the spoon's axis. This script reads the master's paths and fills them, so
-the master is the one place the shape is edited. The master's viewBox is the
+The mark is drawn once as a black SVG master at
+assets/images/logo/scoop.svg. It is a spoon drawn as a mouse pointer (the bowl
+is the arrowhead, the flared handle its tail) with a pair of angle brackets,
+`< >`, cut out of its bowl and turned to the spoon's axis. The mark is centred
+on the tile. This script reads the master's paths and fills them, so the
+master is the one place the shape is edited. The master's viewBox is the
 tile itself, so the master alone decides how much of the tile the mark fills.
 
 The mark is set on a squircle tile with a soft vertical gradient, in the
 format of Shipyard's logo, in two colourways. The green tile carries the mark
 in cream under a white sheen. The white tile carries the mark in pistachio
 inside a hairline edge from 48 px up, so it keeps its outline on a white page.
-ICON_TILE picks the extension icons' colourway, the green tile, and setting it
-to WHITE_TILE and re-running switches them to green on white. The 48 and
+ICON_TILE picks the extension icons' colourway, the white tile, and setting it
+to GREEN_TILE and re-running switches them to white on green. The 48 and
 128 px icons keep Chrome's transparent margin, and the 16 and 32 px tiles fill
-the canvas. Both colourways are written at 512 px for the README. Icons below
-DETAIL_MIN px are drawn from a second master, scoop-16.svg, the same mark
-redrawn simpler and bolder so it holds at 16 px. It shares the full master's
-viewBox.
+the canvas. Both colourways are written at 512 px for the README. Every size is drawn
+from the same master, so the small icons are the large mark scaled down.
 
-The masters may use only absolute M, L, H, V, A and Z path commands, with each
+The master may use only absolute M, L, H, V, A and Z path commands, with each
 path filled even-odd. Pure standard library, supersampled for clean edges, and
-deterministic. Re-run after editing a master or the colours. Rejected icons
+deterministic. Re-run after editing the master or the colours. Rejected icons
 are kept as PNGs under assets/images/logo/archive/, which this script never
 writes or deletes.
 """
@@ -34,7 +32,6 @@ import struct
 import zlib
 
 SIZES = (16, 32, 48, 128)
-DETAIL_MIN = 32              # smallest icon drawn from the full master
 ROOT = os.path.join(os.path.dirname(__file__), os.pardir)
 OUT_DIR = os.path.join(ROOT, "icons")
 LOGO_SIZE = 512
@@ -42,7 +39,6 @@ LOGO_DIR = os.path.join(ROOT, "assets", "images", "logo")
 LOGO_PATH = os.path.join(LOGO_DIR, "scoop.png")
 LOGO_WHITE_PATH = os.path.join(LOGO_DIR, "scoop-on-white.png")
 MASTER_PATH = os.path.join(LOGO_DIR, "scoop.svg")
-SMALL_MASTER_PATH = os.path.join(LOGO_DIR, "scoop-16.svg")
 
 # Pistachio: Shipyard's khaki shifted to hue 140 in OKLCH (lightness +0.02,
 # chroma x0.95). The green tile's figure is Shipyard's cream. The white tile's
@@ -61,7 +57,7 @@ GREEN_TILE = (TILE_TOP, TILE_BOTTOM, CREAM, 0.14, None)
 WHITE_TILE = (WHITE, WHITE_BOTTOM, ICON_GREEN, 0.0, WHITE_EDGE)
 # The extension icons' colourway, the one switch between white on green
 # (GREEN_TILE) and green on white (WHITE_TILE). Re-run after changing it.
-ICON_TILE = GREEN_TILE
+ICON_TILE = WHITE_TILE
 
 SQUIRCLE_N = 5               # superellipse exponent of the tile
 MARGIN = {48: 0.06, 128: 0.125, LOGO_SIZE: 0.125}  # transparent margin per side; 0 elsewhere
@@ -275,15 +271,10 @@ def write_png(path, size, raw):
 
 def main():
     box, paths = load_master()
-    small_box, small = load_master(SMALL_MASTER_PATH)
-    # Both cuts are scaled by the full master's box, so they must share it.
-    if small_box != box:
-        raise SystemExit(f"{os.path.relpath(SMALL_MASTER_PATH)}: viewBox {small_box:g} differs from "
-                         f"{os.path.relpath(MASTER_PATH)}'s {box:g}")
     os.makedirs(OUT_DIR, exist_ok=True)
     for s in SIZES:
         p = os.path.join(OUT_DIR, f"icon{s}.png")
-        write_png(p, s, render_tile(paths if s >= DETAIL_MIN else small, box, s, ICON_TILE))
+        write_png(p, s, render_tile(paths, box, s, ICON_TILE))
         print("wrote", os.path.relpath(p))
     for p, colourway in ((LOGO_PATH, GREEN_TILE), (LOGO_WHITE_PATH, WHITE_TILE)):
         write_png(p, LOGO_SIZE, render_tile(paths, box, LOGO_SIZE, colourway))

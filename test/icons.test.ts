@@ -90,23 +90,31 @@ function iconColourway() {
     : { name: "the cream mark on a green tile", isTile: isGreen, isMark: isWhite };
 }
 
-/** The mark's bounding box as a share of the tile's, both measured in whole pixels of the PNG. */
-function markShare(png: Png, isMark: (pixel: number[]) => boolean): number {
-  const rows = pixelRows(png);
-  const area = (hit: (pixel: number[]) => boolean) => {
-    const xs: number[] = [];
-    const ys: number[] = [];
-    rows.forEach((row, y) =>
-      row.forEach((pixel, x) => {
-        if (hit(pixel)) {
-          xs.push(x);
-          ys.push(y);
-        }
-      }),
-    );
-    return (Math.max(...xs) - Math.min(...xs) + 1) * (Math.max(...ys) - Math.min(...ys) + 1);
-  };
-  return area(isMark) / area(([, , , a]) => a > 0);
+interface Box {
+  left: number;
+  right: number;
+  top: number;
+  bottom: number;
+}
+
+/** The bounding box of the pixels that hit, in whole pixels of the PNG, edges included. */
+function boundingBox(png: Png, hit: (pixel: number[]) => boolean): Box {
+  const xs: number[] = [];
+  const ys: number[] = [];
+  pixelRows(png).forEach((row, y) =>
+    row.forEach((pixel, x) => {
+      if (hit(pixel)) {
+        xs.push(x);
+        ys.push(y);
+      }
+    }),
+  );
+  return { left: Math.min(...xs), right: Math.max(...xs), top: Math.min(...ys), bottom: Math.max(...ys) };
+}
+
+/** The mark's box and the tile's box, the tile being every pixel that is not transparent. */
+function markAndTile(png: Png, isMark: (pixel: number[]) => boolean) {
+  return { mark: boundingBox(png, isMark), tile: boundingBox(png, ([, , , a]) => a > 0) };
 }
 
 describe("extension icons", () => {
@@ -162,13 +170,21 @@ describe("extension icons", () => {
     expect(pixels.some(isMark), name).toBe(true);
   });
 
-  // The icon before spec 05 drew its mark's bounding box over about a third of
-  // the tile at 48 and 128 px (0.32) and under half at 16 px (0.47), and
-  // Scale-up over more than half at each. At 32 px the old icon already drew
-  // its mark as large, so that size cannot tell them apart and is left out.
-  test.each(["16", "48", "128"])("the %s px icon's mark spans more than half of its tile, not the old icon's smaller share", (size) => {
+  // Spec 06's mark is the spoon-pointer alone, a tall shape, so its size is
+  // its height. It spans 0.56 of the tile at 16 px and 0.63 at 128 px.
+  test.each(["16", "32", "48", "128"])("the %s px icon's mark spans more than half of its tile's height", (size) => {
     const { isMark } = iconColourway();
-    expect(markShare(readPng(manifest.icons[size]), isMark)).toBeGreaterThan(0.5);
+    const { mark, tile } = markAndTile(readPng(manifest.icons[size]), isMark);
+    expect((mark.bottom - mark.top + 1) / (tile.bottom - tile.top + 1)).toBeGreaterThan(0.55);
+  });
+
+  // The mark used to sit off to one side of its tile. Antialiasing can shift
+  // a box edge by a pixel, so the centres may differ by up to one pixel.
+  test.each(["16", "32", "48", "128"])("the %s px icon's mark is centred on its tile", (size) => {
+    const { isMark } = iconColourway();
+    const { mark, tile } = markAndTile(readPng(manifest.icons[size]), isMark);
+    expect(Math.abs((mark.left + mark.right) / 2 - (tile.left + tile.right) / 2)).toBeLessThanOrEqual(1);
+    expect(Math.abs((mark.top + mark.bottom) / 2 - (tile.top + tile.bottom) / 2)).toBeLessThanOrEqual(1);
   });
 });
 
@@ -195,11 +211,11 @@ describe("README logos", () => {
 });
 
 describe("logo folder", () => {
-  // The generator reads the two SVG masters and writes only the README logos
-  // beside them, so no stale preview or concept is left behind.
-  test("holds the masters, the README logos and the archive only", () => {
+  // The generator reads the one SVG master and writes only the README logos
+  // beside it, so no stale preview, concept or retired cut is left behind.
+  test("holds the master, the README logos and the archive only", () => {
     const files = readdirSync(new URL("assets/images/logo/", ROOT)).filter((name) => !name.startsWith("."));
-    expect(files.sort()).toEqual(["archive", "scoop-16.svg", "scoop-on-white.png", "scoop.png", "scoop.svg"]);
+    expect(files.sort()).toEqual(["archive", "scoop-on-white.png", "scoop.png", "scoop.svg"]);
   });
 });
 
@@ -207,7 +223,7 @@ describe("archived icons", () => {
   // Rejected figures kept as a record. The generator never writes here.
   const archived = readdirSync(new URL("assets/images/logo/archive/", ROOT)).filter((name) => !name.startsWith("."));
 
-  test("the rejected icons and concepts, including the former pointer icon and spec 05's other four prototypes, are archived", () => {
+  test("the rejected icons and concepts, including the former pointer icon, spec 05's other four prototypes and the page-and-spoon icon it shipped, are archived", () => {
     expect(archived.sort()).toEqual([
       "scoop-ball-terminal.png",
       "scoop-ball.png",
@@ -227,6 +243,7 @@ describe("archived icons", () => {
       "scoop-lifted-o.png",
       "scoop-marquee.png",
       "scoop-monogram.png",
+      "scoop-page-and-spoon.png",
       "scoop-peel.png",
       "scoop-pointer-scoop.png",
       "scoop-pointer.png",

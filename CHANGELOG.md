@@ -10,6 +10,21 @@ milestones. `0.1.0` will be the first version considered ready to use.
 
 ## [Unreleased]
 
+### Changed
+- The icon and both README logos are the spoon-pointer alone, centred on its
+  tile. The page outline beside it is gone, and the block in the spoon's bowl
+  is now a pair of angle brackets, `< >`, so the mark reads as scooping up an
+  HTML element.
+- Every icon size is drawn from the one master, so the 16 px icon is the same
+  mark as the large one, scaled down.
+- The extension icon is green on white, the pistachio mark on the white tile
+  of the README's second logo.
+
+### Removed
+- The separate 16 px master, `assets/images/logo/scoop-16.svg`. The
+  page-and-spoon icon it belonged to is kept in
+  `assets/images/logo/archive/scoop-page-and-spoon.png`.
+
 ## [0.0.8] - 2026-10-03
 
 ### Added

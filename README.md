@@ -1,6 +1,6 @@
 <p align="center">
-  <img src="assets/images/logo/scoop.png" width="128" alt="Scoop's logo: a cream page outline missing a block from its lower-right corner, and a cream spoon shaped like a mouse pointer carrying that block in its bowl, on a pistachio green tile">
-  <img src="assets/images/logo/scoop-on-white.png" width="128" alt="Scoop's logo on white: the same page outline and spoon-shaped pointer in pistachio green, on a white tile">
+  <img src="assets/images/logo/scoop.png" width="128" alt="Scoop's logo: a cream spoon shaped like a mouse pointer, with a pair of angle brackets cut out of its bowl, centred on a pistachio green tile">
+  <img src="assets/images/logo/scoop-on-white.png" width="128" alt="Scoop's logo on white: the same spoon-shaped pointer in pistachio green, on a white tile">
 </p>
 
 <h1 align="center">Scoop</h1>
@@ -95,7 +95,7 @@ The extension stays installed across restarts as long as the folder stays put.
 | `npm run dev` | The same build in watch mode. |
 | `npm run typecheck` | `tsc --noEmit` in strict mode. |
 | `npm test` | Run the test suite with Vitest (jsdom, with the icon-file suite in Node). |
-| `npm run gen-icons` | Regenerate the toolbar and extension icons at 16, 32, 48 and 128 px, the spoon-pointer mark in cream on a pistachio tile, plus the two 512 px README logos in `assets/images/logo/`, `scoop.png` in cream on a pistachio tile and `scoop-on-white.png` in pistachio on a white tile. All are drawn from the SVG masters (`tools/gen-icons.py`, standard library only, see [Logo](#logo)). |
+| `npm run gen-icons` | Regenerate the toolbar and extension icons at 16, 32, 48 and 128 px, the spoon-pointer mark in pistachio on a white tile, plus the two 512 px README logos in `assets/images/logo/`, `scoop.png` in cream on a pistachio tile and `scoop-on-white.png` in pistachio on a white tile. All are drawn from the one SVG master (`tools/gen-icons.py`, standard library only, see [Logo](#logo)). |
 
 The source is TypeScript under `src/`, built by Vite. `dist/` is generated and
 gitignored. `demo.html` is a manual test page with nested lists, links, and
@@ -108,23 +108,23 @@ buttons.
 ### Logo
 
 Scoop's mark is a spoon drawn as a mouse pointer. Its bowl is the pointer's
-arrowhead and carries a block taken from the corner of a page beside it, so
-pointing at part of a page lifts exactly that piece out.
+arrowhead and carries a pair of angle brackets, `< >`, so pointing at part of a
+page scoops up an HTML element.
 
 The mark is drawn once, in black, as
-[`assets/images/logo/scoop.svg`](assets/images/logo/scoop.svg), with
-`scoop-16.svg` beside it, a simpler and bolder cut for the 16 px icon. Their
-viewBox is the whole tile, so the masters alone decide how much of it the mark
-fills. `npm run gen-icons` sets the mark on a squircle tile in two
+[`assets/images/logo/scoop.svg`](assets/images/logo/scoop.svg), and centred on
+the tile. Its viewBox is the whole tile, so the master alone decides how much
+of it the mark fills. Every icon size is drawn from this one master, so the
+16 px icon is the large mark scaled down. `npm run gen-icons` sets the mark on a squircle tile in two
 colourways, shown side by side above. One is cream on a pistachio tile
 (`scoop.png`). The other is pistachio (`#5f9653`) on a white tile with a
-hairline edge (`scoop-on-white.png`). The extension icons use the pistachio
-tile, so the toolbar shows a green tile on light and dark toolbars alike.
-`ICON_TILE` in `tools/gen-icons.py` switches them to the white tile; change it
-and run `npm run gen-icons`. Edit the masters, not the PNGs.
+hairline edge (`scoop-on-white.png`). The extension icons use the white
+tile. `ICON_TILE` in `tools/gen-icons.py` switches them to the pistachio tile;
+change it and run `npm run gen-icons`. Edit the master, not the PNGs.
 
-Earlier icons and concepts, among them the former `pointer` icon and the four
-spec 05 prototypes that were not picked, are kept as 512 px renders in
+Earlier icons and concepts, among them the former `pointer` icon, the four
+spec 05 prototypes that were not picked and the page-and-spoon icon that
+spec 05 shipped, are kept as 512 px renders in
 [`assets/images/logo/archive/`](assets/images/logo/archive/), which the
 generator never touches.
 
