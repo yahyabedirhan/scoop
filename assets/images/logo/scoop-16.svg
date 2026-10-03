@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" role="img" aria-labelledby="title">
+  <title id="title">Scoop logo, 16 px cut</title>
+  <path fill="#111" fill-rule="evenodd" d="M51 16 H149 A21 21 0 0 1 170 37 V93 A7 7 0 0 1 163 100 H128 A14 14 0 0 0 114 114 V135 A7 7 0 0 1 107 142 H51 A21 21 0 0 1 30 121 V37 A21 21 0 0 1 51 16 ZM58 44 H142 V72 H128 A42 42 0 0 0 86 114 V114 H58 Z"/>
+  <path fill="#111" fill-rule="evenodd" d="M142 114 L223.2 160.9 A5.72 5.72 0 0 1 223.2 170.7 L198.98 184.7 L219.98 212.7 A18.2 18.2 0 0 1 188.48 230.9 L174.76 198.7 L150.54 212.7 A5.72 5.72 0 0 1 142 207.66 Z"/>
+</svg>

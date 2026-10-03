@@ -15,21 +15,21 @@ milestones. `0.1.0` will be the first version considered ready to use.
 ### Added
 - The `README` opens with the Scoop logo, a 512 px render of the icon at
   `assets/images/logo/scoop.png`, centred above the title.
-- Six prototype icons, `clipboard`, `cursor-scoop`, `clipboard-scoop`,
-  `scooper`, `scoop-tub` and `scoop-cone`, kept as 512 px previews beside the
-  logo and described in the `README`. Five of them are built around the
-  ice-cream scoop tool. `npm run gen-icons -- --variant <name>` ships one of
-  them instead of the default `pointer`. The final icon is picked from the
-  seven at review.
-- The rejected `brackets`, `ball`, `cone-cursor`, `bite`, `monogram` and
-  `window-cup` prototypes, which never shipped, are kept as 512 px renders in
-  `assets/images/logo/archive/`.
+- The icon's black SVG masters, `assets/images/logo/scoop.svg` and a heavier
+  `scoop-16.svg` for the 16 px icon, from which `npm run gen-icons` draws
+  every icon and the README logo.
+- The rejected prototypes, which never shipped, are kept as 512 px renders in
+  `assets/images/logo/archive/`. They are twelve tile figures, among them
+  `clipboard` and the five built around the ice-cream scoop tool, seventeen
+  black SVG concepts, and the `pointer` icon that briefly replaced the scoop.
 
 ### Changed
-- A new icon replaces the ice-cream scoop. A pistachio ball with a scalloped
-  base has a cream mouse pointer over its lower right, on a pistachio squircle
-  tile with a soft gradient, so it reads as a flat, quiet mark in the toolbar
-  rather than a sticker.
+- A new icon replaces the ice-cream scoop. A spoon drawn as a mouse pointer
+  carries a block taken from the corner of a page, so pointing at part of a
+  page lifts exactly that piece out. The extension icon is the mark in
+  pistachio on a transparent background, which holds on light and dark
+  toolbars. The README logo is the mark in cream on a pistachio squircle tile
+  with a soft gradient, in the format of Shipyard's logo.
 - The toolbar `ON` badge is deep pistachio (`#37692c`) instead of Chrome blue,
   to match the new icon.
 
