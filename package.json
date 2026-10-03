@@ -10,7 +10,9 @@
     "dev": "npm run clean && (vite build --watch --mode content & vite build --watch --mode background & wait)",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "gen-icons": "python3 tools/gen-icons.py"
+    "gen-icons": "python3 tools/gen-icons.py",
+    "package": "npm run build && node -e \"require('fs').mkdirSync('release',{recursive:true})\" && rm -f release/scoop-$npm_package_version.zip && cd dist && zip -qrX ../release/scoop-$npm_package_version.zip . -x '*.DS_Store'",
+    "store-assets": "npm run build && node tools/store-assets/render.mjs"
   },
   "devDependencies": {
     "@types/chrome": "^0.0.270",
