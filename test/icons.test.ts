@@ -32,9 +32,9 @@ function readPng(path: string): Png {
   return { width: bytes.readUInt32BE(16), height: bytes.readUInt32BE(20), bytes };
 }
 
-/** Alpha of the pixel at (x, y) of an 8-bit RGBA, non-interlaced PNG. */
-function alphaAt(png: Png, x: number, y: number): number {
-  const { bytes, width } = png;
+/** Alpha channel of an 8-bit RGBA, non-interlaced PNG, as one array per row. */
+function alphaRows(png: Png): Uint8Array[] {
+  const { bytes, width, height } = png;
   expect([bytes[24], bytes[25], bytes[28]]).toEqual([8, 6, 0]); // depth, RGBA, no interlace
   const idat: Buffer[] = [];
   for (let at = 8; at < bytes.length; ) {
@@ -45,12 +45,12 @@ function alphaAt(png: Png, x: number, y: number): number {
   const raw = inflateSync(Buffer.concat(idat));
   const bpp = 4;
   const stride = width * bpp;
+  const rows: Uint8Array[] = [];
   let prev = new Uint8Array(stride);
-  let row = new Uint8Array(stride);
-  for (let r = 0; r <= y; r++) {
+  for (let r = 0; r < height; r++) {
     const filter = raw[r * (stride + 1)];
     const line = raw.subarray(r * (stride + 1) + 1, (r + 1) * (stride + 1));
-    row = new Uint8Array(stride);
+    const row = new Uint8Array(stride);
     for (let i = 0; i < stride; i++) {
       const a = i >= bpp ? row[i - bpp] : 0;
       const b = prev[i];
@@ -60,9 +60,10 @@ function alphaAt(png: Png, x: number, y: number): number {
       const predictor = [0, a, b, (a + b) >> 1, pa <= pb && pa <= pc ? a : pb <= pc ? b : c][filter];
       row[i] = (line[i] + predictor) & 0xff;
     }
+    rows.push(row.filter((_, i) => i % bpp === 3));
     prev = row;
   }
-  return row[x * bpp + 3];
+  return rows;
 }
 
 describe("extension icons", () => {
@@ -87,9 +88,24 @@ describe("extension icons", () => {
     expect(files.sort()).toEqual(declaredFiles.sort());
   });
 
-  test("the 16 px tile fills the canvas, so the middle of its left edge is opaque", () => {
-    const png = readPng(manifest.icons["16"]);
-    expect(alphaAt(png, 0, 8)).toBe(255);
+  test("the 128 px icon keeps Chrome's 16 px transparent margin", () => {
+    const rows = alphaRows(readPng(manifest.icons["128"]));
+    rows.forEach((row, y) =>
+      row.forEach((alpha, x) => {
+        if (x < 16 || x >= 112 || y < 16 || y >= 112) expect(alpha, `(${x}, ${y})`).toBe(0);
+      }),
+    );
+  });
+
+  test("the 16 px icon is cropped to the mark, so the mark reaches its top and bottom rows", () => {
+    const rows = alphaRows(readPng(manifest.icons["16"]));
+    expect(Math.max(...rows[0])).toBeGreaterThan(0);
+    expect(Math.max(...rows[15])).toBeGreaterThan(0);
+  });
+
+  test.each(declared)("%s %s px (%s) is transparent around the mark, with a clear top-right corner", (_where, _size, path) => {
+    const rows = alphaRows(readPng(path));
+    expect(rows[0][rows[0].length - 1]).toBe(0);
   });
 });
 
@@ -101,26 +117,19 @@ describe("README logo", () => {
     expect([png.width, png.height]).toEqual([512, 512]);
   });
 
-  test("keeps a transparent margin around the tile, as the 128 px icon does", () => {
-    const png = readPng(LOGO);
-    expect(alphaAt(png, 0, 256)).toBe(0);
+  test("keeps a transparent margin around an opaque tile, as Shipyard's logo does", () => {
+    const rows = alphaRows(readPng(LOGO));
+    expect(rows[256][0]).toBe(0);
+    expect(rows[256][256]).toBe(255);
   });
 });
 
-describe("alternate icon previews", () => {
-  // The variants not shipped are written beside the README logo as previews.
-  // `pointer` ships, so it has none of its own.
-  const EXPECTED: string[] = ["scoop-clipboard-scoop.png", "scoop-clipboard.png", "scoop-cursor-scoop.png", "scoop-scoop-cone.png", "scoop-scoop-tub.png", "scoop-scooper.png"];
-  const previews = readdirSync(new URL("assets/images/logo/", ROOT)).filter((name) => /^scoop-.+\.png$/.test(name));
-
-  test("only the figures not shipped have previews", () => {
-    expect(previews.sort()).toEqual(EXPECTED.sort());
-  });
-
-  test.each(previews)("%s is a 512 x 512 PNG with the logo's transparent margin", (name) => {
-    const png = readPng(`assets/images/logo/${name}`);
-    expect([png.width, png.height]).toEqual([512, 512]);
-    expect(alphaAt(png, 0, 256)).toBe(0);
+describe("logo folder", () => {
+  // The generator reads the two SVG masters and writes only the README logo
+  // beside them, so no stale preview or concept is left behind.
+  test("holds the masters, the README logo and the archive only", () => {
+    const files = readdirSync(new URL("assets/images/logo/", ROOT)).filter((name) => !name.startsWith("."));
+    expect(files.sort()).toEqual(["archive", "scoop-16.svg", "scoop.png", "scoop.svg"]);
   });
 });
 
@@ -128,13 +137,37 @@ describe("archived icons", () => {
   // Rejected figures kept as a record. The generator never writes here.
   const archived = readdirSync(new URL("assets/images/logo/archive/", ROOT)).filter((name) => !name.startsWith("."));
 
-  test("the brackets, ball, cone-cursor, bite, monogram and window-cup icons are archived", () => {
+  test("the rejected icons and concepts, including the former pointer icon, are archived", () => {
     expect(archived.sort()).toEqual([
+      "scoop-ball-terminal.png",
       "scoop-ball.png",
       "scoop-bite.png",
       "scoop-brackets.png",
+      "scoop-carve.png",
+      "scoop-clip-spoon.png",
+      "scoop-clipboard-bite.png",
+      "scoop-clipboard-scoop.png",
+      "scoop-clipboard.png",
       "scoop-cone-cursor.png",
+      "scoop-cradle.png",
+      "scoop-cursor-scoop.png",
+      "scoop-ladle.png",
+      "scoop-lifted-o.png",
+      "scoop-marquee.png",
       "scoop-monogram.png",
+      "scoop-peel.png",
+      "scoop-pointer-scoop.png",
+      "scoop-pointer.png",
+      "scoop-scoop-arc.png",
+      "scoop-scoop-cone.png",
+      "scoop-scoop-to-clipboard.png",
+      "scoop-scoop-tub.png",
+      "scoop-scooped-line.png",
+      "scoop-scooper.png",
+      "scoop-spoon-line.png",
+      "scoop-spoon-pointer-ball.png",
+      "scoop-spoon-pointer-line.png",
+      "scoop-spoon-pointer-square.png",
       "scoop-window-cup.png",
     ]);
   });

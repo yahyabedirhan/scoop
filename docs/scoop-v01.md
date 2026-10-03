@@ -543,7 +543,7 @@ src/
 | `npm run dev` | the same two passes in `--watch` mode |
 | `npm run typecheck` | `tsc --noEmit`, `strict` |
 | `npm test` | `vitest run` (jsdom, with the icon-file suite in Node) |
-| `npm run gen-icons` | regenerate the icons at 16, 32, 48 and 128 px, a pistachio ice-cream ball with a scalloped base and a cream mouse pointer over its lower right, on a pistachio squircle tile, plus the 512 px README logo at `assets/images/logo/scoop.png` and a 512 px preview beside it of each of the six prototypes, `clipboard`, `cursor-scoop`, `clipboard-scoop`, `scooper`, `scoop-tub` and `scoop-cone`; `-- --variant <figure>` ships one of them instead of `pointer`. Rejected icons are kept in `assets/images/logo/archive/`, which the generator never touches (`tools/gen-icons.py`, standard library only) |
+| `npm run gen-icons` | regenerate the icons at 16, 32, 48 and 128 px, the spoon-pointer mark in pistachio `#5f9653` on a transparent background, cropped to the mark at 16 and 32 px and inside Chrome's margin at 48 and 128 px, plus the 512 px README logo at `assets/images/logo/scoop.png`, the mark in cream on a pistachio squircle tile. Both are filled from the black SVG masters `assets/images/logo/scoop.svg` and, below 32 px, `scoop-16.svg`, which may use only absolute `M L H V A Z` path commands. Rejected icons are kept in `assets/images/logo/archive/`, which the generator never touches (`tools/gen-icons.py`, standard library only) |
 
 Install: `chrome://extensions` -> Developer mode -> Load unpacked -> pick
 `dist/`. After changing code, rebuild (or run the watch), click reload on the
@@ -564,7 +564,7 @@ never private helpers or traversal order. This project has no issue tracker, so
 | `Inspector` methods, no `chrome` and no scroll mock needed | `test/inspector.test.ts` | extension-node identity, clean capture, class restore including page-edited classes |
 | `Scooper`, with `chrome.*` mocked at its constructor callbacks and `inspector` / `scroller` mocked at their interfaces | `test/scooper.test.ts` | the state machine, digit-key mode switching, stale-completion guard, `flush()` before capture and on `stop()` |
 | `MarginScroller` plus the pure `applyScrollMargin` / `restoreScrollMargin` | `test/scroll/margin-scroller.test.ts` | the `Map` / `requestAnimationFrame` / `flush()` timing, byte-exact vs per-property revert |
-| the committed icon PNGs as `manifest.json` declares them, the README logo, its previews and archive | `test/icons.test.ts` | every declared icon exists as a PNG of its declared size, the 16 px tile fills the canvas, the 512 px logo and each prototype preview keep a transparent margin, only the figures not shipped have previews, the archive holds the rejected icons |
+| the committed icon PNGs as `manifest.json` declares them, the README logo, the logo folder and archive | `test/icons.test.ts` | every declared icon exists as a PNG of its declared size and is transparent around the mark, the 128 px icon keeps Chrome's 16 px margin, the 16 px icon is cropped to the mark, the 512 px logo is an opaque tile with a transparent margin, the logo folder holds only the masters, the logo and the archive, and the archive holds the rejected icons |
 
 `html-tags` and `MessageType` have no behavior of their own; `formatHTML`'s
 tests guard that sharing the tag sets changed nothing.

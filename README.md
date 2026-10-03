@@ -1,4 +1,4 @@
-<p align="center"><img src="assets/images/logo/scoop.png" width="128" alt="Scoop's logo: a pistachio scoop of ice cream with a cream mouse pointer over its lower right, on a pistachio green tile"></p>
+<p align="center"><img src="assets/images/logo/scoop.png" width="128" alt="Scoop's logo: a cream page outline missing a block from its lower-right corner, and a cream spoon shaped like a mouse pointer carrying that block in its bowl, on a pistachio green tile"></p>
 
 <h1 align="center">Scoop</h1>
 
@@ -92,7 +92,7 @@ The extension stays installed across restarts as long as the folder stays put.
 | `npm run dev` | The same build in watch mode. |
 | `npm run typecheck` | `tsc --noEmit` in strict mode. |
 | `npm test` | Run the test suite with Vitest (jsdom, with the icon-file suite in Node). |
-| `npm run gen-icons` | Regenerate the toolbar and extension icons at 16, 32, 48 and 128 px, a pistachio ice-cream ball with a scalloped base and a cream mouse pointer over its lower right, on a pistachio squircle tile, plus the 512 px README logo at `assets/images/logo/scoop.png` and a 512 px preview beside it of each prototype icon (`tools/gen-icons.py`, standard library only). |
+| `npm run gen-icons` | Regenerate the toolbar and extension icons at 16, 32, 48 and 128 px, the spoon-pointer mark in pistachio on a transparent background, plus the 512 px README logo at `assets/images/logo/scoop.png`, the mark in cream on a pistachio tile. Both are drawn from the SVG masters in `assets/images/logo/` (`tools/gen-icons.py`, standard library only). |
 
 The source is TypeScript under `src/`, built by Vite. `dist/` is generated and
 gitignored. `demo.html` is a manual test page with nested lists, links, and
@@ -102,34 +102,23 @@ buttons.
   piece works, the module layout, and the low-level design.
 - **[`CHANGELOG.md`](CHANGELOG.md)** is the version history.
 
-### Alternate icons
+### Logo
 
-TODO: the maintainer picks the final icon at review. Remove the figures not
-picked from `tools/gen-icons.py`, with their previews and this section.
+Scoop's mark is a spoon drawn as a mouse pointer. Its bowl is the pointer's
+arrowhead and carries a block taken from the corner of a page beside it, so
+pointing at part of a page lifts exactly that piece out.
 
-`pointer` ships as the icon, the logo at the top of this file. Each other
-figure in `tools/gen-icons.py` is a prototype, written as a 512 px preview
-`scoop-<figure>.png` beside the README logo. The seven candidates are these.
+The mark is drawn once, in black, as
+[`assets/images/logo/scoop.svg`](assets/images/logo/scoop.svg), with
+`scoop-16.svg` beside it, the same mark with heavier strokes for the 16 px
+icon. `npm run gen-icons` turns them into the extension icons, in pistachio
+(`#5f9653`) on a transparent background so the icon sits on light and dark
+toolbars alike, and the README logo above, in cream on a pistachio tile. Edit
+the masters, not the PNGs.
 
-| Figure | Preview | Description |
-|---|---|---|
-| `pointer` | <img src="assets/images/logo/scoop.png" width="64" alt="pointer icon"> | A pistachio ball with a scalloped base and a cream mouse pointer over its lower right. The icon that ships. |
-| `clipboard` | <img src="assets/images/logo/scoop-clipboard.png" width="64" alt="clipboard icon"> | A cream clipboard with its clip and a round pistachio scoop on the board. |
-| `cursor-scoop` | <img src="assets/images/logo/scoop-cursor-scoop.png" width="64" alt="cursor-scoop icon"> | A cream ice-cream scoop holding a round pistachio ball heaped in its bowl, its handle running down to the left, with a cream mouse pointer below the bowl. |
-| `clipboard-scoop` | <img src="assets/images/logo/scoop-clipboard-scoop.png" width="64" alt="clipboard-scoop icon"> | The cream clipboard of `clipboard` with an ice-cream scoop cut out in tile colour on the board, holding a round pistachio ball. |
-| `scooper` | <img src="assets/images/logo/scoop-scooper.png" width="64" alt="scooper icon"> | The ice-cream scoop on its own, a round pistachio ball heaped in its cream bowl, with a handle to the lower left and a thumb lever. |
-| `scoop-tub` | <img src="assets/images/logo/scoop-scoop-tub.png" width="64" alt="scoop-tub icon"> | A cream ice-cream scoop, seen from the side, pulling a round pistachio ball up out of a cream tub heaped with more. |
-| `scoop-cone` | <img src="assets/images/logo/scoop-scoop-cone.png" width="64" alt="scoop-cone icon"> | A cream ice-cream scoop, its handle rising up and right, tipping a round pistachio ball onto a cream cone. |
-
-To ship a prototype instead, run `npm run gen-icons -- --variant <figure>`.
-That writes the chosen figure as the extension icons and README logo, and a
-preview of each figure not shipped. `npm run gen-icons` on its own restores
-`pointer`.
-
-The rejected `brackets`, `ball`, `cone-cursor`, `bite`, `monogram` and
-`window-cup` icons are kept as a record in
-[`assets/images/logo/archive/`](assets/images/logo/archive/), which the
-generator never touches. Git history keeps their code.
+Earlier icons and concepts, among them the former `pointer` icon, are kept as
+512 px renders in [`assets/images/logo/archive/`](assets/images/logo/archive/),
+which the generator never touches.
 
 ## Not included
 

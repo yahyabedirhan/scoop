@@ -1,6 +1,6 @@
 # 04 - Icon Redesign
 
-Status: implemented, awaiting the maintainer's pick of the final icon
+Status: implemented
 Last updated: 2026-10-03
 
 Builds on the ice-cream-scoop icon from 0.0.6 (`feat: draw an ice-cream-scoop
@@ -220,3 +220,72 @@ overrides the sections above where they disagree.
 - **Delivery.** PR #15 carries this round too. The maintainer picks from the
   seven candidates, `pointer`, `clipboard` and the five new figures. The
   release stays `0.0.7`.
+
+## Third revision after PR review
+
+Added 2026-10-03, after the maintainer looked at the seven candidates. It
+overrides the sections above where they disagree.
+
+- **Feedback.** None of the seven is a usable logo. The scoop-tool figures
+  (`cursor-scoop`, `clipboard-scoop`, `scooper`, `scoop-tub`, `scoop-cone`)
+  are illustrations, not marks. `pointer` and `clipboard` are not ready either,
+  but the pointer and the clipboard are good material for the next round.
+- **Tool and style.** A first round drawn with the `logo-design` agent skill
+  (kaankiziltug/logo-design-skill) as black, flat SVG marks, with no tile and
+  no palette yet, read as more professional. Of its five concepts, `carve` (a
+  block with a round scoop taken from its corner, the ball lifting away) and
+  `marquee` (the selection box with one corner scooped out and the ball rising
+  out of it) are kept aside as SVGs in `assets/images/logo/concepts/`, not
+  developed further. `lifted-o`, `ball-terminal` and `cradle` read as
+  irrelevant.
+- **Archive.** The six prototypes leave the generator and the README table.
+  Their 512 px PNGs join the archive, with renders of `lifted-o`,
+  `ball-terminal` and `cradle`. `pointer` keeps shipping until a replacement
+  is picked, since the extension needs an icon.
+- **Next round.** Ten new concepts built around the act of extracting
+  something out of a document. The material is a spoon or scooper, the mouse
+  pointer, the clipboard, a page and its text lines. Each concept must say what
+  objects it contains, what action it shows and what it explains.
+- **Delivery.** PR #15 carries this round too. The release stays `0.0.7`.
+
+## Fourth revision after PR review
+
+Added 2026-10-03, after the maintainer looked at the ten concepts. It
+overrides the sections above where they disagree.
+
+- **Pick.** `spoon-pointer` is the direction. A page outline is missing a
+  square from its lower-right corner, and a spoon drawn as a mouse pointer
+  (the bowl is the arrowhead, the flared handle its tail) carries that square
+  as a hole in the bowl. The maintainer calls it production ready apart from
+  the square, whose shape could be different.
+- **Archive.** The other nine concepts of that round, and `carve` and
+  `marquee`, join the archive as 512 px renders. Only `spoon-pointer` stays in
+  `assets/images/logo/concepts/`.
+- **Three prototypes.** Each changes only the shape the spoon carries, with
+  the page's missing piece matching it. `ball` takes a round scoop from the
+  page's corner and carries the ball. `line` restores the page's corner,
+  gives it text lines with one row empty, and carries that line. `soft` keeps
+  the block but softens it and turns it to the spoon's axis.
+- **Colour.** The README logo keeps the pistachio tile with a cream figure.
+  The extension icon is shown two ways, transparent with a mid-green figure
+  that holds on light and dark toolbars, and a light-green tile with a dark
+  figure.
+
+## Final decision
+
+Added 2026-10-03. It overrides the sections above where they disagree.
+
+- **Pick.** `soft` ships as the icon and the README logo. The block in the
+  bowl is a rounded square turned to the spoon's axis, and the page's notch
+  is rounded to match. `ball`, `line` and the square original join the archive.
+- **Masters.** The mark lives as black SVGs, `assets/images/logo/scoop.svg`
+  and `scoop-16.svg`, a heavier cut for the 16 px icon. `tools/gen-icons.py`
+  fills their paths with the standard library instead of drawing figures in
+  code, so the `--variant` option, the figure functions and the preview files
+  are gone. `pointer` joins the archive.
+- **Colour.** The extension icons are the mark in pistachio `#5f9653` on a
+  transparent background, the one shade with at least 3:1 contrast on light
+  and dark Chrome toolbars. They are cropped to the mark at 16 and 32 px and
+  keep Chrome's margin at 48 and 128 px. The README logo is the mark in cream
+  on the pistachio squircle tile, in the format of Shipyard's logo.
+- **Delivery.** PR #15 carries this. The release stays `0.0.7`.
