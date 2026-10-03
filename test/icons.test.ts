@@ -32,8 +32,8 @@ function readPng(path: string): Png {
   return { width: bytes.readUInt32BE(16), height: bytes.readUInt32BE(20), bytes };
 }
 
-/** Alpha channel of an 8-bit RGBA, non-interlaced PNG, as one array per row. */
-function alphaRows(png: Png): Uint8Array[] {
+/** Pixels of an 8-bit RGBA, non-interlaced PNG, as one [r, g, b, a] array per pixel per row. */
+function pixelRows(png: Png): number[][][] {
   const { bytes, width, height } = png;
   expect([bytes[24], bytes[25], bytes[28]]).toEqual([8, 6, 0]); // depth, RGBA, no interlace
   const idat: Buffer[] = [];
@@ -45,7 +45,7 @@ function alphaRows(png: Png): Uint8Array[] {
   const raw = inflateSync(Buffer.concat(idat));
   const bpp = 4;
   const stride = width * bpp;
-  const rows: Uint8Array[] = [];
+  const rows: number[][][] = [];
   let prev = new Uint8Array(stride);
   for (let r = 0; r < height; r++) {
     const filter = raw[r * (stride + 1)];
@@ -60,11 +60,21 @@ function alphaRows(png: Png): Uint8Array[] {
       const predictor = [0, a, b, (a + b) >> 1, pa <= pb && pa <= pc ? a : pb <= pc ? b : c][filter];
       row[i] = (line[i] + predictor) & 0xff;
     }
-    rows.push(row.filter((_, i) => i % bpp === 3));
+    rows.push(Array.from({ length: width }, (_, x) => [...row.subarray(x * bpp, (x + 1) * bpp)]));
     prev = row;
   }
   return rows;
 }
+
+/** Alpha channel of an 8-bit RGBA, non-interlaced PNG, as one array per row. */
+function alphaRows(png: Png): number[][] {
+  return pixelRows(png).map((row) => row.map((pixel) => pixel[3]));
+}
+
+/** Whether an [r, g, b, a] pixel is the white tile: opaque and near white. */
+const isWhite = ([r, g, b, a]: number[]) => a === 255 && Math.min(r, g, b) >= 0xe8;
+/** Whether an [r, g, b, a] pixel is the green mark: opaque, with green well above red and blue. */
+const isGreen = ([r, g, b, a]: number[]) => a === 255 && g - r > 40 && g - b > 40;
 
 describe("extension icons", () => {
   const declared = [
@@ -97,39 +107,56 @@ describe("extension icons", () => {
     );
   });
 
-  test("the 16 px icon is cropped to the mark, so the mark reaches its top and bottom rows", () => {
-    const rows = alphaRows(readPng(manifest.icons["16"]));
-    expect(Math.max(...rows[0])).toBeGreaterThan(0);
-    expect(Math.max(...rows[15])).toBeGreaterThan(0);
+  test.each(["16", "32"])("the %s px icon's tile fills the canvas, so the mark is as large as it can be", (size) => {
+    const rows = alphaRows(readPng(manifest.icons[size]));
+    const mid = rows.length / 2;
+    for (const alpha of [rows[0][mid], rows[rows.length - 1][mid], rows[mid][0], rows[mid][rows.length - 1]]) {
+      expect(alpha).toBe(255);
+    }
   });
 
-  test.each(declared)("%s %s px (%s) is transparent around the mark, with a clear top-right corner", (_where, _size, path) => {
+  test.each(declared)("%s %s px (%s) is a squircle tile, transparent at its corners", (_where, _size, path) => {
     const rows = alphaRows(readPng(path));
-    expect(rows[0][rows[0].length - 1]).toBe(0);
+    const last = rows.length - 1;
+    expect([rows[0][0], rows[0][last], rows[last][0], rows[last][last]]).toEqual([0, 0, 0, 0]);
+  });
+
+  test.each(declared)("%s %s px (%s) is the green mark on a white tile", (_where, _size, path) => {
+    const pixels = pixelRows(readPng(path)).flat();
+    const tile = pixels.filter(([, , , a]) => a === 255);
+    expect(tile.filter(isWhite).length).toBeGreaterThan(tile.length / 2);
+    expect(pixels.some(isGreen)).toBe(true);
   });
 });
 
-describe("README logo", () => {
-  const LOGO = "assets/images/logo/scoop.png";
+describe("README logos", () => {
+  const GREEN_LOGO = "assets/images/logo/scoop.png";
+  const WHITE_LOGO = "assets/images/logo/scoop-on-white.png";
 
-  test("is a 512 x 512 PNG, so the 128 px README image is sharp on retina screens", () => {
-    const png = readPng(LOGO);
+  test.each([GREEN_LOGO, WHITE_LOGO])("%s is a 512 x 512 PNG, so the 128 px README image is sharp on retina screens", (logo) => {
+    const png = readPng(logo);
     expect([png.width, png.height]).toEqual([512, 512]);
   });
 
-  test("keeps a transparent margin around an opaque tile, as Shipyard's logo does", () => {
-    const rows = alphaRows(readPng(LOGO));
+  test.each([GREEN_LOGO, WHITE_LOGO])("%s keeps a transparent margin around an opaque tile, as Shipyard's logo does", (logo) => {
+    const rows = alphaRows(readPng(logo));
     expect(rows[256][0]).toBe(0);
     expect(rows[256][256]).toBe(255);
+  });
+
+  test("the green logo has a green tile and the white logo a white one", () => {
+    // (100, 256) lies on the tile, left of the mark, in both logos.
+    expect(isGreen(pixelRows(readPng(GREEN_LOGO))[256][100])).toBe(true);
+    expect(isWhite(pixelRows(readPng(WHITE_LOGO))[256][100])).toBe(true);
   });
 });
 
 describe("logo folder", () => {
-  // The generator reads the two SVG masters and writes only the README logo
+  // The generator reads the two SVG masters and writes only the README logos
   // beside them, so no stale preview or concept is left behind.
-  test("holds the masters, the README logo and the archive only", () => {
+  test("holds the masters, the README logos and the archive only", () => {
     const files = readdirSync(new URL("assets/images/logo/", ROOT)).filter((name) => !name.startsWith("."));
-    expect(files.sort()).toEqual(["archive", "scoop-16.svg", "scoop.png", "scoop.svg"]);
+    expect(files.sort()).toEqual(["archive", "scoop-16.svg", "scoop-on-white.png", "scoop.png", "scoop.svg"]);
   });
 });
 

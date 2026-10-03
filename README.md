@@ -1,4 +1,7 @@
-<p align="center"><img src="assets/images/logo/scoop.png" width="128" alt="Scoop's logo: a cream page outline missing a block from its lower-right corner, and a cream spoon shaped like a mouse pointer carrying that block in its bowl, on a pistachio green tile"></p>
+<p align="center">
+  <img src="assets/images/logo/scoop.png" width="128" alt="Scoop's logo: a cream page outline missing a block from its lower-right corner, and a cream spoon shaped like a mouse pointer carrying that block in its bowl, on a pistachio green tile">
+  <img src="assets/images/logo/scoop-on-white.png" width="128" alt="Scoop's logo on white: the same page outline and spoon-shaped pointer in pistachio green, on a white tile">
+</p>
 
 <h1 align="center">Scoop</h1>
 
@@ -92,7 +95,7 @@ The extension stays installed across restarts as long as the folder stays put.
 | `npm run dev` | The same build in watch mode. |
 | `npm run typecheck` | `tsc --noEmit` in strict mode. |
 | `npm test` | Run the test suite with Vitest (jsdom, with the icon-file suite in Node). |
-| `npm run gen-icons` | Regenerate the toolbar and extension icons at 16, 32, 48 and 128 px, the spoon-pointer mark in pistachio on a transparent background, plus the 512 px README logo at `assets/images/logo/scoop.png`, the mark in cream on a pistachio tile. Both are drawn from the SVG masters in `assets/images/logo/` (`tools/gen-icons.py`, standard library only). |
+| `npm run gen-icons` | Regenerate the toolbar and extension icons at 16, 32, 48 and 128 px, the spoon-pointer mark in pistachio on a white tile, plus the two 512 px README logos in `assets/images/logo/`, `scoop.png` in cream on a pistachio tile and `scoop-on-white.png` in pistachio on a white tile. All are drawn from the SVG masters in `assets/images/logo/` (`tools/gen-icons.py`, standard library only). |
 
 The source is TypeScript under `src/`, built by Vite. `dist/` is generated and
 gitignored. `demo.html` is a manual test page with nested lists, links, and
@@ -111,10 +114,11 @@ pointing at part of a page lifts exactly that piece out.
 The mark is drawn once, in black, as
 [`assets/images/logo/scoop.svg`](assets/images/logo/scoop.svg), with
 `scoop-16.svg` beside it, the same mark with heavier strokes for the 16 px
-icon. `npm run gen-icons` turns them into the extension icons, in pistachio
-(`#5f9653`) on a transparent background so the icon sits on light and dark
-toolbars alike, and the README logo above, in cream on a pistachio tile. Edit
-the masters, not the PNGs.
+icon. `npm run gen-icons` sets the mark on a squircle tile in two colourways,
+shown side by side above. One is cream on a pistachio tile (`scoop.png`). The
+other is pistachio (`#5f9653`) on a white tile with a hairline edge
+(`scoop-on-white.png`), and the extension icons use it, so the toolbar shows a
+white tile on light and dark toolbars alike. Edit the masters, not the PNGs.
 
 Earlier icons and concepts, among them the former `pointer` icon, are kept as
 512 px renders in [`assets/images/logo/archive/`](assets/images/logo/archive/),
