@@ -127,9 +127,10 @@ variant in its own folder, `assets/images/logo/variants/<name>/`, with a
 finds every folder there, so a new variant needs only its two masters. Today's
 icon is the variant `current`, and it stays the shipped icon until a pick is
 made. `npm run gen-icons -- --review --variant <name>` writes one variant's
-review images to `assets/screenshots/icon-legibility/<name>/`, `toolbar.png`
-(16, 32 and 48 px at actual size on a light and a dark toolbar) and `logo.png`
-(both 512 px README logos). `npm run icon-review` rebuilds them for every
+two review images to `assets/screenshots/icon-legibility/<name>/`. Its
+`toolbar.png` shows the 16, 32 and 48 px icons at actual size on a light and a
+dark toolbar, then the 16 px icon magnified, and its `logo.png` shows both
+512 px README logos. `npm run icon-review` rebuilds them for every
 variant, along with `overview.png`. TODO: once a variant is picked, ship it and
 drop this paragraph, the other variants and their review images.
 
