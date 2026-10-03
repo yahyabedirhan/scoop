@@ -171,11 +171,12 @@ describe("extension icons", () => {
   });
 
   // Spec 06's mark is the spoon-pointer alone, a tall shape, so its size is
-  // its height. It spans 0.56 of the tile at 16 px and 0.63 at 128 px.
-  test.each(["16", "32", "48", "128"])("the %s px icon's mark spans more than half of its tile's height", (size) => {
+  // its height. With its padding halved in 0.0.10 it spans 0.75 of the tile at
+  // 16 px and 0.80 at 128 px, where 0.0.9's spanned 0.56 and 0.63.
+  test.each(["16", "32", "48", "128"])("the %s px icon's mark spans more than 0.7 of its tile's height", (size) => {
     const { isMark } = iconColourway();
     const { mark, tile } = markAndTile(readPng(manifest.icons[size]), isMark);
-    expect((mark.bottom - mark.top + 1) / (tile.bottom - tile.top + 1)).toBeGreaterThan(0.55);
+    expect((mark.bottom - mark.top + 1) / (tile.bottom - tile.top + 1)).toBeGreaterThan(0.7);
   });
 
   // The mark used to sit off to one side of its tile. Antialiasing can shift

@@ -46,3 +46,10 @@ The other icon and logo tests from spec 05 still apply.
 ## Outcome
 
 Released in 0.0.9 on 2026-10-03.
+
+In 0.0.10 the maintainer halved the padding above and below the mark, from 48
+to 24 of the tile's 256 units, so the mark grew by 30% to 208 units tall and
+132 wide. The padding at the sides went from 77 to 62 units, since halving it
+too would make the mark taller than the tile. The mark spans 0.75 of the
+tile's height at 16 px and 0.80 at 128 px, and the icon tests require more
+than 0.7.
