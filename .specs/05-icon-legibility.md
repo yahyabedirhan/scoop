@@ -130,12 +130,14 @@ there and picks one, and the same PR then ships the pick.
 Added 2026-10-03. It records the maintainer's pick on PR #36 and overrides the
 sections above where they disagree.
 
-- **Pick.** `scale-up` ships as the extension icons and both README logos, and
-  the generator's `SHIPPED` names it. Its masters stay in
-  `assets/images/logo/variants/scale-up/`. The masters of the icon before this
-  spec stay at `assets/images/logo/scoop.svg` and `scoop-16.svg` as the
-  variant `current`, so the review images can still show it beside the
-  shipped one.
+- **Pick.** `scale-up` ships as the extension icons and both README logos.
+  Once it shipped, its masters moved to `assets/images/logo/scoop.svg` and
+  `scoop-16.svg`, replacing the masters of the icon before this spec, and the
+  generator went back to spec 04's shape of one pair of masters. The variant
+  folders, `SHIPPED`, `--variant` and the comparison variant `current` only
+  served the pick and are gone. The masters' viewBox is the whole tile, so
+  they alone decide how much of it the mark fills. Every shipped PNG stayed
+  byte-identical through the move.
 - **Archive.** `tight-diagonal`, `spoon-led`, `heavy` and `compact-glyph`
   leave the tree with their masters and review images. Each is kept as a
   512 px render of its README logo on the green tile in
@@ -161,9 +163,10 @@ sections above where they disagree.
   than half. The icon before this spec covered 0.47 at 16 px and 0.32 at 48
   and 128 px. At 32 px it already drew its mark as large as Scale-up does, so
   that size is not checked.
-- **Review images.** `current` and `scale-up` keep their review images in
-  `assets/screenshots/icon-legibility/`. Each `toolbar.png` now shows the 16,
-  32 and 48 px icons on light and dark toolbars in both colourways, with the
-  shipped one marked, and `overview.png` has a row per variant and colourway.
+- **Review images.** During review, `npm run icon-review` wrote toolbar and
+  README-logo images for `current` and every prototype to
+  `assets/screenshots/icon-legibility/`, in both colourways. They served the
+  pick, so they and the script left the tree after it shipped. They remain in
+  git history at `b1de1b5`.
 - **Release.** A new patch entry under Unreleased in the changelog. The version
   stays `0.0.7`.
