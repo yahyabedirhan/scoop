@@ -95,8 +95,8 @@ The extension stays installed across restarts as long as the folder stays put.
 | `npm run dev` | The same build in watch mode. |
 | `npm run typecheck` | `tsc --noEmit` in strict mode. |
 | `npm test` | Run the test suite with Vitest (jsdom, with the icon-file suite in Node). |
-| `npm run gen-icons` | Regenerate the toolbar and extension icons at 16, 32, 48 and 128 px, the spoon-pointer mark in pistachio on a white tile, plus the two 512 px README logos in `assets/images/logo/`, `scoop.png` in cream on a pistachio tile and `scoop-on-white.png` in pistachio on a white tile. All are drawn from the SVG masters in `assets/images/logo/` (`tools/gen-icons.py`, standard library only). `npm run gen-icons -- --variant <name>` writes them from a prototype variant instead, to try it in Chrome. Run `npm run gen-icons` again to restore them (see [Logo](#logo)). |
-| `npm run icon-review` | Rebuild the icon prototypes' review images in `assets/screenshots/icon-legibility/`, two per variant and `overview.png` of them all beside today's icon. |
+| `npm run gen-icons` | Regenerate the toolbar and extension icons at 16, 32, 48 and 128 px, the spoon-pointer mark in cream on a pistachio tile, plus the two 512 px README logos in `assets/images/logo/`, `scoop.png` in cream on a pistachio tile and `scoop-on-white.png` in pistachio on a white tile. All are drawn from the shipped variant's SVG masters (`tools/gen-icons.py`, standard library only). `npm run gen-icons -- --variant <name>` writes them from another variant instead, to try it in Chrome. Run `npm run gen-icons` again to restore them (see [Logo](#logo)). |
+| `npm run icon-review` | Rebuild the icon review images in `assets/screenshots/icon-legibility/`, two per variant and `overview.png` of the shipped icon beside the one before it. |
 
 The source is TypeScript under `src/`, built by Vite. `dist/` is generated and
 gitignored. `demo.html` is a manual test page with nested lists, links, and
@@ -112,29 +112,29 @@ Scoop's mark is a spoon drawn as a mouse pointer. Its bowl is the pointer's
 arrowhead and carries a block taken from the corner of a page beside it, so
 pointing at part of a page lifts exactly that piece out.
 
-The mark is drawn once, in black, as
-[`assets/images/logo/scoop.svg`](assets/images/logo/scoop.svg), with
-`scoop-16.svg` beside it, the same mark with heavier strokes for the 16 px
-icon. `npm run gen-icons` sets the mark on a squircle tile in two colourways,
-shown side by side above. One is cream on a pistachio tile (`scoop.png`). The
-other is pistachio (`#5f9653`) on a white tile with a hairline edge
-(`scoop-on-white.png`), and the extension icons use it, so the toolbar shows a
-white tile on light and dark toolbars alike. Edit the masters, not the PNGs.
+The shipped mark, `scale-up`, is drawn once, in black, as
+[`assets/images/logo/variants/scale-up/scoop.svg`](assets/images/logo/variants/scale-up/scoop.svg),
+with `scoop-16.svg` beside it, a simpler and bolder cut for the 16 px icon.
+Their viewBox is the whole tile, so the masters alone decide how much of it the
+mark fills. `npm run gen-icons` sets the mark on a squircle tile in two
+colourways, shown side by side above. One is cream on a pistachio tile
+(`scoop.png`). The other is pistachio (`#5f9653`) on a white tile with a
+hairline edge (`scoop-on-white.png`). The extension icons use the pistachio
+tile, so the toolbar shows a green tile on light and dark toolbars alike.
+`ICON_TILE` in `tools/gen-icons.py` switches them to the white tile; change it
+and run `npm run gen-icons`. Edit the masters, not the PNGs.
 
-Prototypes of a more legible mark are under review (spec 05). Each is a
-variant in its own folder, `assets/images/logo/variants/<name>/`, with a
-`scoop.svg` and `scoop-16.svg` whose viewBox is the whole tile. The generator
-finds every folder there, so a new variant needs only its two masters. Today's
-icon is the variant `current`, and it stays the shipped icon until a pick is
-made. `npm run gen-icons -- --review --variant <name>` writes one variant's
-two review images to `assets/screenshots/icon-legibility/<name>/`. Its
+The icon before spec 05 keeps its masters at `assets/images/logo/scoop.svg`
+and `scoop-16.svg` as the variant `current`, for comparison.
+`npm run icon-review` writes review images for `current` and every folder
+under `assets/images/logo/variants/` to
+`assets/screenshots/icon-legibility/<name>/`, along with `overview.png`. Each
 `toolbar.png` shows the 16, 32 and 48 px icons at actual size on a light and a
-dark toolbar, then the 16 px icon magnified, and its `logo.png` shows both
-512 px README logos. `npm run icon-review` rebuilds them for every
-variant, along with `overview.png`. TODO: once a variant is picked, ship it and
-drop this paragraph, the other variants and their review images.
+dark toolbar, then the 16 px icon magnified, once per colourway, and each
+`logo.png` shows both 512 px README logos.
 
-Earlier icons and concepts, among them the former `pointer` icon, are kept as
+Earlier icons and concepts, among them the former `pointer` icon and the four
+spec 05 prototypes that were not picked, are kept as
 512 px renders in [`assets/images/logo/archive/`](assets/images/logo/archive/),
 which the generator never touches.
 

@@ -76,6 +76,39 @@ const isWhite = ([r, g, b, a]: number[]) => a === 255 && Math.min(r, g, b) >= 0x
 /** Whether an [r, g, b, a] pixel is the green mark: opaque, with green well above red and blue. */
 const isGreen = ([r, g, b, a]: number[]) => a === 255 && g - r > 40 && g - b > 40;
 
+/**
+ * The extension icons' colourway, read from the shipped 128 px icon rather
+ * than assumed, so switching it in the generator needs no change here. Its
+ * tile is the colour most of its opaque pixels have, and the mark is drawn in
+ * the other one: cream, which isWhite also matches, on green, or green on white.
+ */
+function iconColourway() {
+  const tile = pixelRows(readPng(manifest.icons["128"])).flat().filter(([, , , a]) => a === 255);
+  const white = tile.filter(isWhite).length > tile.length / 2;
+  return white
+    ? { name: "the green mark on a white tile", isTile: isWhite, isMark: isGreen }
+    : { name: "the cream mark on a green tile", isTile: isGreen, isMark: isWhite };
+}
+
+/** The mark's bounding box as a share of the tile's, both measured in whole pixels of the PNG. */
+function markShare(png: Png, isMark: (pixel: number[]) => boolean): number {
+  const rows = pixelRows(png);
+  const area = (hit: (pixel: number[]) => boolean) => {
+    const xs: number[] = [];
+    const ys: number[] = [];
+    rows.forEach((row, y) =>
+      row.forEach((pixel, x) => {
+        if (hit(pixel)) {
+          xs.push(x);
+          ys.push(y);
+        }
+      }),
+    );
+    return (Math.max(...xs) - Math.min(...xs) + 1) * (Math.max(...ys) - Math.min(...ys) + 1);
+  };
+  return area(isMark) / area(([, , , a]) => a > 0);
+}
+
 describe("extension icons", () => {
   const declared = [
     ...Object.entries(manifest.icons).map(([size, path]) => ["icons", size, path]),
@@ -121,11 +154,21 @@ describe("extension icons", () => {
     expect([rows[0][0], rows[0][last], rows[last][0], rows[last][last]]).toEqual([0, 0, 0, 0]);
   });
 
-  test.each(declared)("%s %s px (%s) is the green mark on a white tile", (_where, _size, path) => {
+  test.each(declared)("%s %s px (%s) is in the 128 px icon's colourway, a tile of one colour and a mark of the other", (_where, _size, path) => {
+    const { name, isTile, isMark } = iconColourway();
     const pixels = pixelRows(readPng(path)).flat();
     const tile = pixels.filter(([, , , a]) => a === 255);
-    expect(tile.filter(isWhite).length).toBeGreaterThan(tile.length / 2);
-    expect(pixels.some(isGreen)).toBe(true);
+    expect(tile.filter(isTile).length, name).toBeGreaterThan(tile.length / 2);
+    expect(pixels.some(isMark), name).toBe(true);
+  });
+
+  // The icon before spec 05 drew its mark's bounding box over about a third of
+  // the tile at 48 and 128 px (0.32) and under half at 16 px (0.47), and
+  // Scale-up over more than half at each. At 32 px the old icon already drew
+  // its mark as large, so that size cannot tell them apart and is left out.
+  test.each(["16", "48", "128"])("the %s px icon's mark spans more than half of its tile, not the old icon's smaller share", (size) => {
+    const { isMark } = iconColourway();
+    expect(markShare(readPng(manifest.icons[size]), isMark)).toBeGreaterThan(0.5);
   });
 });
 
@@ -161,10 +204,16 @@ describe("logo folder", () => {
 });
 
 describe("icon variants", () => {
-  // Prototypes under review. Each folder is one variant the generator can
+  // The shipped variant. Each folder is one variant the generator can
   // draw, and `npm run icon-review` writes its review images to its own folder.
   const variants = readdirSync(new URL("assets/images/logo/variants/", ROOT)).filter((name) => !name.startsWith("."));
   const REVIEW = "assets/screenshots/icon-legibility";
+
+  test("only the shipped Scale-up is left, the other prototypes being archived", () => {
+    expect(variants).toEqual(["scale-up"]);
+    const reviewed = readdirSync(new URL(`${REVIEW}/`, ROOT)).filter((name) => !name.startsWith("."));
+    expect(reviewed.sort()).toEqual(["current", "overview.png", "scale-up"]);
+  });
 
   test.each(variants)("%s has a full master and a 16 px cut", (name) => {
     const files = readdirSync(new URL(`assets/images/logo/variants/${name}/`, ROOT)).filter((f) => !f.startsWith("."));
@@ -186,7 +235,7 @@ describe("archived icons", () => {
   // Rejected figures kept as a record. The generator never writes here.
   const archived = readdirSync(new URL("assets/images/logo/archive/", ROOT)).filter((name) => !name.startsWith("."));
 
-  test("the rejected icons and concepts, including the former pointer icon, are archived", () => {
+  test("the rejected icons and concepts, including the former pointer icon and spec 05's other four prototypes, are archived", () => {
     expect(archived.sort()).toEqual([
       "scoop-ball-terminal.png",
       "scoop-ball.png",
@@ -197,9 +246,11 @@ describe("archived icons", () => {
       "scoop-clipboard-bite.png",
       "scoop-clipboard-scoop.png",
       "scoop-clipboard.png",
+      "scoop-compact-glyph.png",
       "scoop-cone-cursor.png",
       "scoop-cradle.png",
       "scoop-cursor-scoop.png",
+      "scoop-heavy.png",
       "scoop-ladle.png",
       "scoop-lifted-o.png",
       "scoop-marquee.png",
@@ -213,10 +264,12 @@ describe("archived icons", () => {
       "scoop-scoop-tub.png",
       "scoop-scooped-line.png",
       "scoop-scooper.png",
+      "scoop-spoon-led.png",
       "scoop-spoon-line.png",
       "scoop-spoon-pointer-ball.png",
       "scoop-spoon-pointer-line.png",
       "scoop-spoon-pointer-square.png",
+      "scoop-tight-diagonal.png",
       "scoop-window-cup.png",
     ]);
   });

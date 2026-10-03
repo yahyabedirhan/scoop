@@ -1,5 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" role="img" aria-labelledby="title">
-  <title id="title">Scoop logo, compact glyph variant, 16 px cut</title>
-  <path fill="#111" fill-rule="evenodd" d="M 16 64 A 48 48 0 0 1 64 16 L 192 16 A 48 48 0 0 1 240 64 L 240 112 L 112 112 L 112 240 L 64 240 A 48 48 0 0 1 16 192 Z M 48 48 L 208 48 L 208 64 L 48 64 Z M 48 80 L 176 80 L 176 96 L 48 96 Z M 48 144 L 80 144 L 80 160 L 48 160 Z M 48 176 L 80 176 L 80 192 L 48 192 Z"/>
-  <path fill="#111" fill-rule="evenodd" d="M 130.69 138.04 A 6 6 0 0 1 138.04 130.69 L 206.07 148.92 A 18 18 0 0 1 214.14 179.03 L 211.43 181.74 L 228.7 201.6 A 18 18 0 0 1 227.85 226.13 L 226.13 227.85 A 18 18 0 0 1 201.6 228.7 L 181.74 211.43 L 179.03 214.14 A 18 18 0 0 1 148.92 206.07 Z M 160 160 L 192 160 L 192 192 L 160 192 Z"/>
-</svg>

@@ -1,6 +1,6 @@
 # 05 - Icon Legibility
 
-Status: specified
+Status: implemented
 Last updated: 2026-10-03
 
 Builds on the spoon-pointer icon from spec 04 and the green-on-white tile from
@@ -124,3 +124,46 @@ there and picks one, and the same PR then ships the pick.
   are decided by the builder and listed in the PR description for review.
 - Spec 04 records the earlier review rounds and the motifs that were rejected.
   None of them should come back.
+
+## Outcome
+
+Added 2026-10-03. It records the maintainer's pick on PR #36 and overrides the
+sections above where they disagree.
+
+- **Pick.** `scale-up` ships as the extension icons and both README logos, and
+  the generator's `SHIPPED` names it. Its masters stay in
+  `assets/images/logo/variants/scale-up/`. The masters of the icon before this
+  spec stay at `assets/images/logo/scoop.svg` and `scoop-16.svg` as the
+  variant `current`, so the review images can still show it beside the
+  shipped one.
+- **Archive.** `tight-diagonal`, `spoon-led`, `heavy` and `compact-glyph`
+  leave the tree with their masters and review images. Each is kept as a
+  512 px render of its README logo on the green tile in
+  `assets/images/logo/archive/`.
+- **Small cut redrawn.** The maintainer found Scale-up's pixel-stepped 16 px
+  cut weird when magnified and preferred the softer look of the icon before
+  this spec. The cut is redrawn in that style. It is smooth and antialiased,
+  with an outlined page whose notch has a rounded inner corner, and a solid
+  pointer. It keeps the carried piece as a rounded square turned to the
+  spoon's axis and knocked out of the bowl, as in the full master. Its mark
+  spans about 209 by 227 units of the 256 unit tile, against about 180 by 206
+  for the 16 px cut before this spec.
+- **Colourway changed.** At the maintainer's request the extension icons are
+  now white on green, the cream mark on the pistachio tile of the README's
+  green logo, instead of green on white. The colourways were out of scope
+  above, and this changed at review. The generator's `ICON_TILE` is the one
+  switch: setting it to `WHITE_TILE` and re-running `npm run gen-icons`
+  restores green on white. The icon tests read the colourway from the shipped
+  128 px icon, so they pass for either. Chrome's transparent margin at 48 and
+  128 px is unchanged.
+- **Size test.** The icon tests measure the mark's bounding box against the
+  tile in the shipped 16, 48 and 128 px icons and require it to cover more
+  than half. The icon before this spec covered 0.47 at 16 px and 0.32 at 48
+  and 128 px. At 32 px it already drew its mark as large as Scale-up does, so
+  that size is not checked.
+- **Review images.** `current` and `scale-up` keep their review images in
+  `assets/screenshots/icon-legibility/`. Each `toolbar.png` now shows the 16,
+  32 and 48 px icons on light and dark toolbars in both colourways, with the
+  shipped one marked, and `overview.png` has a row per variant and colourway.
+- **Release.** A new patch entry under Unreleased in the changelog. The version
+  stays `0.0.7`.

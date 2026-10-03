@@ -14,18 +14,25 @@ milestones. `0.1.0` will be the first version considered ready to use.
 - A green-on-white colourway of the logo, the mark in pistachio on a white
   squircle tile, at `assets/images/logo/scoop-on-white.png`. The `README`
   header shows it beside the white-on-green logo.
-- Icon prototypes for review. `npm run gen-icons -- --variant <name>` draws a
-  variant from its own masters in `assets/images/logo/variants/<name>/`, and
-  `npm run icon-review` writes review images of every variant beside today's
-  icon to `assets/screenshots/icon-legibility/`. There are five variants,
-  `scale-up`, `tight-diagonal`, `spoon-led`, `heavy` and `compact-glyph`.
-  Each redraws today's mark to fill most of the tile and gives the 16 px cut
-  back its carried piece. The shipped icon does not change.
+- Icon variants. `npm run gen-icons -- --variant <name>` draws a variant from
+  its own masters in `assets/images/logo/variants/<name>/`, and
+  `npm run icon-review` writes review images of each variant beside the icon
+  before spec 05 to `assets/screenshots/icon-legibility/`, in both colourways.
+- The four icon prototypes that were not picked, `tight-diagonal`,
+  `spoon-led`, `heavy` and `compact-glyph`, are kept as 512 px renders in
+  `assets/images/logo/archive/`.
 
 ### Changed
-- The extension icon is the green-on-white logo instead of the bare pistachio
-  mark on a transparent background. At 16 and 32 px the white tile fills the
-  canvas and the mark is drawn larger on it.
+- The extension icon is a squircle tile instead of the bare pistachio mark on
+  a transparent background. At 16 and 32 px the tile fills the canvas and the
+  mark is drawn larger on it.
+- The icon and both README logos are the `scale-up` mark, the spoon-pointer
+  redrawn to fill most of its tile, so it reads at toolbar size. Its 16 px cut
+  is smooth like the one before and keeps the block carried in the spoon's
+  bowl, which the old 16 px cut dropped.
+- The extension icon is white on green, the cream mark on the pistachio tile
+  of the README's green logo. `ICON_TILE` in `tools/gen-icons.py` switches it
+  back to green on white.
 
 ## [0.0.7] - 2026-10-02
 
