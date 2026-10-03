@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Scoop promo tile</title>
+  <!-- The store's promo tiles, rendered at the window size render.mjs gives:
+       the 440x280 small tile (required, laid out at 880x560) or the 1400x560
+       marquee (optional). Sizes are in vh so one layout serves both. -->
+  <style>
+    html, body { margin: 0; width: 100vw; height: 100vh; overflow: hidden; }
+    body { display: flex; align-items: center; justify-content: center; gap: 7vh; background: linear-gradient(#6da361, #557f4b); color: #fbf6ea; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    img { width: 46vh; height: 46vh; }
+    h1 { margin: 0; font-size: 22vh; line-height: 1; font-weight: 700; letter-spacing: -0.02em; }
+    p { margin: 3vh 0 0; font-size: 7.2vh; line-height: 1.25; opacity: 0.92; }
+    body.small { flex-direction: column; gap: 4vh; text-align: center; }
+    body.small img { width: 40vh; height: 40vh; }
+    body.small h1 { font-size: 16vh; }
+    body.small p { margin-top: 2vh; font-size: 6.4vh; }
+  </style>
+</head>
+<body>
+  <img src="../../assets/images/logo/scoop-on-white.png" alt="" />
+  <div>
+    <h1>Scoop</h1>
+    <p>Copy any element as HTML, text or Markdown</p>
+  </div>
+  <script>
+    if (innerWidth < 1000) document.body.classList.add("small");
+  </script>
+</body>
+</html>

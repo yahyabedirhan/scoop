@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Pistachio gelato at home</title>
+  <!-- The page a store screenshot shows Scoop running on. The built
+       content.css and content.js are the real extension, driven by driver.js
+       through a stub of the chrome.* APIs. -->
+  <link rel="stylesheet" href="../../dist/content.css" />
+  <style>
+    body { margin: 0; font: 16px/1.6 Georgia, "Times New Roman", serif; color: #2b2b2b; background: #fdfcf8; }
+    header { display: flex; align-items: center; gap: 12px; padding: 14px 40px; border-bottom: 1px solid #ece8dc; font: 600 15px/1 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    header nav { margin-left: auto; display: flex; gap: 20px; font-weight: 400; color: #6b6b6b; }
+    main { display: grid; grid-template-columns: 1fr 260px; gap: 40px; max-width: 920px; margin: 28px auto; padding: 0 40px; }
+    h1 { font-size: 34px; line-height: 1.15; margin: 0 0 8px; }
+    .byline { color: #7a7a7a; font-size: 14px; margin: 0 0 18px; }
+    h2 { font-size: 20px; margin: 22px 0 18px; }
+    p { margin: 0 0 12px; }
+    ol { padding-left: 22px; margin: 0; }
+    li { margin: 0 0 6px; }
+    aside .card { background: #f1f6ee; border: 1px solid #d9e6d4; border-radius: 10px; padding: 16px 18px; font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    aside h3 { margin: 0 0 8px; font-size: 15px; }
+    aside ul { margin: 0; padding-left: 18px; }
+    aside li { margin: 0 0 4px; }
+  </style>
+</head>
+<body>
+  <header>
+    <span>The Weekend Kitchen</span>
+    <nav><span>Recipes</span><span>Techniques</span><span>About</span></nav>
+  </header>
+  <main>
+    <article>
+      <h1>Pistachio gelato at home</h1>
+      <p class="byline">A weekend recipe · 20 minutes of work, one night of waiting</p>
+      <p id="intro">Good gelato needs less air and more flavour than ice cream. Toast the
+        pistachios lightly, steep them in warm milk, and let the base rest overnight
+        so it churns smooth and dense.</p>
+      <h2>Method</h2>
+      <ol id="method">
+        <li>Toast <strong>150 g pistachios</strong> for 6 minutes, then grind them fine.</li>
+        <li>Warm the milk and cream, stir in the pistachios, and steep for 30 minutes.</li>
+        <li>Whisk the yolks with the sugar, temper them with the warm milk, and cook to 82 °C.</li>
+        <li>Strain, chill overnight, then churn until it holds soft peaks.</li>
+      </ol>
+    </article>
+    <aside>
+      <div class="card" id="ingredients">
+        <h3>Ingredients</h3>
+        <ul>
+          <li>500 ml whole milk</li>
+          <li>150 ml double cream</li>
+          <li>150 g shelled pistachios</li>
+          <li>4 egg yolks</li>
+          <li>110 g sugar</li>
+        </ul>
+      </div>
+    </aside>
+  </main>
+  <script src="driver.js"></script>
+  <script src="../../dist/content.js"></script>
+  <script>window.scoopShot();</script>
+</body>
+</html>
