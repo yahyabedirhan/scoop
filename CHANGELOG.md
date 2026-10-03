@@ -5,10 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/2.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-Scoop has not been released yet. The `0.0.x` entries below are development
-milestones. `0.1.0` will be the first version considered ready to use.
+`0.1.0` is the first version released on the Chrome Web Store. The `0.0.x`
+entries below are development milestones.
 
 ## [Unreleased]
+
+## [0.1.0] - 2026-10-03
+
+### Added
+- `npm run package` builds the extension and zips it into
+  `release/scoop-<version>.zip`, ready to upload to the Chrome Web Store.
+- `npm run store-assets` renders the store's promo tiles and screenshots into
+  `assets/store/` with headless Chrome, running the real overlay on a sample
+  page.
+- A privacy policy, `PRIVACY.md`, stating that Scoop collects no data.
+- `docs/store-listing.md`, the text for every Chrome Web Store dashboard field
+  and the steps to submit.
+
+### Changed
+- The extension's description names the four copy formats, since it is the
+  summary shown in the Chrome Web Store.
 
 ## [0.0.10] - 2026-10-03
 
