@@ -1,0 +1,126 @@
+# 05 - Icon Legibility
+
+Status: specified
+Last updated: 2026-10-03
+
+Builds on the spoon-pointer icon from spec 04 and the green-on-white tile from
+`feat: ship the icon as green on a white tile`. Covers only the icon, the two
+README logos and their SVG masters. Inspect mode and copy modes do not change.
+
+## Problem Statement
+
+The maintainer likes the spoon-pointer concept, a spoon shaped like a mouse
+pointer carrying a block it has scooped out of a page's corner. In Chrome's
+toolbar, though, the icon is tiny. The mark fills only about the middle half of
+the white tile, so at 16 and 32 px the page, its missing corner and the block in
+the spoon's bowl cannot be told apart. A glance at the toolbar does not say
+"this scoops something out of a page". The current 16 px cut also drops the
+carried block altogether, which loses the meaning of the icon at the size where
+it is seen most.
+
+## Solution
+
+Redesign the mark, keeping the concept and its two actors, the spoon-pointer
+and the page it scoops from, so that the icon reads at toolbar size. This is a
+design job, not a pixel scale-up. The objects grow, move, and may be redrawn in
+a bolder, cartoon-like way so the action of scooping is obvious. Everything the
+mark means today must still be there at 16 px, the spoon, the page, and the
+piece taken from one and carried by the other.
+
+The small icon and the README logo are both redrawn and stay recognisably the
+same mark at a similar visual size. They may differ in detail. The small cut
+can be simpler and bolder to read at 16 px, and the README logo can be more
+balanced on its tile.
+
+The work is delivered as five prototypes in one PR. The maintainer reviews them
+there and picks one, and the same PR then ships the pick.
+
+## User Stories
+
+1. As a Scoop user, I want to recognise the toolbar icon at 16 px, so that I can find Scoop at a glance.
+2. As a Scoop user, I want to see that the icon is a spoon scooping something out of a page, so that the icon tells me what the extension does.
+3. As a Scoop user, I want the mark to fill its tile with a sensible margin, so that it does not look like a small sticker in an empty square.
+4. As a Scoop user on a dark toolbar, I want the icon to stay legible, so that the white tile and green mark still read against a dark background.
+5. As a Scoop user, I want the 16, 32, 48 and 128 px icons to look like one mark, so that the toolbar, the extensions page and the store listing agree.
+6. As a README reader, I want the logo to look like the toolbar icon, so that I connect the project page with the extension I installed.
+7. As a README reader, I want the logo to look balanced on its tile, so that the project page looks finished.
+8. As the maintainer, I want five distinct prototypes, so that I can choose between real alternatives instead of one guess.
+9. As the maintainer, I want every prototype shown at actual toolbar sizes on light and dark toolbars beside today's icon, so that I judge legibility where it matters.
+10. As the maintainer, I want every prototype also shown at README size on both colourways, so that I judge the logo too.
+11. As the maintainer, I want to review the prototypes in the PR, so that I do not need to check out the branch to compare them.
+12. As the maintainer, I want switching the shipped prototype to be a one-option change in the generator, so that my pick can ship without redrawing anything.
+13. As the maintainer, I want the rejected prototypes archived as renders after I pick, so that the record of what was tried survives.
+14. As the maintainer, I want the concept kept, the spoon-pointer and the scooped page, so that the icon I liked is improved rather than replaced.
+15. As a developer, I want the shape edited in SVG masters rather than in code, so that the masters stay the one place the mark is defined.
+16. As a developer, I want the icon tests to keep checking what ships, so that a regenerated icon cannot silently break the manifest's sizes, colours or margins.
+
+## Implementation Decisions
+
+- **Use the logo-design skill.** The redesign follows the user-level
+  `logo-design` skill, including its small-size, one-colour and reversed tests
+  and its audit scripts. Its 16 px test is the bar every prototype must clear.
+- **Concept and actors stay.** Each prototype keeps a spoon shaped like a mouse
+  pointer, a page with a piece missing from it, and that piece carried in the
+  spoon's bowl. Proportions, positions, stroke weights, gaps and the drawing
+  style may change. A bolder, cartoon-like treatment is welcome where it helps
+  the mark read.
+- **Five directions.** The maintainer agreed to these as the five prototypes.
+  Each takes the redesign brief above further in its own way, so the agent may
+  adapt the details as the design calls for.
+  1. **Scale-up.** Today's layout, enlarged so the mark fills most of the tile.
+  2. **Tight diagonal.** Page and spoon pulled together along the diagonal with
+     a smaller gap, so both can grow.
+  3. **Spoon-led.** A larger spoon and a smaller page, so the scooping action
+     dominates.
+  4. **Heavy.** Bold, thick strokes and an enlarged notch and carried piece.
+  5. **Compact glyph.** The spoon tucks into the page's notch, with only a
+     separation gap between them, so the mark reads as one compact shape.
+- **Two cuts per prototype, one mark.** Each prototype has a full master for
+  the README logos and the larger icons, and a small cut for the smallest
+  icons. The two cuts look like the same mark at a similar visual size. The
+  small cut may simplify, but it keeps the carried piece.
+- **Generator.** The existing icon generator keeps drawing every output from
+  the SVG masters under the same path-command rules. Each prototype is a
+  variant the generator can be told to draw, and the shipped variant is the
+  default. Colours, tile, colourways, sheen and Chrome's transparent margin at
+  48 and 128 px do not change.
+- **Review material.** The PR shows, for each prototype and for today's icon,
+  the 16, 32 and 48 px icons at actual size on a light and a dark toolbar, and
+  the 512 px README logo in both colourways. The images live in the repo so the
+  PR description can embed them.
+- **After the pick.** The picked variant becomes the default and is written as
+  the extension icons and both README logos. The other four are archived as
+  512 px renders beside the earlier rejected concepts, and their masters and
+  review images leave the tree. The spec, README, design doc and changelog
+  record the outcome.
+- **Release.** The change is a new patch entry in the changelog. Bumping the
+  version is part of the eventual release, not this PR, unless the maintainer
+  says otherwise at review.
+
+## Testing Decisions
+
+- A good test checks what ships, the icon files the manifest declares and the
+  README logos, not how the generator draws them. The existing icon test suite
+  is the seam and the prior art, and no new seam is needed.
+- Keep the existing checks for sizes, the white tile, the green mark and
+  Chrome's margin at 48 and 128 px.
+- Add a check that the mark fills more of the tile than it does today, so the
+  legibility gain cannot quietly regress. Measure it from the shipped PNGs, for
+  example as the green mark's bounding box against the tile.
+- Run `npm run typecheck` and `npm test` before calling the work done. Loading
+  the extension in Chrome is manual and cannot be verified by an agent, so the
+  PR says so.
+
+## Out of Scope
+
+- A new concept or motif. The spoon-pointer and the scooped page stay.
+- Changing the palette, the tile shape, the colourways or the `ON` badge.
+- Bumping the version or publishing a release.
+- Changes to inspect mode, copy modes or anything outside the icon and logos.
+
+## Further Notes
+
+- The maintainer will not answer questions while this is built. Open questions
+  are decided by the builder and listed in the PR description for review.
+- Spec 04 records the earlier review rounds and the motifs that were rejected.
+  None of them should come back.
