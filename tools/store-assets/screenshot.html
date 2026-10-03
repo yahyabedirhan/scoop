@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Scoop store screenshot</title>
+  <!-- A 1280x800 store screenshot: a caption band over sample.html with Scoop
+       running in it. The frame is zoomed 1.25x so the 11 px hover label reads
+       at store size. `?shot=N` picks the scene and its caption. -->
+  <style>
+    html, body { margin: 0; width: 1280px; height: 800px; overflow: hidden; background: #fff; }
+    .band { height: 80px; display: flex; align-items: center; gap: 16px; padding: 0 40px; background: linear-gradient(#6da361, #557f4b); color: #fbf6ea; font: 600 28px/1 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    .band img { width: 52px; height: 52px; }
+    iframe { display: block; border: 0; width: 1024px; height: 576px; zoom: 1.25; }
+  </style>
+</head>
+<body>
+  <div class="band"><img src="../../assets/images/logo/scoop-on-white.png" alt="" /><span id="caption"></span></div>
+  <iframe id="frame" title="Sample page"></iframe>
+  <script>
+    const CAPTIONS = {
+      1: "Point at any element to select it",
+      2: "Copy it as Markdown, plain text or HTML",
+      3: "One click puts it on your clipboard",
+    };
+    const shot = new URLSearchParams(location.search).get("shot") || "1";
+    document.getElementById("caption").textContent = CAPTIONS[shot];
+    document.getElementById("frame").src = "sample.html?shot=" + shot;
+  </script>
+</body>
+</html>
