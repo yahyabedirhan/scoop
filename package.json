@@ -10,7 +10,8 @@
     "dev": "npm run clean && (vite build --watch --mode content & vite build --watch --mode background & wait)",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "gen-icons": "python3 tools/gen-icons.py"
+    "gen-icons": "python3 tools/gen-icons.py",
+    "icon-review": "python3 tools/gen-icons.py --review"
   },
   "devDependencies": {
     "@types/chrome": "^0.0.270",
