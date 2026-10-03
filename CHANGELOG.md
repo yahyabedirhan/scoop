@@ -10,6 +10,8 @@ milestones. `0.1.0` will be the first version considered ready to use.
 
 ## [Unreleased]
 
+## [0.0.8] - 2026-10-03
+
 ### Added
 - A green-on-white colourway of the logo, the mark in pistachio on a white
   squircle tile, at `assets/images/logo/scoop-on-white.png`. The `README`

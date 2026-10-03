@@ -168,5 +168,5 @@ sections above where they disagree.
   `assets/screenshots/icon-legibility/`, in both colourways. They served the
   pick, so they and the script left the tree after it shipped. They remain in
   git history at `b1de1b5`.
-- **Release.** A new patch entry under Unreleased in the changelog. The version
-  stays `0.0.7`.
+- **Release.** Released as `0.0.8`, after the cleanup of the variant
+  machinery.
