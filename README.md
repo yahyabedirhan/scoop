@@ -10,8 +10,8 @@ whatever shape you need it: the full HTML, a cleaned-up version, plain text, or
 Markdown. Like an ice-cream scoop, it lifts out just the part you want. Scoop
 only ever writes to your clipboard and sends nothing anywhere.
 
-It is a local, unpacked Chrome extension. There is no store listing and no
-account.
+It is a Chrome extension with no account and no setup. See the
+[privacy policy](PRIVACY.md).
 
 ## Why
 
@@ -72,13 +72,21 @@ click.
 
 ## Install
 
+Install Scoop from the Chrome Web Store, then pin the icon from the
+puzzle-piece menu.
+
+TODO: link the Chrome Web Store listing once 0.1.0 is published.
+
+### From source
+
 1. Run `npm install`, then `npm run build`. This produces a `dist/` folder,
    which is the complete, self-contained extension.
 2. Open `chrome://extensions` and enable **Developer mode** (top right).
 3. Click **Load unpacked** and choose the `dist/` folder.
 4. Pin the icon from the puzzle-piece menu.
 
-The extension stays installed across restarts as long as the folder stays put.
+The unpacked extension stays installed across restarts as long as the folder
+stays put.
 
 ### After changing the code
 
@@ -95,6 +103,8 @@ The extension stays installed across restarts as long as the folder stays put.
 | `npm run dev` | The same build in watch mode. |
 | `npm run typecheck` | `tsc --noEmit` in strict mode. |
 | `npm test` | Run the test suite with Vitest (jsdom, with the icon-file suite in Node). |
+| `npm run package` | Build `dist/` and zip it into `release/scoop-<version>.zip`, the file uploaded to the Chrome Web Store. |
+| `npm run store-assets` | Build `dist/` and render the store's promo tiles and screenshots into `assets/store/` with headless Chrome (see [Releasing](#releasing)). |
 | `npm run gen-icons` | Regenerate the toolbar and extension icons at 16, 32, 48 and 128 px, the spoon-pointer mark in pistachio on a white tile, plus the two 512 px README logos in `assets/images/logo/`, `scoop.png` in cream on a pistachio tile and `scoop-on-white.png` in pistachio on a white tile. All are drawn from the one SVG master (`tools/gen-icons.py`, standard library only, see [Logo](#logo)). |
 
 The source is TypeScript under `src/`, built by Vite. `dist/` is generated and
@@ -104,6 +114,20 @@ buttons.
 - **[`docs/scoop-v01.md`](docs/scoop-v01.md)** is the full reference: how every
   piece works, the module layout, and the low-level design.
 - **[`CHANGELOG.md`](CHANGELOG.md)** is the version history.
+
+### Releasing
+
+Scoop is published on the Chrome Web Store.
+[`docs/store-listing.md`](docs/store-listing.md) holds every field the
+Developer Dashboard asks for and the steps to submit. For a new version, raise
+`version` in `manifest.json` and `package.json`, add a changelog entry, run
+`npm run package`, and upload the zip on the item's **Package** tab.
+
+The store images come from HTML sources in `tools/store-assets/`. The
+screenshots load the built `content.js` into a sample page through a stub of
+the `chrome.*` APIs, so they show Scoop's real overlay, label and toast. The
+script uses Chrome at its macOS path, and `CHROME` points it at another
+binary. Run `npm run store-assets` again after changing the overlay's look.
 
 ### Logo
 
