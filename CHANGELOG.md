@@ -10,6 +10,12 @@ milestones. `0.1.0` will be the first version considered ready to use.
 
 ## [Unreleased]
 
+## [0.0.10] - 2026-10-03
+
+### Changed
+- The mark is 30% larger on its tile. The padding above and below it is half
+  what it was, so it fills about four fifths of the tile's height.
+
 ## [0.0.9] - 2026-10-03
 
 ### Changed
