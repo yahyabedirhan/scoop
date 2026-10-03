@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate the Scoop extension icons (16/32/48/128) and README logo as RGBA PNGs.
+"""Generate the Scoop extension icons (16/32/48/128) and README logos as RGBA PNGs.
 
 The mark, `spoon-pointer`, is drawn once as a black SVG master at
 assets/images/logo/scoop.svg. A page outline is missing a softened block from
@@ -8,12 +8,13 @@ arrowhead, the flared handle its tail) carries that block in its bowl, turned
 to the spoon's axis. This script reads the master's paths and fills them, so
 the master is the one place the shape is edited.
 
-The extension icons are the mark in pistachio on a transparent canvas, a green
-that keeps 3:1 contrast on Chrome's light and dark toolbars. The 48 and 128 px
-icons keep Chrome's transparent margin; the 16 and 32 px icons crop to the mark
-so it fills the canvas. The 512 px README logo sets the mark in cream on a
-pistachio squircle tile with a soft vertical gradient and a white sheen, in the
-format of Shipyard's logo, with the 128 px icon's margin. Icons below
+The mark is set on a squircle tile with a soft vertical gradient, in the
+format of Shipyard's logo, in two colourways. The green tile carries the mark
+in cream under a white sheen. The white tile carries the mark in pistachio
+inside a hairline edge from 48 px up, so it keeps its outline on a white page. The extension
+icons use the white tile. The 48 and 128 px icons keep Chrome's transparent
+margin, and the 16 and 32 px tiles fill the canvas with the mark drawn larger
+on them. Both colourways are written at 512 px for the README. Icons below
 DETAIL_MIN px are drawn from a second master, scoop-16.svg, the same mark
 redrawn with heavier strokes and wider gaps so it holds at 16 px.
 
@@ -36,22 +37,30 @@ OUT_DIR = os.path.join(ROOT, "icons")
 LOGO_SIZE = 512
 LOGO_DIR = os.path.join(ROOT, "assets", "images", "logo")
 LOGO_PATH = os.path.join(LOGO_DIR, "scoop.png")
+LOGO_WHITE_PATH = os.path.join(LOGO_DIR, "scoop-on-white.png")
 MASTER_PATH = os.path.join(LOGO_DIR, "scoop.svg")
 SMALL_MASTER_PATH = os.path.join(LOGO_DIR, "scoop-16.svg")
 
 # Pistachio: Shipyard's khaki shifted to hue 140 in OKLCH (lightness +0.02,
-# chroma x0.95). The README figure is Shipyard's cream. The icon green sits
-# between the tile's two stops, the one shade with at least 3:1 contrast on
-# white, #F1F3F4, #35363A and #202124 toolbars.
+# chroma x0.95). The green tile's figure is Shipyard's cream. The white tile's
+# figure green sits between the green tile's two stops, and its bottom stop and
+# edge are a faint pistachio grey.
 TILE_TOP = (0x6D, 0xA3, 0x61)     # #6da361
 TILE_BOTTOM = (0x55, 0x7F, 0x4B)  # #557f4b
 CREAM = (0xFB, 0xF6, 0xEA)        # #FBF6EA
 ICON_GREEN = (0x5F, 0x96, 0x53)   # #5f9653
 WHITE = (255, 255, 255)
+WHITE_BOTTOM = (0xEE, 0xF2, 0xEC)  # #eef2ec
+WHITE_EDGE = (0xD3, 0xDB, 0xD0)   # #d3dbd0
+
+# One colourway: tile gradient stops, figure colour, sheen opacity, edge colour.
+GREEN_TILE = (TILE_TOP, TILE_BOTTOM, CREAM, 0.14, None)
+WHITE_TILE = (WHITE, WHITE_BOTTOM, ICON_GREEN, 0.0, WHITE_EDGE)
+ICON_TILE = WHITE_TILE        # the colourway the extension icons use
 
 SQUIRCLE_N = 5               # superellipse exponent of the tile
-SHEEN_ALPHA = 0.14           # white at the tile's top, fading out at its middle
 FIGURE_SPAN = 0.70           # the master's 256 box as a share of the tile
+SMALL_FIGURE_SPAN = 0.92     # the same below 48 px, where the mark needs every pixel
 MARGIN = {48: 0.06, 128: 0.125, LOGO_SIZE: 0.125}  # transparent margin per side; 0 elsewhere
 ARC_STEP = math.radians(3)   # arcs are flattened into chords of at most this angle
 
@@ -148,12 +157,6 @@ def load_master(path=MASTER_PATH):
     return box, [_parse_path(d) for d in re.findall(r'<path\b[^>]*\bd="([^"]+)"', src)]
 
 
-def _bounds(paths):
-    xs = [p[0] for edges in paths for edge in edges for p in edge]
-    ys = [p[1] for edges in paths for edge in edges for p in edge]
-    return min(xs), min(ys), max(xs), max(ys)
-
-
 # ---------- rasterising ----------
 
 def _spans(edges, y):
@@ -191,28 +194,8 @@ def _mix(base, over, alpha):
     return tuple(b + (o - b) * alpha for b, o in zip(base, over))
 
 
-def render_icon(paths, size):
-    """RGBA bytes of the mark in ICON_GREEN on transparent, cropped to the mark inside the margin."""
-    bx0, by0, bx1, by1 = _bounds(paths)
-    margin = MARGIN.get(size, 0.0) * size
-    room = size - 2 * margin
-    k = room / max(bx1 - bx0, by1 - by0)
-    ox = margin + (room - (bx1 - bx0) * k) / 2 - bx0 * k
-    oy = margin + (room - (by1 - by0) * k) / 2 - by0 * k
-    cover = mark_coverage(paths, size, _supersample(size), ox, oy, k)
-    return b"".join(bytes((*ICON_GREEN, round(255 * c))) for c in cover)
-
-
-def render_logo(paths, box, size=LOGO_SIZE):
-    """RGBA bytes of the mark in cream on the pistachio squircle tile."""
-    ss = _supersample(size)
-    margin = MARGIN[size]
-    half = 0.5 - margin                      # tile half-width, canvas units
-    t0 = margin * size
-    k = FIGURE_SPAN * 2 * half * size / box
-    off = t0 + (2 * half * size - box * k) / 2
-    figure = mark_coverage(paths, size, ss, off, off, k)
-
+def _squircle_coverage(size, ss, half):
+    """Per-pixel subsample count inside the centred squircle of half-width `half` canvas units."""
     hi = size * ss
     tile = [0] * (size * size)
     for sy in range(hi):
@@ -225,22 +208,45 @@ def render_logo(paths, box, size=LOGO_SIZE):
         base = (sy // ss) * size
         for sx in range(lo, up):
             tile[base + sx // ss] += 1
+    return tile
+
+
+def render_tile(paths, box, size, colourway):
+    """RGBA bytes of the mark on a squircle tile in `colourway`, inside the size's margin."""
+    top, bottom, ink, sheen, edge = colourway
+    ss = _supersample(size)
+    margin = MARGIN.get(size, 0.0)
+    half = 0.5 - margin                      # tile half-width, canvas units
+    t0 = margin * size
+    span = FIGURE_SPAN if size >= 48 else SMALL_FIGURE_SPAN
+    k = span * 2 * half * size / box
+    off = t0 + (2 * half * size - box * k) / 2
+    figure = mark_coverage(paths, size, ss, off, off, k)
+    tile = _squircle_coverage(size, ss, half)
+    # The edge is the ring between the tile and a squircle one hairline inside
+    # it. Below 48 px a 1 px ring would muddy the tile, so it is left off.
+    edge = edge if size >= 48 else None
+    inner = _squircle_coverage(size, ss, half - max(1, size / 256) / size) if edge else tile
 
     px = bytearray()
     n = ss * ss
     for y in range(size):
         t = min(max(((y + 0.5) / size - margin) / (2 * half), 0), 1)  # 0 at the tile's top
-        color = _mix(TILE_TOP, TILE_BOTTOM, t)
+        color = _mix(top, bottom, t)
         if t < 0.5:
-            color = _mix(color, WHITE, SHEEN_ALPHA * (1 - 2 * t))
+            color = _mix(color, WHITE, sheen * (1 - 2 * t))
         for x in range(size):
-            cover = tile[y * size + x] / n
+            i = y * size + x
+            cover = tile[i] / n
             if cover == 0:
                 px += bytes(4)
                 continue
+            c = color
+            if edge:
+                c = _mix(c, edge, (tile[i] - inner[i]) / tile[i])
             # The mark lies wholly inside the tile, so its share of the tile's
-            # samples is how much cream covers the pixel's tile colour.
-            c = _mix(color, CREAM, min(figure[y * size + x] / cover, 1))
+            # samples is how much of the figure colour covers the pixel.
+            c = _mix(c, ink, min(figure[i] / cover, 1))
             px += bytes((round(c[0]), round(c[1]), round(c[2]), round(255 * cover)))
     return bytes(px)
 
@@ -269,10 +275,11 @@ def main():
     os.makedirs(OUT_DIR, exist_ok=True)
     for s in SIZES:
         p = os.path.join(OUT_DIR, f"icon{s}.png")
-        write_png(p, s, render_icon(paths if s >= DETAIL_MIN else small, s))
+        write_png(p, s, render_tile(paths if s >= DETAIL_MIN else small, box, s, ICON_TILE))
         print("wrote", os.path.relpath(p))
-    write_png(LOGO_PATH, LOGO_SIZE, render_logo(paths, box))
-    print("wrote", os.path.relpath(LOGO_PATH))
+    for p, colourway in ((LOGO_PATH, GREEN_TILE), (LOGO_WHITE_PATH, WHITE_TILE)):
+        write_png(p, LOGO_SIZE, render_tile(paths, box, LOGO_SIZE, colourway))
+        print("wrote", os.path.relpath(p))
 
 
 if __name__ == "__main__":

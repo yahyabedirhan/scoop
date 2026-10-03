@@ -10,6 +10,16 @@ milestones. `0.1.0` will be the first version considered ready to use.
 
 ## [Unreleased]
 
+### Added
+- A green-on-white colourway of the logo, the mark in pistachio on a white
+  squircle tile, at `assets/images/logo/scoop-on-white.png`. The `README`
+  header shows it beside the white-on-green logo.
+
+### Changed
+- The extension icon is the green-on-white logo instead of the bare pistachio
+  mark on a transparent background. At 16 and 32 px the white tile fills the
+  canvas and the mark is drawn larger on it.
+
 ## [0.0.7] - 2026-10-02
 
 ### Added
