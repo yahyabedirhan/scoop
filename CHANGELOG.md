@@ -14,6 +14,12 @@ milestones. `0.1.0` will be the first version considered ready to use.
 - A green-on-white colourway of the logo, the mark in pistachio on a white
   squircle tile, at `assets/images/logo/scoop-on-white.png`. The `README`
   header shows it beside the white-on-green logo.
+- Icon prototypes for review. `npm run gen-icons -- --variant <name>` draws a
+  variant from its own masters in `assets/images/logo/variants/<name>/`, and
+  `npm run icon-review` writes review images of every variant beside today's
+  icon to `assets/screenshots/icon-legibility/`. The first variant,
+  `scale-up`, redraws today's mark to fill most of the tile and gives the
+  16 px cut back its carried piece. The shipped icon does not change.
 
 ### Changed
 - The extension icon is the green-on-white logo instead of the bare pistachio

@@ -154,9 +154,31 @@ describe("README logos", () => {
 describe("logo folder", () => {
   // The generator reads the two SVG masters and writes only the README logos
   // beside them, so no stale preview or concept is left behind.
-  test("holds the masters, the README logos and the archive only", () => {
+  test("holds the masters, the README logos, the archive and the variants only", () => {
     const files = readdirSync(new URL("assets/images/logo/", ROOT)).filter((name) => !name.startsWith("."));
-    expect(files.sort()).toEqual(["archive", "scoop-16.svg", "scoop-on-white.png", "scoop.png", "scoop.svg"]);
+    expect(files.sort()).toEqual(["archive", "scoop-16.svg", "scoop-on-white.png", "scoop.png", "scoop.svg", "variants"]);
+  });
+});
+
+describe("icon variants", () => {
+  // Prototypes under review. Each folder is one variant the generator can
+  // draw, and `npm run icon-review` writes its review images to its own folder.
+  const variants = readdirSync(new URL("assets/images/logo/variants/", ROOT)).filter((name) => !name.startsWith("."));
+  const REVIEW = "assets/screenshots/icon-legibility";
+
+  test.each(variants)("%s has a full master and a 16 px cut", (name) => {
+    const files = readdirSync(new URL(`assets/images/logo/variants/${name}/`, ROOT)).filter((f) => !f.startsWith("."));
+    expect(files.sort()).toEqual(["scoop-16.svg", "scoop.svg"]);
+  });
+
+  test.each(["current", ...variants])("%s has its toolbar and README-logo review images", (name) => {
+    readPng(`${REVIEW}/${name}/toolbar.png`);
+    const logo = readPng(`${REVIEW}/${name}/logo.png`);
+    expect([logo.width, logo.height]).toEqual([1024, 512]);
+  });
+
+  test("the overview sheet is narrow enough for a PR description to show it at actual size", () => {
+    expect(readPng(`${REVIEW}/overview.png`).width).toBeLessThanOrEqual(800);
   });
 });
 
