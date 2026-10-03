@@ -1,41 +1,46 @@
 #!/usr/bin/env python3
 """Generate the Scoop extension icons (16/32/48/128) and README logos as RGBA PNGs.
 
-The mark, `spoon-pointer`, is drawn once as a black SVG master at
-assets/images/logo/scoop.svg. A page outline is missing a softened block from
-its lower-right corner, and a spoon drawn as a mouse pointer (the bowl is the
-arrowhead, the flared handle its tail) carries that block in its bowl, turned
-to the spoon's axis. This script reads the master's paths and fills them, so
-the master is the one place the shape is edited.
+The mark, `spoon-pointer`, is drawn once as a black SVG master. A page outline
+is missing a softened block from its lower-right corner, and a spoon drawn as
+a mouse pointer (the bowl is the arrowhead, the flared handle its tail)
+carries that block in its bowl, turned to the spoon's axis. This script reads
+the master's paths and fills them, so the master is the one place the shape
+is edited.
 
 The mark is set on a squircle tile with a soft vertical gradient, in the
 format of Shipyard's logo, in two colourways. The green tile carries the mark
 in cream under a white sheen. The white tile carries the mark in pistachio
-inside a hairline edge from 48 px up, so it keeps its outline on a white page. The extension
-icons use the white tile. The 48 and 128 px icons keep Chrome's transparent
-margin, and the 16 and 32 px tiles fill the canvas with the mark drawn larger
-on them. Both colourways are written at 512 px for the README. Icons below
-DETAIL_MIN px are drawn from a second master, scoop-16.svg, the same mark
-redrawn with heavier strokes and wider gaps so it holds at 16 px.
+inside a hairline edge from 48 px up, so it keeps its outline on a white page.
+ICON_TILE picks the extension icons' colourway, the green tile, and setting it
+to WHITE_TILE and re-running switches them to green on white. The 48 and
+128 px icons keep Chrome's transparent margin, and the 16 and 32 px tiles fill
+the canvas with the mark drawn larger on them. Both colourways are written at
+512 px for the README. Icons below DETAIL_MIN px are drawn from a second
+master, scoop-16.svg, the same mark redrawn simpler and bolder so it holds at
+16 px.
 
-The master may use only absolute M, L, H, V, A and Z path commands, with each
+The masters may use only absolute M, L, H, V, A and Z path commands, with each
 path filled even-odd. Pure standard library, supersampled for clean edges, and
-deterministic. Re-run after editing the master or the colours. Rejected icons
+deterministic. Re-run after editing a master or the colours. Rejected icons
 are kept as PNGs under assets/images/logo/archive/, which this script never
 writes or deletes.
 
-Variants. The masters above are the variant `current`, today's icon, and
-SHIPPED names the variant written as the icons and README logos. Every folder
-under assets/images/logo/variants/ is another variant, named after the folder,
-with its own scoop.svg and scoop-16.svg. A variant's viewBox is the tile
-itself, so its masters alone decide how much of the tile the mark fills.
+Variants. SHIPPED names the variant written as the icons and README logos,
+`scale-up`. Every folder under assets/images/logo/variants/ is a variant,
+named after the folder, with its own scoop.svg and scoop-16.svg. A variant's
+viewBox is the tile itself, so its masters alone decide how much of the tile
+the mark fills. The masters at assets/images/logo/scoop.svg and scoop-16.svg
+are the variant `current`, the icon before spec 05, kept for comparison and
+drawn at the fixed spans below.
 `--variant NAME` draws that variant instead of SHIPPED. `--review` writes
 review images instead of the shipped files, into
 assets/screenshots/icon-legibility/<name>/. Its toolbar.png shows the 16, 32
 and 48 px icons at actual size on a light and a dark toolbar, then the 16 px
-icon magnified, and its logo.png shows both 512 px README logos. With
-`--variant` it writes only that variant's two images. Without it, it writes
-them for every variant and adds overview.png, one row per variant.
+icon magnified, once per colourway, the shipped one marked as such, and its
+logo.png shows both 512 px README logos. With `--variant` it writes only that
+variant's two images. Without it, it writes them for every variant and adds
+overview.png, one row per variant and colourway.
 """
 import argparse
 import math
@@ -54,10 +59,10 @@ LOGO_PATH = os.path.join(LOGO_DIR, "scoop.png")
 LOGO_WHITE_PATH = os.path.join(LOGO_DIR, "scoop-on-white.png")
 MASTER_PATH = os.path.join(LOGO_DIR, "scoop.svg")
 SMALL_MASTER_PATH = os.path.join(LOGO_DIR, "scoop-16.svg")
-VARIANT_DIR = os.path.join(LOGO_DIR, "variants")  # one folder of masters per prototype
+VARIANT_DIR = os.path.join(LOGO_DIR, "variants")  # one folder of masters per variant
 REVIEW_DIR = os.path.join(ROOT, "assets", "screenshots", "icon-legibility")
-CURRENT = "current"          # the variant drawn from the masters above, today's icon
-SHIPPED = CURRENT            # the variant written as the extension icons and README logos
+CURRENT = "current"          # the variant drawn from the masters above, the icon before spec 05
+SHIPPED = "scale-up"         # the variant written as the extension icons and README logos
 
 # Pistachio: Shipyard's khaki shifted to hue 140 in OKLCH (lightness +0.02,
 # chroma x0.95). The green tile's figure is Shipyard's cream. The white tile's
@@ -74,10 +79,12 @@ WHITE_EDGE = (0xD3, 0xDB, 0xD0)   # #d3dbd0
 # One colourway: tile gradient stops, figure colour, sheen opacity, edge colour.
 GREEN_TILE = (TILE_TOP, TILE_BOTTOM, CREAM, 0.14, None)
 WHITE_TILE = (WHITE, WHITE_BOTTOM, ICON_GREEN, 0.0, WHITE_EDGE)
-ICON_TILE = WHITE_TILE        # the colourway the extension icons use
+# The extension icons' colourway, the one switch between white on green
+# (GREEN_TILE) and green on white (WHITE_TILE). Re-run after changing it.
+ICON_TILE = GREEN_TILE
 
 SQUIRCLE_N = 5               # superellipse exponent of the tile
-FIGURE_SPAN = 0.70           # the master's 256 box as a share of the tile
+FIGURE_SPAN = 0.70           # `current`'s 256 box as a share of the tile
 SMALL_FIGURE_SPAN = 0.92     # the same below 48 px, where the mark needs every pixel
 MARGIN = {48: 0.06, 128: 0.125, LOGO_SIZE: 0.125}  # transparent margin per side; 0 elsewhere
 ARC_STEP = math.radians(3)   # arcs are flattened into chords of at most this angle
@@ -414,14 +421,28 @@ def _strip(sheet, icons, x, y, color):
     sheet.paste(icons[16], 16, x + GAP, y + GAP, ZOOM)
 
 
+COLOURWAYS = ((WHITE_TILE, "green on white"), (GREEN_TILE, "white on green"))
+
+
+def _label(variant, colourway, name):
+    """`name`, marked shipped when it is the shipped variant in the extension icons' colourway."""
+    return f"{name} shipped" if variant.name == SHIPPED and colourway is ICON_TILE else name
+
+
 def review(variant):
     """Write the variant's two review images, `toolbar.png` and `logo.png`, to its own folder."""
     folder = os.path.join(REVIEW_DIR, variant.name)
-    icons = {s: variant.icon(s) for s in TOOLBAR_SIZES}
-    sheet = Sheet(STRIP_WIDTH + 2 * GAP, 2 * GAP + TEXT_HEIGHT + 2 * STRIP + GAP, PAGE)
+    block = TEXT_HEIGHT + GAP // 2 + 2 * STRIP + GAP   # one colourway's label and two strips
+    sheet = Sheet(STRIP_WIDTH + 2 * GAP, 2 * GAP + TEXT_HEIGHT + len(COLOURWAYS) * block, PAGE)
     sheet.text(GAP, GAP, f"{variant.name} 16 32 48 px")
-    _strip(sheet, icons, GAP, 2 * GAP + TEXT_HEIGHT, LIGHT_TOOLBAR)
-    _strip(sheet, icons, GAP, 2 * GAP + TEXT_HEIGHT + STRIP, DARK_TOOLBAR)
+    y = 2 * GAP + TEXT_HEIGHT
+    for colourway, name in COLOURWAYS:
+        icons = {s: variant.icon(s, colourway) for s in TOOLBAR_SIZES}
+        sheet.text(GAP, y, _label(variant, colourway, name))
+        y += TEXT_HEIGHT + GAP // 2
+        _strip(sheet, icons, GAP, y, LIGHT_TOOLBAR)
+        _strip(sheet, icons, GAP, y + STRIP, DARK_TOOLBAR)
+        y += 2 * STRIP + GAP
     sheet.save(os.path.join(folder, "toolbar.png"))
 
     # Both README logos at 512 px, green tile then white tile.
@@ -432,24 +453,23 @@ def review(variant):
 
 
 def overview(variants):
-    """Write one sheet with a row per variant, showing its name, both toolbars and both README logos at 128 px.
+    """Write one sheet with a row per variant and colourway: its toolbars and its 128 px icon.
 
-    It is 800 px wide, narrow enough for a PR description to show it at actual size.
+    It is at most 800 px wide, narrow enough for a PR description to show it at actual size.
     """
-    row = TEXT_HEIGHT + GAP // 2 + 128 + GAP   # the logos are the tallest item in a row
-    sheet = Sheet(GAP + 2 * (STRIP_WIDTH + GAP) + 2 * 128 + GAP, GAP + row * len(variants), PAGE)
-    for i, variant in enumerate(variants):
+    row = TEXT_HEIGHT + GAP // 2 + 128 + GAP   # the 128 px icon is the tallest item in a row
+    rows = [(v, c, n) for v in variants for c, n in COLOURWAYS]
+    sheet = Sheet(GAP + 2 * (STRIP_WIDTH + GAP) + 128 + GAP, GAP + row * len(rows), PAGE)
+    for i, (variant, colourway, name) in enumerate(rows):
         y = GAP + i * row
-        icons = {s: variant.icon(s) for s in TOOLBAR_SIZES}
-        sheet.text(GAP, y, variant.name)
+        icons = {s: variant.icon(s, colourway) for s in TOOLBAR_SIZES}
+        sheet.text(GAP, y, f"{variant.name} {_label(variant, colourway, name)}")
         y += TEXT_HEIGHT + GAP // 2
         x = GAP
         for color in (LIGHT_TOOLBAR, DARK_TOOLBAR):
             _strip(sheet, icons, x, y + (128 - STRIP) // 2, color)
             x += STRIP_WIDTH + GAP
-        for colourway in (GREEN_TILE, WHITE_TILE):
-            sheet.paste(variant.icon(128, colourway), 128, x, y)
-            x += 128
+        sheet.paste(variant.icon(128, colourway), 128, x, y)
     sheet.save(os.path.join(REVIEW_DIR, "overview.png"))
 
 
