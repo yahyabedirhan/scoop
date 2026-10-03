@@ -42,3 +42,7 @@ the bowl. The spoon-pointer's silhouette is what carries the icon at that size.
 `test/icons.test.ts` checks that the mark spans more than half of its tile's
 height at every size and that it is centred on its tile to within one pixel.
 The other icon and logo tests from spec 05 still apply.
+
+## Outcome
+
+Released in 0.0.9 on 2026-10-03.

@@ -10,6 +10,8 @@ milestones. `0.1.0` will be the first version considered ready to use.
 
 ## [Unreleased]
 
+## [0.0.9] - 2026-10-03
+
 ### Changed
 - The icon and both README logos are the spoon-pointer alone, centred on its
   tile. The page outline beside it is gone, and the block in the spoon's bowl
