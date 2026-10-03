@@ -14,10 +14,6 @@ milestones. `0.1.0` will be the first version considered ready to use.
 - A green-on-white colourway of the logo, the mark in pistachio on a white
   squircle tile, at `assets/images/logo/scoop-on-white.png`. The `README`
   header shows it beside the white-on-green logo.
-- Icon variants. `npm run gen-icons -- --variant <name>` draws a variant from
-  its own masters in `assets/images/logo/variants/<name>/`, and
-  `npm run icon-review` writes review images of each variant beside the icon
-  before spec 05 to `assets/screenshots/icon-legibility/`, in both colourways.
 - The four icon prototypes that were not picked, `tight-diagonal`,
   `spoon-led`, `heavy` and `compact-glyph`, are kept as 512 px renders in
   `assets/images/logo/archive/`.

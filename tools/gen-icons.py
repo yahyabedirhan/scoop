@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 """Generate the Scoop extension icons (16/32/48/128) and README logos as RGBA PNGs.
 
-The mark, `spoon-pointer`, is drawn once as a black SVG master. A page outline
-is missing a softened block from its lower-right corner, and a spoon drawn as
-a mouse pointer (the bowl is the arrowhead, the flared handle its tail)
-carries that block in its bowl, turned to the spoon's axis. This script reads
-the master's paths and fills them, so the master is the one place the shape
-is edited.
+The mark, `spoon-pointer`, is drawn once as a black SVG master at
+assets/images/logo/scoop.svg. A page outline is missing a softened block from
+its lower-right corner, and a spoon drawn as a mouse pointer (the bowl is the
+arrowhead, the flared handle its tail) carries that block in its bowl, turned
+to the spoon's axis. This script reads the master's paths and fills them, so
+the master is the one place the shape is edited. The master's viewBox is the
+tile itself, so the master alone decides how much of the tile the mark fills.
 
 The mark is set on a squircle tile with a soft vertical gradient, in the
 format of Shipyard's logo, in two colourways. The green tile carries the mark
@@ -15,34 +16,17 @@ inside a hairline edge from 48 px up, so it keeps its outline on a white page.
 ICON_TILE picks the extension icons' colourway, the green tile, and setting it
 to WHITE_TILE and re-running switches them to green on white. The 48 and
 128 px icons keep Chrome's transparent margin, and the 16 and 32 px tiles fill
-the canvas with the mark drawn larger on them. Both colourways are written at
-512 px for the README. Icons below DETAIL_MIN px are drawn from a second
-master, scoop-16.svg, the same mark redrawn simpler and bolder so it holds at
-16 px.
+the canvas. Both colourways are written at 512 px for the README. Icons below
+DETAIL_MIN px are drawn from a second master, scoop-16.svg, the same mark
+redrawn simpler and bolder so it holds at 16 px. It shares the full master's
+viewBox.
 
 The masters may use only absolute M, L, H, V, A and Z path commands, with each
 path filled even-odd. Pure standard library, supersampled for clean edges, and
 deterministic. Re-run after editing a master or the colours. Rejected icons
 are kept as PNGs under assets/images/logo/archive/, which this script never
 writes or deletes.
-
-Variants. SHIPPED names the variant written as the icons and README logos,
-`scale-up`. Every folder under assets/images/logo/variants/ is a variant,
-named after the folder, with its own scoop.svg and scoop-16.svg. A variant's
-viewBox is the tile itself, so its masters alone decide how much of the tile
-the mark fills. The masters at assets/images/logo/scoop.svg and scoop-16.svg
-are the variant `current`, the icon before spec 05, kept for comparison and
-drawn at the fixed spans below.
-`--variant NAME` draws that variant instead of SHIPPED. `--review` writes
-review images instead of the shipped files, into
-assets/screenshots/icon-legibility/<name>/. Its toolbar.png shows the 16, 32
-and 48 px icons at actual size on a light and a dark toolbar, then the 16 px
-icon magnified, once per colourway, the shipped one marked as such, and its
-logo.png shows both 512 px README logos. With `--variant` it writes only that
-variant's two images. Without it, it writes them for every variant and adds
-overview.png, one row per variant and colourway.
 """
-import argparse
 import math
 import os
 import re
@@ -59,10 +43,6 @@ LOGO_PATH = os.path.join(LOGO_DIR, "scoop.png")
 LOGO_WHITE_PATH = os.path.join(LOGO_DIR, "scoop-on-white.png")
 MASTER_PATH = os.path.join(LOGO_DIR, "scoop.svg")
 SMALL_MASTER_PATH = os.path.join(LOGO_DIR, "scoop-16.svg")
-VARIANT_DIR = os.path.join(LOGO_DIR, "variants")  # one folder of masters per variant
-REVIEW_DIR = os.path.join(ROOT, "assets", "screenshots", "icon-legibility")
-CURRENT = "current"          # the variant drawn from the masters above, the icon before spec 05
-SHIPPED = "scale-up"         # the variant written as the extension icons and README logos
 
 # Pistachio: Shipyard's khaki shifted to hue 140 in OKLCH (lightness +0.02,
 # chroma x0.95). The green tile's figure is Shipyard's cream. The white tile's
@@ -84,8 +64,6 @@ WHITE_TILE = (WHITE, WHITE_BOTTOM, ICON_GREEN, 0.0, WHITE_EDGE)
 ICON_TILE = GREEN_TILE
 
 SQUIRCLE_N = 5               # superellipse exponent of the tile
-FIGURE_SPAN = 0.70           # `current`'s 256 box as a share of the tile
-SMALL_FIGURE_SPAN = 0.92     # the same below 48 px, where the mark needs every pixel
 MARGIN = {48: 0.06, 128: 0.125, LOGO_SIZE: 0.125}  # transparent margin per side; 0 elsewhere
 ARC_STEP = math.radians(3)   # arcs are flattened into chords of at most this angle
 
@@ -236,19 +214,18 @@ def _squircle_coverage(size, ss, half):
     return tile
 
 
-def render_tile(paths, box, size, colourway, span):
+def render_tile(paths, box, size, colourway):
     """RGBA bytes of the mark on a squircle tile in `colourway`, inside the size's margin.
 
-    The master's `box` spans `span` of the tile's width, centred on it.
+    The master's `box` spans the tile.
     """
     top, bottom, ink, sheen, edge = colourway
     ss = _supersample(size)
     margin = MARGIN.get(size, 0.0)
     half = 0.5 - margin                      # tile half-width, canvas units
     t0 = margin * size
-    k = span * 2 * half * size / box
-    off = t0 + (2 * half * size - box * k) / 2
-    figure = mark_coverage(paths, size, ss, off, off, k)
+    k = 2 * half * size / box
+    figure = mark_coverage(paths, size, ss, t0, t0, k)
     tile = _squircle_coverage(size, ss, half)
     # The edge is the ring between the tile and a squircle one hairline inside
     # it. Below 48 px a 1 px ring would muddy the tile, so it is left off.
@@ -278,12 +255,10 @@ def render_tile(paths, box, size, colourway, span):
     return bytes(px)
 
 
-def write_png(path, width, raw, height=None):
-    """Write 8-bit RGBA `raw` as a PNG `width` px wide and `height` (default `width`) px tall."""
-    height = height or width
-    stride = width * 4
+def write_png(path, size, raw):
+    stride = size * 4
     scan = bytearray()
-    for y in range(height):
+    for y in range(size):
         scan.append(0)
         scan += raw[y * stride:(y + 1) * stride]
 
@@ -292,215 +267,27 @@ def write_png(path, width, raw, height=None):
                 struct.pack(">I", zlib.crc32(tag + data) & 0xffffffff))
 
     sig = b"\x89PNG\r\n\x1a\n"
-    ihdr = struct.pack(">IIBBBBB", width, height, 8, 6, 0, 0, 0)
+    ihdr = struct.pack(">IIBBBBB", size, size, 8, 6, 0, 0, 0)
     idat = zlib.compress(bytes(scan), 9)
     with open(path, "wb") as f:
         f.write(sig + chunk(b"IHDR", ihdr) + chunk(b"IDAT", idat) + chunk(b"IEND", b""))
 
 
-# ---------- variants ----------
-
-class Variant:
-    """One drawing of the mark, its two masters and the share of the tile each master's box spans."""
-
-    def __init__(self, name, master, small_master, span, small_span):
-        self.name = name
-        self.box, self.paths = load_master(master)
-        small_box, self.small = load_master(small_master)
-        # Both cuts are scaled by the full master's box, so they must share it.
-        if small_box != self.box:
-            raise SystemExit(f"{os.path.relpath(small_master)}: viewBox {small_box:g} differs from "
-                             f"{os.path.relpath(master)}'s {self.box:g}")
-        self.span, self.small_span = span, small_span
-
-    def icon(self, size, colourway=ICON_TILE):
-        """RGBA bytes of the mark at `size` px in `colourway`."""
-        paths = self.paths if size >= DETAIL_MIN else self.small
-        span = self.span if size >= 48 else self.small_span
-        return render_tile(paths, self.box, size, colourway, span)
-
-
-def variant_names():
-    """`current` first, then every folder under VARIANT_DIR in name order."""
-    if not os.path.isdir(VARIANT_DIR):
-        return [CURRENT]
-    return [CURRENT] + sorted(n for n in os.listdir(VARIANT_DIR) if os.path.isdir(os.path.join(VARIANT_DIR, n)))
-
-
-def load_variant(name):
-    if name == CURRENT:
-        return Variant(name, MASTER_PATH, SMALL_MASTER_PATH, FIGURE_SPAN, SMALL_FIGURE_SPAN)
-    if name not in variant_names():
-        raise SystemExit(f"unknown variant {name!r}; known: {', '.join(variant_names())}")
-    if not re.fullmatch(r"[a-z0-9-]+", name):
-        raise SystemExit(f"variant {name!r} must be named in lowercase kebab-case, as the review labels are")
-    folder = os.path.join(VARIANT_DIR, name)
-    # A variant's viewBox is the tile itself, so its masters alone decide how
-    # much of the tile the mark fills.
-    return Variant(name, os.path.join(folder, "scoop.svg"), os.path.join(folder, "scoop-16.svg"), 1.0, 1.0)
-
-
-# ---------- review images ----------
-
-LIGHT_TOOLBAR = (0xF1, 0xF3, 0xF4)  # Chrome's light toolbar
-DARK_TOOLBAR = (0x35, 0x36, 0x3A)   # Chrome's dark toolbar
-PAGE = (0xFF, 0xFF, 0xFF)           # GitHub's light page, behind the sheets
-INK = (0x3C, 0x40, 0x43)            # label text
-TOOLBAR_SIZES = (16, 32, 48)
-ZOOM = 4                            # magnification of the 16 px icon after the actual sizes
-GAP = 16
-
-# A 3 x 5 bitmap font for the labels, one string of bits per row.
-FONT = {c: g.split() for c, g in {
-    "a": "010 101 111 101 101", "b": "110 101 110 101 110", "c": "011 100 100 100 011",
-    "d": "110 101 101 101 110", "e": "111 100 110 100 111", "f": "111 100 110 100 100",
-    "g": "011 100 101 101 011", "h": "101 101 111 101 101", "i": "111 010 010 010 111",
-    "j": "001 001 001 101 010", "k": "101 101 110 101 101", "l": "100 100 100 100 111",
-    "m": "101 111 111 101 101", "n": "110 101 101 101 101", "o": "010 101 101 101 010",
-    "p": "110 101 110 100 100", "q": "010 101 101 110 011", "r": "110 101 110 101 101",
-    "s": "011 100 010 001 110", "t": "111 010 010 010 010", "u": "101 101 101 101 111",
-    "v": "101 101 101 101 010", "w": "101 101 111 111 101", "x": "101 101 010 101 101",
-    "y": "101 101 010 010 010", "z": "111 001 010 100 111", "0": "111 101 101 101 111",
-    "1": "010 110 010 010 111", "2": "110 001 010 100 111", "3": "110 001 010 001 110",
-    "4": "101 101 111 001 001", "5": "111 100 110 001 110", "6": "011 100 111 101 111",
-    "7": "111 001 010 010 010", "8": "111 101 111 101 111", "9": "111 101 111 001 110",
-    "-": "000 000 111 000 000", " ": "000 000 000 000 000",
-}.items()}
-TEXT_SCALE = 2
-TEXT_HEIGHT = 5 * TEXT_SCALE
-STRIP = 16 * ZOOM + 2 * GAP          # height of one toolbar strip
-STRIP_WIDTH = GAP + sum(s + GAP for s in TOOLBAR_SIZES) + 16 * ZOOM + GAP
-
-
-class Sheet:
-    """An opaque RGB canvas that icons are laid onto at whole-pixel positions."""
-
-    def __init__(self, width, height, color):
-        self.width, self.height = width, height
-        self.px = bytearray(bytes(color) * (width * height))
-
-    def rect(self, x, y, w, h, color):
-        for row in range(y, y + h):
-            at = (row * self.width + x) * 3
-            self.px[at:at + w * 3] = bytes(color) * w
-
-    def paste(self, raw, size, x, y, zoom=1):
-        """Lay RGBA bytes `size` px square over the canvas at (x, y), each pixel `zoom` px wide."""
-        for row in range(size * zoom):
-            for col in range(size * zoom):
-                i = ((row // zoom) * size + col // zoom) * 4
-                a = raw[i + 3] / 255
-                at = ((y + row) * self.width + x + col) * 3
-                for c in range(3):
-                    self.px[at + c] = round(self.px[at + c] * (1 - a) + raw[i + c] * a)
-
-    def text(self, x, y, label):
-        for ch in label.lower():
-            for r, bits in enumerate(FONT[ch]):
-                for c, bit in enumerate(bits):
-                    if bit == "1":
-                        self.rect(x + c * TEXT_SCALE, y + r * TEXT_SCALE, TEXT_SCALE, TEXT_SCALE, INK)
-            x += 4 * TEXT_SCALE
-
-    def save(self, path):
-        raw = bytearray()
-        for i in range(0, len(self.px), 3):
-            raw += self.px[i:i + 3] + b"\xff"
-        os.makedirs(os.path.dirname(path), exist_ok=True)
-        write_png(path, self.width, bytes(raw), self.height)
-        print("wrote", os.path.relpath(path))
-
-
-def _strip(sheet, icons, x, y, color):
-    """Draw a toolbar strip in `color` with the 16, 32 and 48 px icons at actual size and the 16 px one zoomed."""
-    sheet.rect(x, y, STRIP_WIDTH, STRIP, color)
-    for s in TOOLBAR_SIZES:
-        x += GAP
-        sheet.paste(icons[s], s, x, y + (STRIP - s) // 2)
-        x += s
-    sheet.paste(icons[16], 16, x + GAP, y + GAP, ZOOM)
-
-
-COLOURWAYS = ((WHITE_TILE, "green on white"), (GREEN_TILE, "white on green"))
-
-
-def _label(variant, colourway, name):
-    """`name`, marked shipped when it is the shipped variant in the extension icons' colourway."""
-    return f"{name} shipped" if variant.name == SHIPPED and colourway is ICON_TILE else name
-
-
-def review(variant):
-    """Write the variant's two review images, `toolbar.png` and `logo.png`, to its own folder."""
-    folder = os.path.join(REVIEW_DIR, variant.name)
-    block = TEXT_HEIGHT + GAP // 2 + 2 * STRIP + GAP   # one colourway's label and two strips
-    sheet = Sheet(STRIP_WIDTH + 2 * GAP, 2 * GAP + TEXT_HEIGHT + len(COLOURWAYS) * block, PAGE)
-    sheet.text(GAP, GAP, f"{variant.name} 16 32 48 px")
-    y = 2 * GAP + TEXT_HEIGHT
-    for colourway, name in COLOURWAYS:
-        icons = {s: variant.icon(s, colourway) for s in TOOLBAR_SIZES}
-        sheet.text(GAP, y, _label(variant, colourway, name))
-        y += TEXT_HEIGHT + GAP // 2
-        _strip(sheet, icons, GAP, y, LIGHT_TOOLBAR)
-        _strip(sheet, icons, GAP, y + STRIP, DARK_TOOLBAR)
-        y += 2 * STRIP + GAP
-    sheet.save(os.path.join(folder, "toolbar.png"))
-
-    # Both README logos at 512 px, green tile then white tile.
-    sheet = Sheet(2 * LOGO_SIZE, LOGO_SIZE, PAGE)
-    for i, colourway in enumerate((GREEN_TILE, WHITE_TILE)):
-        sheet.paste(variant.icon(LOGO_SIZE, colourway), LOGO_SIZE, i * LOGO_SIZE, 0)
-    sheet.save(os.path.join(folder, "logo.png"))
-
-
-def overview(variants):
-    """Write one sheet with a row per variant and colourway: its toolbars and its 128 px icon.
-
-    It is at most 800 px wide, narrow enough for a PR description to show it at actual size.
-    """
-    row = TEXT_HEIGHT + GAP // 2 + 128 + GAP   # the 128 px icon is the tallest item in a row
-    rows = [(v, c, n) for v in variants for c, n in COLOURWAYS]
-    sheet = Sheet(GAP + 2 * (STRIP_WIDTH + GAP) + 128 + GAP, GAP + row * len(rows), PAGE)
-    for i, (variant, colourway, name) in enumerate(rows):
-        y = GAP + i * row
-        icons = {s: variant.icon(s, colourway) for s in TOOLBAR_SIZES}
-        sheet.text(GAP, y, f"{variant.name} {_label(variant, colourway, name)}")
-        y += TEXT_HEIGHT + GAP // 2
-        x = GAP
-        for color in (LIGHT_TOOLBAR, DARK_TOOLBAR):
-            _strip(sheet, icons, x, y + (128 - STRIP) // 2, color)
-            x += STRIP_WIDTH + GAP
-        sheet.paste(variant.icon(128, colourway), 128, x, y)
-    sheet.save(os.path.join(REVIEW_DIR, "overview.png"))
-
-
-def ship(variant):
-    """Write the extension icons and both README logos from `variant`."""
+def main():
+    box, paths = load_master()
+    small_box, small = load_master(SMALL_MASTER_PATH)
+    # Both cuts are scaled by the full master's box, so they must share it.
+    if small_box != box:
+        raise SystemExit(f"{os.path.relpath(SMALL_MASTER_PATH)}: viewBox {small_box:g} differs from "
+                         f"{os.path.relpath(MASTER_PATH)}'s {box:g}")
     os.makedirs(OUT_DIR, exist_ok=True)
     for s in SIZES:
         p = os.path.join(OUT_DIR, f"icon{s}.png")
-        write_png(p, s, variant.icon(s))
+        write_png(p, s, render_tile(paths if s >= DETAIL_MIN else small, box, s, ICON_TILE))
         print("wrote", os.path.relpath(p))
     for p, colourway in ((LOGO_PATH, GREEN_TILE), (LOGO_WHITE_PATH, WHITE_TILE)):
-        write_png(p, LOGO_SIZE, variant.icon(LOGO_SIZE, colourway))
+        write_png(p, LOGO_SIZE, render_tile(paths, box, LOGO_SIZE, colourway))
         print("wrote", os.path.relpath(p))
-
-
-def main():
-    parser = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
-    parser.add_argument("--variant", help=f"the variant to draw (default {SHIPPED!r}, the shipped icon)")
-    parser.add_argument("--review", action="store_true",
-                        help="write review images instead of the shipped files, for --variant alone "
-                             "or, without it, for every variant plus the overview sheet")
-    args = parser.parse_args()
-    if not args.review:
-        ship(load_variant(args.variant or SHIPPED))
-    elif args.variant:
-        review(load_variant(args.variant))
-    else:
-        variants = [load_variant(n) for n in variant_names()]
-        for v in variants:
-            review(v)
-        overview(variants)
 
 
 if __name__ == "__main__":
