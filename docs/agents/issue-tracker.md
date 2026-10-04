@@ -15,6 +15,23 @@ Issues and specs for this repo live as GitHub issues in `yahyabedirhan/scoop`, s
 
 Infer the repo from `git remote -v`; `gh` does this automatically when run inside a clone.
 
+## Title prefixes
+
+Start every issue title with one prefix, then `: ` and a capitalized title with no trailing period, for example `QA: Verify the panel on a VPS`. When more than one prefix fits, use the first one in this order:
+
+1. `QA`: manual work for the maintainer.
+2. A semantic prefix from the list below: one area of this project.
+3. `Bug`, `Feature`, `Chore` or `Spec`: the kind of work.
+4. `Research`: a question to answer before the work starts.
+
+Write each prefix the way its maker writes it. Use a semantic prefix before a generic one when one fits.
+
+### Semantic prefixes
+
+- None yet.
+
+Reuse a prefix from this list before you add a new one. Add a new one when no prefix fits and the issue belongs to one tool, product, skill or workflow. Add it to this list in the same change.
+
 ## Pull requests as a triage surface
 
 **PRs as a request surface: no.** _(Set to `yes` if this repo treats external PRs as feature requests; `/triage` reads this flag.)_
